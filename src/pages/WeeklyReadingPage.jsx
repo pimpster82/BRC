@@ -270,21 +270,28 @@ const WeeklyReadingPage = () => {
     // Progressive Enhancement: Try JW Library first, fallback to web
     if (links?.library && links?.web) {
       console.log('🚀 Attempting to open JW Library app...')
+      console.log('Deep Link URL:', links.library)
 
-      // Try to open JW Library deep link
-      window.location.href = links.library
+      // Standard approach: Use iframe to trigger deep link
+      // This doesn't change the page if app is not installed
+      const iframe = document.createElement('iframe')
+      iframe.style.display = 'none'
+      document.body.appendChild(iframe)
+      iframe.src = links.library
 
       // Fallback to web link if JW Library is not installed
       // Wait 1.5 seconds - if no response from app, open website instead
       const fallbackTimer = setTimeout(() => {
         console.log('⚠️ JW Library not responding, falling back to website')
-        window.location.href = links.web
+        document.body.removeChild(iframe)
+        window.open(links.web, '_blank', 'noopener,noreferrer')
       }, 1500)
 
-      // If user returns to app within 1.5s, clear the timeout (user has JW Library)
+      // If user switches to app, clear the timeout (user has JW Library)
       const handleFocus = () => {
         clearTimeout(fallbackTimer)
         window.removeEventListener('focus', handleFocus)
+        document.body.removeChild(iframe)
         console.log('✓ JW Library app opened successfully')
       }
       window.addEventListener('focus', handleFocus)

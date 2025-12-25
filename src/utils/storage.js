@@ -385,16 +385,22 @@ export const loadProgressFromFirebase = async (userId) => {
 
     // Load from Firebase
     const firebaseProgress = await loadAllUserProgress(userId)
+    console.log(`   Firebase data:`, firebaseProgress)
 
     // Get current local data
     const localDaily = getDailyTextData()
     const localWeekly = getWeeklyReadingData()
     const localPersonal = getPersonalReadingData()
 
+    console.log(`   Local weekly before merge:`, localWeekly)
+    console.log(`   Firebase weekly:`, firebaseProgress?.weekly)
+
     // Merge using timestamp logic (last-write-wins)
     const mergedDaily = mergeProgress(localDaily, firebaseProgress?.daily)
     const mergedWeekly = mergeProgress(localWeekly, firebaseProgress?.weekly)
     const mergedPersonal = mergeProgress(localPersonal, firebaseProgress?.personal)
+
+    console.log(`   Merged weekly after merge:`, mergedWeekly)
 
     // Save merged data back to localStorage
     if (mergedDaily) saveDailyTextData(mergedDaily)
@@ -402,6 +408,7 @@ export const loadProgressFromFirebase = async (userId) => {
     if (mergedPersonal) savePersonalReadingData(mergedPersonal)
 
     console.log('✓ Progress merged and saved to localStorage')
+    console.log('⚠️ Note: weeklyReading_current (current week details) is NOT synced! This is a separate data structure.')
 
     return {
       daily: mergedDaily,

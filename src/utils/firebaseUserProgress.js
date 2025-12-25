@@ -94,6 +94,9 @@ export const saveWeeklyProgressToFirebase = async (weeklyReadingData) => {
   try {
     const userId = auth?.currentUser?.uid
 
+    console.log(`📤 Saving weekly progress to Firebase...`)
+    console.log(`   Data being saved:`, weeklyReadingData)
+
     if (!userId) {
       console.warn('⚠️ No authenticated user, falling back to device-based sync')
       const deviceId = getOrCreateDeviceId()
@@ -116,6 +119,7 @@ export const saveWeeklyProgressToFirebase = async (weeklyReadingData) => {
       lastUpdated: Date.now()
     }
 
+    console.log(`   Saving to path: users/${userId}/progress/weekly`)
     await set(progressRef, dataToSave)
 
     console.log(`✓ Weekly progress synced to Firebase (user: ${userId.substring(0, 8)}...)`)

@@ -97,8 +97,17 @@ function HomePage() {
       setIsRefreshing(true)
       try {
         console.log('🔄 Reloading progress from Firebase...')
-        await loadProgressFromFirebase(currentUser.uid)
+        console.log(`   User: ${currentUser.email}`)
+        console.log(`   Before sync - weeklyReading_current:`, localStorage.getItem('weeklyReading_current'))
+
+        const result = await loadProgressFromFirebase(currentUser.uid)
+
         console.log('✓ Progress reloaded successfully')
+        console.log(`   After sync - weeklyReading_current:`, localStorage.getItem('weeklyReading_current'))
+        console.log(`   Merged weekly data:`, result?.weekly)
+
+        // Trigger WeeklyReadingCard update
+        window.dispatchEvent(new Event('weeklyReadingUpdated'))
       } catch (error) {
         console.error('✗ Failed to reload progress:', error)
       } finally {

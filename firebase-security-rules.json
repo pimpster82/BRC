@@ -2,8 +2,6 @@
   "rules": {
     "devices": {
       "{deviceId}": {
-        // Each device can read and write its own data
-        // No authentication required - device identified by UUID
         ".read": true,
         ".write": true,
 
@@ -11,7 +9,7 @@
           "daily": {
             ".validate": "newData.hasChildren(['completedDates', 'currentStreak', 'longestStreak', 'lastUpdated'])",
             "completedDates": {
-              ".validate": "newData.isArray()"
+              ".validate": "newData.hasChildren() || newData.val() === []"
             },
             "currentStreak": {
               ".validate": "newData.isNumber()"
@@ -26,7 +24,7 @@
           "weekly": {
             ".validate": "newData.hasChildren(['completedWeeks', 'currentMeetingDay', 'lastUpdated']) || !newData.exists()",
             "completedWeeks": {
-              ".validate": "newData.isArray()"
+              ".validate": "newData.hasChildren() || newData.val() === []"
             },
             "currentMeetingDay": {
               ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 6"
@@ -38,7 +36,7 @@
           "personal": {
             ".validate": "newData.hasChildren(['chaptersRead', 'selectedPlan', 'lastUpdated']) || !newData.exists()",
             "chaptersRead": {
-              ".validate": "newData.isArray()"
+              ".validate": "newData.hasChildren() || newData.val() === []"
             },
             "selectedPlan": {
               ".validate": "newData.isString()"
@@ -65,18 +63,16 @@
     },
 
     "schedules": {
-      // Shared read-only schedules
       ".read": true,
       "{year}": {
         ".write": false,
         "weeks": {
-          ".validate": "newData.isArray()"
+          ".validate": "newData.hasChildren() || newData.val() === []"
         }
       }
     },
 
     "yeartexts": {
-      // Shared read-only yeartexts
       ".read": true,
       "{year}": {
         ".write": false

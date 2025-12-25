@@ -279,11 +279,16 @@ const WeeklyReadingPage = () => {
       document.body.appendChild(iframe)
       iframe.src = links.library
 
+      let iframeRemoved = false
+
       // Fallback to web link if JW Library is not installed
       // Wait 1.5 seconds - if no response from app, open website instead
       const fallbackTimer = setTimeout(() => {
         console.log('⚠️ JW Library not responding, falling back to website')
-        document.body.removeChild(iframe)
+        if (!iframeRemoved && iframe.parentNode) {
+          document.body.removeChild(iframe)
+          iframeRemoved = true
+        }
         window.open(links.web, '_blank', 'noopener,noreferrer')
       }, 1500)
 
@@ -291,7 +296,10 @@ const WeeklyReadingPage = () => {
       const handleFocus = () => {
         clearTimeout(fallbackTimer)
         window.removeEventListener('focus', handleFocus)
-        document.body.removeChild(iframe)
+        if (!iframeRemoved && iframe.parentNode) {
+          document.body.removeChild(iframe)
+          iframeRemoved = true
+        }
         console.log('✓ JW Library app opened successfully')
       }
       window.addEventListener('focus', handleFocus)

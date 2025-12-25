@@ -195,14 +195,14 @@ export function buildLanguageSpecificWebLink(bookNumber, chapter, startVerse = 1
   const wtlocale = localeCodeMap[languageCode] || 'E';
 
   // Build mobile-friendly JW.org finder URL (works great on phone)
-  // Format: https://www.jw.org/finder?srcid=jwshare&wtlocale=E&prefer=lang&bible=39004001&pub=nwsty
+  // Format: https://www.jw.org/finder?srcid=jwlshare&wtlocale=E&prefer=lang&bible=39004001&pub=nwsty
   // bible parameter: BB (book 01-66) + CCC (chapter 000-999) + VVV (verse 000-999)
   const jwOrgBookNumber = bookNumber.toString().padStart(2, '0');
   const chapterStr = chapter.toString().padStart(3, '0');
   const startVerseStr = startVerse.toString().padStart(3, '0');
 
   const bibleParam = `${jwOrgBookNumber}${chapterStr}${startVerseStr}`;
-  const webUrl = `https://www.jw.org/finder?srcid=jwshare&wtlocale=${wtlocale}&prefer=lang&bible=${bibleParam}&pub=nwsty`;
+  const webUrl = `https://www.jw.org/finder?srcid=jwlshare&wtlocale=${wtlocale}&prefer=lang&bible=${bibleParam}&pub=nwsty`;
 
   // Build JW Library deep link for app opening
   // Format: jwpub://b/NWT/BOOK:CHAPTER:VERSE-BOOK:CHAPTER:VERSE

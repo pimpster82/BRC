@@ -1,0 +1,86 @@
+{
+  "rules": {
+    "devices": {
+      "{deviceId}": {
+        // Each device can read and write its own data
+        // No authentication required - device identified by UUID
+        ".read": true,
+        ".write": true,
+
+        "progress": {
+          "daily": {
+            ".validate": "newData.hasChildren(['completedDates', 'currentStreak', 'longestStreak', 'lastUpdated'])",
+            "completedDates": {
+              ".validate": "newData.isArray()"
+            },
+            "currentStreak": {
+              ".validate": "newData.isNumber()"
+            },
+            "longestStreak": {
+              ".validate": "newData.isNumber()"
+            },
+            "lastUpdated": {
+              ".validate": "newData.isString()"
+            }
+          },
+          "weekly": {
+            ".validate": "newData.hasChildren(['completedWeeks', 'currentMeetingDay', 'lastUpdated']) || !newData.exists()",
+            "completedWeeks": {
+              ".validate": "newData.isArray()"
+            },
+            "currentMeetingDay": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 6"
+            },
+            "lastUpdated": {
+              ".validate": "newData.isString()"
+            }
+          },
+          "personal": {
+            ".validate": "newData.hasChildren(['chaptersRead', 'selectedPlan', 'lastUpdated']) || !newData.exists()",
+            "chaptersRead": {
+              ".validate": "newData.isArray()"
+            },
+            "selectedPlan": {
+              ".validate": "newData.isString()"
+            },
+            "lastUpdated": {
+              ".validate": "newData.isString()"
+            }
+          }
+        },
+
+        "stats": {
+          ".validate": "newData.hasChildren(['deviceId', 'deviceName', 'lastSync'])",
+          "deviceId": {
+            ".validate": "newData.isString()"
+          },
+          "deviceName": {
+            ".validate": "newData.isString()"
+          },
+          "lastSync": {
+            ".validate": "newData.isString()"
+          }
+        }
+      }
+    },
+
+    "schedules": {
+      // Shared read-only schedules
+      ".read": true,
+      "{year}": {
+        ".write": false,
+        "weeks": {
+          ".validate": "newData.isArray()"
+        }
+      }
+    },
+
+    "yeartexts": {
+      // Shared read-only yeartexts
+      ".read": true,
+      "{year}": {
+        ".write": false
+      }
+    }
+  }
+}

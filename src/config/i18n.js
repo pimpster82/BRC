@@ -76,7 +76,7 @@ export const translations = {
     'settings.reset_progress_confirm': 'Möchtest du wirklich ALLE Lesefortschritte zurücksetzen? Dies kann nicht rückgängig gemacht werden!',
     'settings.reset_success': '✅ Lesefortschritt erfolgreich zurückgesetzt!',
     'settings.version': 'Bible Reading Companion v{version}',
-    'settings.made_with': 'Made with ❤️ for Bible readers',
+    'settings.made_with': 'Gemacht mit ❤️ für Bibelleser',
 
     // Weekdays
     'weekday.sunday': 'Sonntag',

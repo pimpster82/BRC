@@ -14,10 +14,26 @@ export const getDailyTextData = () => {
   if (!data) {
     return {
       completedDates: [],
-      currentStreak: 0
+      currentStreak: 0,
+      longestStreak: 0
     }
   }
-  return JSON.parse(data)
+  try {
+    const parsed = JSON.parse(data)
+    // Ensure all required fields exist (defensive against corrupted data)
+    return {
+      completedDates: Array.isArray(parsed.completedDates) ? parsed.completedDates : [],
+      currentStreak: typeof parsed.currentStreak === 'number' ? parsed.currentStreak : 0,
+      longestStreak: typeof parsed.longestStreak === 'number' ? parsed.longestStreak : 0
+    }
+  } catch (error) {
+    console.warn('⚠️ Corrupted daily text data in localStorage, resetting:', error)
+    return {
+      completedDates: [],
+      currentStreak: 0,
+      longestStreak: 0
+    }
+  }
 }
 
 export const saveDailyTextData = (data) => {
@@ -121,20 +137,56 @@ export const getFormattedDate = (date) => {
   return dateObj.toLocaleDateString('en-US', options)
 }
 
-// Weekly Reading Storage Functions (placeholder for future)
+// Weekly Reading Storage Functions
 export const getWeeklyReadingData = () => {
   const data = localStorage.getItem(STORAGE_KEYS.WEEKLY_READING)
-  return data ? JSON.parse(data) : { completedWeeks: [] }
+  if (!data) {
+    return {
+      completedWeeks: [],
+      currentMeetingDay: 0
+    }
+  }
+  try {
+    const parsed = JSON.parse(data)
+    return {
+      completedWeeks: Array.isArray(parsed.completedWeeks) ? parsed.completedWeeks : [],
+      currentMeetingDay: typeof parsed.currentMeetingDay === 'number' ? parsed.currentMeetingDay : 0
+    }
+  } catch (error) {
+    console.warn('⚠️ Corrupted weekly reading data in localStorage, resetting:', error)
+    return {
+      completedWeeks: [],
+      currentMeetingDay: 0
+    }
+  }
 }
 
 export const saveWeeklyReadingData = (data) => {
   localStorage.setItem(STORAGE_KEYS.WEEKLY_READING, JSON.stringify(data))
 }
 
-// Personal Reading Storage Functions (placeholder for future)
+// Personal Reading Storage Functions
 export const getPersonalReadingData = () => {
   const data = localStorage.getItem(STORAGE_KEYS.PERSONAL_READING)
-  return data ? JSON.parse(data) : { chaptersRead: [] }
+  if (!data) {
+    return {
+      chaptersRead: [],
+      selectedPlan: 'free'
+    }
+  }
+  try {
+    const parsed = JSON.parse(data)
+    return {
+      chaptersRead: Array.isArray(parsed.chaptersRead) ? parsed.chaptersRead : [],
+      selectedPlan: typeof parsed.selectedPlan === 'string' ? parsed.selectedPlan : 'free'
+    }
+  } catch (error) {
+    console.warn('⚠️ Corrupted personal reading data in localStorage, resetting:', error)
+    return {
+      chaptersRead: [],
+      selectedPlan: 'free'
+    }
+  }
 }
 
 export const savePersonalReadingData = (data) => {

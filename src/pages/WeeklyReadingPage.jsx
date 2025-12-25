@@ -272,7 +272,14 @@ const WeeklyReadingPage = () => {
     // Otherwise the web link opens in browser
     if (links?.web) {
       console.log('📱 Opening link:', links.web)
-      window.open(links.web, '_blank', 'noopener,noreferrer')
+      // Use proper way to open with security attributes
+      const link = document.createElement('a')
+      link.href = links.web
+      link.target = '_blank'
+      link.rel = 'noopener noreferrer'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
     } else {
       console.error('No valid link available')
     }

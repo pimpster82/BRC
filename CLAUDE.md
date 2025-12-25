@@ -35,7 +35,9 @@ const result = await WebFetch('https://wol.jw.org/...', 'extract yeartext')
 | **Weekly Reading Tracking** | ⚠️ PARTIAL | Schedule fetching & display works; full chapter tracking UI incomplete |
 | **Personal Bible Program (PBP)** | 🔶 DATA ONLY | Storage structures exist; UI components not implemented |
 | **5-Language i18n** | ✅ COMPLETE | All 5 languages fully translated (100+ keys) |
-| **Firebase Integration** | ✅ COMPLETE | Schedule & yeartext sync working; user auth not implemented |
+| **Multilingual Yeartext** | ✅ NEW | Yeartext downloaded as English, all 5 languages stored in Firebase, manual editing support |
+| **Display Settings** | ✅ NEW | Toggle yeartext visibility, extensible settings panel for future options |
+| **Firebase Integration** | ✅ COMPLETE | Schedule & multilingual yeartext sync working; user auth not implemented |
 | **Offline Capability** | ✅ PARTIAL | Works offline after initial load; no service worker registered |
 | **PWA Features** | ❌ NOT IMPLEMENTED | No manifest.json, no service worker, no install prompt |
 | **Notifications/Reminders** | 🔶 UI ONLY | Settings UI exists; backend notification logic not implemented |
@@ -205,15 +207,21 @@ The Firebase integration enables:
     // One document per year (shared, not per user)
   },
 
+  // ✅ UPDATED: Multilingual yeartext structure
   yeartexts: {
     2025: {
-      scripture: 'Psalm 56:3',
-      text: 'I am afraid, but I put my trust in you.',
-      year: 2025,
-      lastUpdated: '2025-01-06T10:30:00Z'
+      english: {
+        scripture: 'Psalm 56:3',
+        text: 'I am afraid, but I put my trust in you.',
+        lastUpdated: '2025-01-06T10:30:00Z'
+      },
+      de: { scripture: 'Psalm 56:3', text: '...', lastUpdated: '...' },
+      es: { scripture: 'Psalm 56:3', text: '...', lastUpdated: '...' },
+      it: { scripture: 'Psalm 56:3', text: '...', lastUpdated: '...' },
+      fr: { scripture: 'Psalm 56:3', text: '...', lastUpdated: '...' }
     },
     2026: { ... }
-    // One document per year (shared)
+    // One document per year with language-specific subtrees
   },
 
   // ❌ NOT YET IMPLEMENTED (Planned for Phase 3)
@@ -259,14 +267,16 @@ VITE_FIREBASE_APP_ID=...
 **File:** `src/utils/firebaseSchedules.js`
 - `saveScheduleToFirebase(year, weeklySchedule)` - Save to Firebase + cache
 - `loadScheduleFromFirebase(year)` - Load from cache first, then Firebase
-- `saveYeartextToFirebase(year, yeartextData)` - Save yeartext with message field
-- `loadYeartextFromFirebase(year)` - Load from cache first, then Firebase
+- `saveYeartextToFirebase(year, yeartextData, language = 'english')` - Save yeartext for specific language (de, en, es, it, fr)
+- `loadYeartextFromFirebase(year, language = 'english')` - Load yeartext from specific language path; no fallback
+- `updateYeartextTranslation(year, language, translationData)` - Update translation for manual editing
+- `getAvailableTranslations(year)` - List available language translations for a year
 - `getAvailableScheduleYears()` - List years in Firebase
 - `deleteScheduleFromFirebase(year)` - Remove schedule
 
 **File:** `src/utils/storage.js` (Extended)
 - `getScheduleFromCache(year)` / `saveScheduleToCache(year, schedule)`
-- `getYeartextFromCache(year)` / `saveYeartextToCache(year, yeartext)`
+- `getYeartextFromCache(year, language)` / `saveYeartextToCache(year, yeartextData, language)`
 - `getCachedScheduleYears()` / `getCachedYeartextYears()`
 
 ### User Flow: Download Schedule
@@ -455,6 +465,7 @@ weeks: [
   settings_readingPlan: 'free',  // For future PBP feature
   settings_dailyReminder: 'false',  // UI exists, backend not implemented
   settings_reminderTime: '08:00',  // UI exists, backend not implemented
+  settings_showYeartext: 'true',  // ✅ NEW: Toggle yeartext card visibility
 
   testDate: '2025-12-25'  // Development helper for date testing
 }
@@ -479,13 +490,14 @@ weeks: [
 | **Schedule Fetching** | `src/utils/scheduleUpdater.js` | ✅ | `fetchScheduleFromWOL(year)` - Downloads from JW.org with CORS proxy fallback |
 | **Yeartext Fetching** | `src/utils/yeartextFetcher.js` | ✅ | `fetchYeartextFromWol(year, language)` - Returns hardcoded 2026+ data |
 | **Firebase Schedule Sync** | `src/utils/firebaseSchedules.js` | ✅ | `saveScheduleToFirebase()`, `loadScheduleFromFirebase()`, `getAvailableScheduleYears()` |
-| **Firebase Yeartext Sync** | `src/utils/firebaseSchedules.js` | ✅ | `saveYeartextToFirebase()`, `loadYeartextFromFirebase()` |
+| **Firebase Yeartext Sync (Multilingual)** | `src/utils/firebaseSchedules.js` | ✅ NEW | `saveYeartextToFirebase(year, data, language)`, `loadYeartextFromFirebase(year, language)`, `updateYeartextTranslation()`, `getAvailableTranslations()` |
 | **Multilingual i18n** | `src/config/i18n.js` | ✅ | 100+ translation keys for 5 languages; `t('key')`, `t('key', null, { param: value })` |
 | **Language Switching** | `src/config/languages.js` | ✅ | `getCurrentLanguage()`, `setCurrentLanguage()`, `SUPPORTED_LANGUAGES` |
 | **Daily Text Card** | `src/components/DailyTextCard.jsx` | ✅ | Full UI with mark complete, streak, JW.org link |
 | **Weekly Reading Card** | `src/components/WeeklyReadingCard.jsx` | ✅ | Shows current week, chapters, links to detailed page |
 | **Weekly Reading Page** | `src/pages/WeeklyReadingPage.jsx` | ⚠️ | Chapter-by-chapter tracker (partial - core functionality there) |
-| **Settings Page** | `src/pages/SettingsPage.jsx` | ⚠️ | Language, meeting day, schedule download, reset data (notifications UI only) |
+| **Settings Page** | `src/pages/SettingsPage.jsx` | ✅ | Language, meeting day, schedule download, reset data, display settings (notifications UI only) |
+| **Display Settings** | `src/pages/SettingsPage.jsx` | ✅ NEW | Toggle yeartext visibility; extensible for future app settings |
 | **Parser Test Bench** | `src/pages/ParserTestBench.jsx` | ✅ | Development tool to test Bible reference parsing |
 
 ### Data Sources
@@ -592,8 +604,13 @@ weeks: [
 ## Deployment
 
 - **Build:** `npm run build` creates optimized bundle in `/dist`
-- **Deploy:** `npm run deploy` pushes to `gh-pages` branch on GitHub
-- **Base path:** App runs at `/bible-reading-companion/` on GitHub Pages
+- **Deploy (GitHub Pages):** `npm run deploy` pushes to `gh-pages` branch on GitHub
+  - For GitHub Pages: Change vite.config.js `base` to `/BRC/` and rebuild
+- **Deploy (Vercel):** Connected to GitHub repo; automatically deploys on push
+  - **Live URL:** https://brc-liard.vercel.app
+  - **Base path:** `base: '/'` in vite.config.js (Vercel deploys to root)
+  - **Cache strategy:** vite.config.js sets `Cache-Control: no-store` headers to prevent stale assets
+- **Current configuration:** `base: '/'` for Vercel; change comment in vite.config.js for GitHub Pages
 
 ## Documentation References
 

@@ -63,11 +63,25 @@ export const AuthProvider = ({ children }) => {
 
   /**
    * Logout current user
+   * Syncs all progress to Firebase before logging out
    * @returns {Promise<void>}
    */
   const logout = async () => {
     try {
       setError(null)
+
+      // Sync progress to Firebase before logout
+      if (currentUser?.uid) {
+        const { syncAllProgressToFirebase } = await import('../utils/storage.js')
+        try {
+          await syncAllProgressToFirebase(currentUser.uid)
+          console.log('✓ Progress synced to Firebase before logout')
+        } catch (syncError) {
+          console.warn('⚠️ Could not sync progress to Firebase:', syncError.message)
+          // Continue with logout even if sync fails
+        }
+      }
+
       await signOut(auth)
       console.log('✓ User logged out')
     } catch (err) {
@@ -80,16 +94,29 @@ export const AuthProvider = ({ children }) => {
   /**
    * Listen for authentication state changes
    * This runs when app loads and whenever user logs in/out
+   * When user logs in, load and merge progress from Firebase
    */
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user)
-      setLoading(false)
+
       if (user) {
         console.log('ℹ️ Auth state changed - user logged in:', user.uid)
+
+        // Load and merge progress from Firebase on login
+        try {
+          const { loadProgressFromFirebase } = await import('../utils/storage.js')
+          await loadProgressFromFirebase(user.uid)
+          console.log('✓ Progress loaded and merged from Firebase')
+        } catch (error) {
+          console.warn('⚠️ Could not load progress from Firebase:', error.message)
+          // Graceful degradation: continue with local data
+        }
       } else {
         console.log('ℹ️ Auth state changed - user logged out')
       }
+
+      setLoading(false)
     })
 
     // Cleanup subscription on unmount
@@ -103,7 +130,8 @@ export const AuthProvider = ({ children }) => {
     register,
     login,
     logout,
-    isAuthenticated: !!currentUser
+    isAuthenticated: !!currentUser,
+    isLoading: loading
   }
 
   return (

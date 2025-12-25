@@ -1,6 +1,7 @@
 // Firebase configuration and initialization
 import { initializeApp } from 'firebase/app'
 import { getDatabase } from 'firebase/database'
+import { getAuth } from 'firebase/auth'
 
 // Firebase configuration from environment variables
 const firebaseConfig = {
@@ -16,6 +17,7 @@ const firebaseConfig = {
 // Initialize Firebase
 let app
 let database
+let auth
 
 try {
   // Check if all required config variables are present
@@ -33,6 +35,7 @@ try {
   if (missingVars.length === 0) {
     app = initializeApp(firebaseConfig)
     database = getDatabase(app)
+    auth = getAuth(app)
     console.log('%c✓ Firebase initialized successfully', 'color: green; font-weight: bold; font-size: 14px')
     console.log('Project:', import.meta.env.VITE_FIREBASE_PROJECT_ID)
     console.log('Database URL:', `https://${import.meta.env.VITE_FIREBASE_PROJECT_ID}.firebaseio.com`)
@@ -44,7 +47,7 @@ try {
   console.error('✗ Firebase initialization failed:', error)
 }
 
-export { app, database }
+export { app, database, auth }
 export const isFirebaseConfigured = () => {
   return Boolean(database)
 }

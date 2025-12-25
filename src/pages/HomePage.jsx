@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import { Calendar, BookOpen, Lightbulb, ExternalLink, Settings, X, RefreshCw } from 'lucide-react'
+import { Calendar, BookOpen, Lightbulb, ExternalLink, Settings, X, RefreshCw, LogOut } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 import { t, getCurrentLanguage } from '../config/i18n'
 import { getYeartextFromCache } from '../utils/storage'
 import { loadYeartextFromFirebase } from '../utils/firebaseSchedules'
@@ -50,6 +51,7 @@ const loadYeartext = async (year) => {
 
 function HomePage() {
   const navigate = useNavigate()
+  const { logout } = useAuth()
   const [showDatePicker, setShowDatePicker] = useState(false)
   const [testDate, setTestDate] = useState(null)
   const [yeartext, setYeartext] = useState(null)
@@ -57,6 +59,19 @@ function HomePage() {
   const [translationAvailable, setTranslationAvailable] = useState(true)
   const [currentLanguage, setCurrentLanguage] = useState('en')
   const [showYeartext, setShowYeartext] = useState(true)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+
+  // Handle logout
+  const handleLogout = async () => {
+    try {
+      setIsLoggingOut(true)
+      await logout()
+      navigate('/login')
+    } catch (error) {
+      console.error('Logout error:', error)
+      setIsLoggingOut(false)
+    }
+  }
 
   // Load test date from localStorage
   useEffect(() => {
@@ -232,13 +247,24 @@ function HomePage() {
               </button>
               {t('nav.today')} - {getFormattedDate()}
             </h1>
-            <button
-              onClick={() => navigate('/settings')}
-              className="p-2 text-gray-600 hover:text-gray-900 hover:bg-white rounded-lg transition-colors"
-              aria-label="Einstellungen"
-            >
-              <Settings className="w-5 h-5" />
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => navigate('/settings')}
+                className="p-2 text-gray-600 hover:text-gray-900 hover:bg-white rounded-lg transition-colors"
+                aria-label="Einstellungen"
+              >
+                <Settings className="w-5 h-5" />
+              </button>
+              <button
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+                className="p-2 text-gray-600 hover:text-red-600 hover:bg-white rounded-lg transition-colors disabled:opacity-50"
+                aria-label="Logout"
+                title="Abmelden"
+              >
+                <LogOut className="w-5 h-5" />
+              </button>
+            </div>
           </div>
 
           {/* Date Picker Dropdown */}

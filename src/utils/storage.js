@@ -202,3 +202,163 @@ export const getCachedYeartextYears = () => {
   }
   return years.sort((a, b) => b - a)
 }
+
+/**
+ * PHASE 3: Firebase Sync Functions
+ * These functions sync user progress to Firebase Realtime Database
+ * They require the user to be authenticated (userId from auth.currentUser.uid)
+ */
+
+/**
+ * Sync daily text progress to Firebase
+ * Called when user marks daily text complete/incomplete or on logout
+ *
+ * @param {string} userId - Firebase user ID
+ * @returns {Promise<Object>} The synced data
+ */
+export const syncDailyTextToFirebase = async (userId) => {
+  if (!userId) {
+    console.warn('⚠️ Cannot sync daily text: no userId provided')
+    return null
+  }
+
+  try {
+    const { saveUserProgress } = await import('./userProgress.js')
+    const dailyData = getDailyTextData()
+    await saveUserProgress(userId, 'daily', dailyData)
+    return dailyData
+  } catch (error) {
+    console.error('✗ Failed to sync daily text to Firebase:', error)
+    throw error
+  }
+}
+
+/**
+ * Sync weekly reading progress to Firebase
+ *
+ * @param {string} userId - Firebase user ID
+ * @returns {Promise<Object>} The synced data
+ */
+export const syncWeeklyReadingToFirebase = async (userId) => {
+  if (!userId) {
+    console.warn('⚠️ Cannot sync weekly reading: no userId provided')
+    return null
+  }
+
+  try {
+    const { saveUserProgress } = await import('./userProgress.js')
+    const weeklyData = getWeeklyReadingData()
+    await saveUserProgress(userId, 'weekly', weeklyData)
+    return weeklyData
+  } catch (error) {
+    console.error('✗ Failed to sync weekly reading to Firebase:', error)
+    throw error
+  }
+}
+
+/**
+ * Sync personal reading progress to Firebase
+ *
+ * @param {string} userId - Firebase user ID
+ * @returns {Promise<Object>} The synced data
+ */
+export const syncPersonalReadingToFirebase = async (userId) => {
+  if (!userId) {
+    console.warn('⚠️ Cannot sync personal reading: no userId provided')
+    return null
+  }
+
+  try {
+    const { saveUserProgress } = await import('./userProgress.js')
+    const personalData = getPersonalReadingData()
+    await saveUserProgress(userId, 'personal', personalData)
+    return personalData
+  } catch (error) {
+    console.error('✗ Failed to sync personal reading to Firebase:', error)
+    throw error
+  }
+}
+
+/**
+ * Sync ALL progress sections to Firebase at once
+ * Useful for logout or batch sync
+ *
+ * @param {string} userId - Firebase user ID
+ * @returns {Promise<Object>} All synced data sections
+ */
+export const syncAllProgressToFirebase = async (userId) => {
+  if (!userId) {
+    console.warn('⚠️ Cannot sync progress: no userId provided')
+    return null
+  }
+
+  try {
+    console.log(`ℹ️ Syncing all progress for user ${userId} to Firebase...`)
+    const results = await Promise.all([
+      syncDailyTextToFirebase(userId),
+      syncWeeklyReadingToFirebase(userId),
+      syncPersonalReadingToFirebase(userId)
+    ])
+
+    console.log('✓ All progress synced to Firebase')
+    return {
+      daily: results[0],
+      weekly: results[1],
+      personal: results[2]
+    }
+  } catch (error) {
+    console.error('✗ Failed to sync all progress:', error)
+    throw error
+  }
+}
+
+/**
+ * Load and merge user progress from Firebase
+ * Uses timestamp-based merge logic (newest wins)
+ * Called on login to sync device progress
+ *
+ * @param {string} userId - Firebase user ID
+ * @returns {Promise<Object>} Merged progress { daily, weekly, personal }
+ */
+export const loadProgressFromFirebase = async (userId) => {
+  if (!userId) {
+    console.warn('⚠️ Cannot load progress: no userId provided')
+    return null
+  }
+
+  try {
+    const { loadAllUserProgress, mergeProgress } = await import('./userProgress.js')
+
+    console.log(`ℹ️ Loading and merging progress for user ${userId} from Firebase...`)
+
+    // Load from Firebase
+    const firebaseProgress = await loadAllUserProgress(userId)
+
+    // Get current local data
+    const localDaily = getDailyTextData()
+    const localWeekly = getWeeklyReadingData()
+    const localPersonal = getPersonalReadingData()
+
+    // Merge using timestamp logic (last-write-wins)
+    const mergedDaily = mergeProgress(localDaily, firebaseProgress?.daily)
+    const mergedWeekly = mergeProgress(localWeekly, firebaseProgress?.weekly)
+    const mergedPersonal = mergeProgress(localPersonal, firebaseProgress?.personal)
+
+    // Save merged data back to localStorage
+    if (mergedDaily) saveDailyTextData(mergedDaily)
+    if (mergedWeekly) saveWeeklyReadingData(mergedWeekly)
+    if (mergedPersonal) savePersonalReadingData(mergedPersonal)
+
+    console.log('✓ Progress merged and saved to localStorage')
+
+    return {
+      daily: mergedDaily,
+      weekly: mergedWeekly,
+      personal: mergedPersonal
+    }
+  } catch (error) {
+    console.error('✗ Failed to load progress from Firebase:', error)
+    // Don't throw - graceful degradation (use local data only)
+    return null
+  }
+}

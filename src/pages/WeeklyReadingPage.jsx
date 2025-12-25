@@ -272,14 +272,9 @@ const WeeklyReadingPage = () => {
     // Otherwise the web link opens in browser
     if (links?.web) {
       console.log('📱 Opening link:', links.web)
-      // Use proper way to open with security attributes
-      const link = document.createElement('a')
-      link.href = links.web
-      link.target = '_blank'
-      link.rel = 'noopener noreferrer'
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
+      // Use direct navigation instead of window.open() to avoid iOS PWA popup
+      // This allows iOS to properly handle the Universal Link and open JW Library app
+      window.location.href = links.web
     } else {
       console.error('No valid link available')
     }

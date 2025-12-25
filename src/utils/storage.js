@@ -372,6 +372,63 @@ export const syncAllProgressToFirebase = async (userId) => {
  * @param {string} userId - Firebase user ID
  * @returns {Promise<Object>} Merged progress { daily, weekly, personal }
  */
+/**
+ * Get the week start date for the current week (based on meeting day)
+ * Used to match against completedWeeks when reconstructing weeklyReading_current
+ * @returns {string} Date string in format YYYY-MM-DD
+ */
+const getCurrentWeekStart = () => {
+  // Get test date from localStorage if set
+  const savedTestDate = localStorage.getItem('testDate')
+  const checkDate = savedTestDate ? new Date(savedTestDate) : new Date()
+
+  // Get meeting day from settings
+  const meetingDay = parseInt(localStorage.getItem('settings_meetingDay') || '1')
+
+  // Calculate week start based on meeting day
+  const currentDay = checkDate.getDay()
+  let daysBack = (currentDay - meetingDay + 7) % 7
+
+  const weekStartDate = new Date(checkDate)
+  weekStartDate.setDate(weekStartDate.getDate() - daysBack)
+
+  // Format as YYYY-MM-DD
+  const year = weekStartDate.getFullYear()
+  const month = String(weekStartDate.getMonth() + 1).padStart(2, '0')
+  const day = String(weekStartDate.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+/**
+ * Reconstruct weeklyReading_current from Firebase completedWeeks data
+ * When syncing from Firebase, we need to rebuild the current week's chapter details
+ * @param {Object} weeklyData - The merged weekly data from Firebase
+ * @returns {void} Saves to localStorage
+ */
+const reconstructWeeklyReadingCurrent = (weeklyData) => {
+  if (!weeklyData || !weeklyData.completedWeeks || weeklyData.completedWeeks.length === 0) {
+    console.log('   No completed weeks in Firebase data, skipping reconstruction')
+    return
+  }
+
+  const currentWeekStart = getCurrentWeekStart()
+  console.log(`   Reconstructing weeklyReading_current for week starting: ${currentWeekStart}`)
+
+  // Find the current week in completedWeeks
+  const currentWeekData = weeklyData.completedWeeks.find(week => week.weekStart === currentWeekStart)
+
+  if (currentWeekData && currentWeekData.chapters) {
+    const reconstructed = {
+      weekStart: currentWeekStart,
+      chaptersRead: currentWeekData.chapters
+    }
+    localStorage.setItem('weeklyReading_current', JSON.stringify(reconstructed))
+    console.log(`   ✓ Reconstructed weeklyReading_current:`, reconstructed)
+  } else {
+    console.log(`   No matching week found in completedWeeks for ${currentWeekStart}`)
+  }
+}
+
 export const loadProgressFromFirebase = async (userId) => {
   if (!userId) {
     console.warn('⚠️ Cannot load progress: no userId provided')
@@ -407,8 +464,14 @@ export const loadProgressFromFirebase = async (userId) => {
     if (mergedWeekly) saveWeeklyReadingData(mergedWeekly)
     if (mergedPersonal) savePersonalReadingData(mergedPersonal)
 
+    // IMPORTANT: Reconstruct weeklyReading_current from the merged weekly data
+    // This is critical for multi-device sync to work!
+    if (mergedWeekly) {
+      reconstructWeeklyReadingCurrent(mergedWeekly)
+    }
+
     console.log('✓ Progress merged and saved to localStorage')
-    console.log('⚠️ Note: weeklyReading_current (current week details) is NOT synced! This is a separate data structure.')
+    console.log('✓ weeklyReading_current reconstructed from Firebase data')
 
     return {
       daily: mergedDaily,

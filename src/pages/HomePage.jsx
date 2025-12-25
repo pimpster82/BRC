@@ -8,7 +8,6 @@ import { loadYeartextFromFirebase } from '../utils/firebaseSchedules'
 import { fetchYeartextFromWol, saveYeartextToCache, getYeartextFromCache as getCachedYeartext } from '../utils/yeartextFetcher'
 import DailyTextCard from '../components/DailyTextCard'
 import WeeklyReadingCard from '../components/WeeklyReadingCard'
-import PersonalReadingCard from '../components/PersonalReadingCard'
 
 // Yeartext cache for lazy loading
 const yeartextCache = {}
@@ -460,7 +459,24 @@ function HomePage() {
           <WeeklyReadingCard />
 
           {/* Personal Reading */}
-          <PersonalReadingCard />
+          <div className="card p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <BookOpen className="w-6 h-6 text-blue-600" />
+              <h2 className="text-xl font-bold text-gray-800">{t('home.personal_reading')}</h2>
+            </div>
+            <p className="text-gray-600 mb-4">
+              {t('home.personal_reading_description')}
+            </p>
+            <button
+              onClick={() => {
+                // TODO: Implement personal reading plan selection
+                console.log('Personal reading feature coming soon...')
+              }}
+              className="btn-open"
+            >
+              {t('home.select_plan')}
+            </button>
+          </div>
         </div>
       </div>
     </div>

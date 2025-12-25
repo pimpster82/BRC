@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react'
-import { ArrowLeft, Globe, Calendar, Bell, RotateCcw, ChevronDown, ChevronRight, BookOpen, Download, RefreshCw, Eye } from 'lucide-react'
+import { ArrowLeft, Globe, Calendar, Bell, RotateCcw, ChevronDown, ChevronRight, BookOpen, Download, RefreshCw, Eye, Smartphone, Copy } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { SUPPORTED_LANGUAGES, getCurrentLanguage, setCurrentLanguage } from '../config/languages'
 import { fetchScheduleFromWOL, fetchYeartextFromWOL } from '../utils/scheduleUpdater'
 import { saveScheduleToFirebase, saveYeartextToFirebase } from '../utils/firebaseSchedules'
+import { getOrCreateDeviceId, getDeviceName, setDeviceName, getDeviceInfo } from '../utils/deviceId'
 import { t } from '../config/i18n'
 import bibleBooks from '../../data/bible-books-en.json'
 
@@ -43,6 +44,13 @@ const SettingsPage = () => {
   const [scheduleYear, setScheduleYear] = useState(new Date().getFullYear() + 1)
   const [scheduleStatus, setScheduleStatus] = useState(null) // 'loading', 'success', 'error'
   const [scheduleMessage, setScheduleMessage] = useState('')
+
+  // Device Info
+  const [deviceId, setDeviceId] = useState(getOrCreateDeviceId())
+  const [deviceName, setDeviceNameState] = useState(getDeviceName())
+  const [isEditingDeviceName, setIsEditingDeviceName] = useState(false)
+  const [tempDeviceName, setTempDeviceName] = useState(getDeviceName())
+  const [copySuccess, setCopySuccess] = useState(false)
 
 
   const handleLanguageChange = (newLanguage) => {
@@ -208,6 +216,25 @@ const SettingsPage = () => {
       keysToRemove.forEach(key => localStorage.removeItem(key))
       alert('✓ Cache gelöscht!')
     }
+  }
+
+  // Device Info Handlers
+  const handleCopyDeviceId = () => {
+    navigator.clipboard.writeText(deviceId)
+    setCopySuccess(true)
+    setTimeout(() => setCopySuccess(false), 2000)
+  }
+
+  const handleSaveDeviceName = () => {
+    if (setDeviceName(tempDeviceName)) {
+      setDeviceNameState(tempDeviceName)
+      setIsEditingDeviceName(false)
+    }
+  }
+
+  const handleCancelEditDeviceName = () => {
+    setTempDeviceName(deviceName)
+    setIsEditingDeviceName(false)
   }
 
   const toggleSection = (section) => {
@@ -656,6 +683,93 @@ const SettingsPage = () => {
                 >
                   {t('settings.reset_progress_button')}
                 </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Device Info */}
+        <div className="card bg-white border border-blue-200 mb-4">
+          <button
+            onClick={() => toggleSection('device')}
+            className="w-full flex items-center justify-between"
+          >
+            <div className="flex items-center gap-2">
+              <Smartphone className="w-5 h-5 text-blue-600" />
+              <h2 className="font-semibold text-gray-800">Device Info</h2>
+            </div>
+            {expandedSection === 'device' ? (
+              <ChevronDown className="w-5 h-5 text-gray-400" />
+            ) : (
+              <ChevronRight className="w-5 h-5 text-gray-400" />
+            )}
+          </button>
+
+          {expandedSection === 'device' && (
+            <div className="mt-4 pt-4 border-t border-blue-200 space-y-3">
+              {/* Device ID */}
+              <div>
+                <p className="text-sm font-medium text-gray-700 mb-2">Device ID</p>
+                <div className="flex gap-2">
+                  <code className="flex-1 text-xs bg-gray-100 p-2 rounded border border-gray-300 font-mono overflow-auto">
+                    {deviceId.substring(0, 12)}...
+                  </code>
+                  <button
+                    onClick={handleCopyDeviceId}
+                    className={`px-3 py-2 rounded text-sm font-medium flex items-center gap-1 transition-colors ${
+                      copySuccess
+                        ? 'bg-green-100 text-green-700 border border-green-300'
+                        : 'bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100'
+                    }`}
+                  >
+                    <Copy className="w-4 h-4" />
+                    {copySuccess ? 'Kopiert!' : 'Kopieren'}
+                  </button>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">Eindeutige Geräte-ID für Cross-Device-Synchronisation</p>
+              </div>
+
+              {/* Device Name */}
+              <div className="pt-3 border-t border-blue-200">
+                <p className="text-sm font-medium text-gray-700 mb-2">Device Name</p>
+                {!isEditingDeviceName ? (
+                  <div className="flex gap-2">
+                    <p className="flex-1 text-sm bg-gray-50 p-2 rounded border border-gray-300">
+                      {deviceName}
+                    </p>
+                    <button
+                      onClick={() => setIsEditingDeviceName(true)}
+                      className="px-3 py-2 rounded text-sm font-medium bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 transition-colors"
+                    >
+                      Bearbeiten
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <input
+                      type="text"
+                      value={tempDeviceName}
+                      onChange={(e) => setTempDeviceName(e.target.value)}
+                      className="w-full text-sm px-3 py-2 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="z.B. Mein Handy"
+                    />
+                    <div className="flex gap-2">
+                      <button
+                        onClick={handleSaveDeviceName}
+                        className="flex-1 px-3 py-2 rounded text-sm font-medium bg-green-100 text-green-700 border border-green-300 hover:bg-green-200 transition-colors"
+                      >
+                        Speichern
+                      </button>
+                      <button
+                        onClick={handleCancelEditDeviceName}
+                        className="flex-1 px-3 py-2 rounded text-sm font-medium bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200 transition-colors"
+                      >
+                        Abbrechen
+                      </button>
+                    </div>
+                  </div>
+                )}
+                <p className="text-xs text-gray-500 mt-1">Hilfreicher Name zur Unterscheidung mehrerer Geräte</p>
               </div>
             </div>
           )}

@@ -6,6 +6,7 @@ import { parseReadingInput, formatChapterStatus, getNextReading } from '../utils
 import { buildLanguageSpecificWebLink, getLocalizedBookName } from '../../data/bible-link-builder'
 import { t, getCurrentLanguage } from '../config/i18n'
 import { parseReadingText } from '../utils/scheduleParser'
+import { saveWeeklyProgressToFirebase } from '../utils/firebaseUserProgress'
 
 const WeeklyReadingPage = () => {
   const navigate = useNavigate()
@@ -131,6 +132,14 @@ const WeeklyReadingPage = () => {
         weekStart: weekReading.weekStart,
         chaptersRead: updatedChapters
       }))
+      // Sync to Firebase
+      await saveWeeklyProgressToFirebase({
+        completedWeeks: [{
+          weekStart: weekReading.weekStart,
+          chapters: updatedChapters
+        }],
+        currentMeetingDay: parseInt(localStorage.getItem('settings_meetingDay') || '1')
+      })
     }
 
     // Reset input
@@ -140,7 +149,7 @@ const WeeklyReadingPage = () => {
     setShowInput(false)
   }
 
-  const handleUndo = () => {
+  const handleUndo = async () => {
     if (!lastAction || !lastAction.previousState) return
 
     setChaptersRead(lastAction.previousState)
@@ -151,10 +160,18 @@ const WeeklyReadingPage = () => {
         weekStart: weekReading.weekStart,
         chaptersRead: lastAction.previousState
       }))
+      // Sync to Firebase
+      await saveWeeklyProgressToFirebase({
+        completedWeeks: [{
+          weekStart: weekReading.weekStart,
+          chapters: lastAction.previousState
+        }],
+        currentMeetingDay: parseInt(localStorage.getItem('settings_meetingDay') || '1')
+      })
     }
   }
 
-  const handleClearAll = () => {
+  const handleClearAll = async () => {
     // Save current state before clearing
     setLastAction({ type: 'clear', previousState: [...chaptersRead] })
     setChaptersRead([])
@@ -165,6 +182,14 @@ const WeeklyReadingPage = () => {
         weekStart: weekReading.weekStart,
         chaptersRead: []
       }))
+      // Sync to Firebase
+      await saveWeeklyProgressToFirebase({
+        completedWeeks: [{
+          weekStart: weekReading.weekStart,
+          chapters: []
+        }],
+        currentMeetingDay: parseInt(localStorage.getItem('settings_meetingDay') || '1')
+      })
     }
   }
 
@@ -178,7 +203,7 @@ const WeeklyReadingPage = () => {
     setInputError(null)
   }
 
-  const toggleChapterRead = (chapter) => {
+  const toggleChapterRead = async (chapter) => {
     const existing = chaptersRead.find(c => c.chapter === chapter)
 
     let updated
@@ -201,6 +226,14 @@ const WeeklyReadingPage = () => {
         weekStart: weekReading.weekStart,
         chaptersRead: updated
       }))
+      // Sync to Firebase
+      await saveWeeklyProgressToFirebase({
+        completedWeeks: [{
+          weekStart: weekReading.weekStart,
+          chapters: updated
+        }],
+        currentMeetingDay: parseInt(localStorage.getItem('settings_meetingDay') || '1')
+      })
     }
   }
 

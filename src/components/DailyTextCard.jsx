@@ -8,6 +8,7 @@ import {
   unmarkDailyTextComplete,
   getDailyTextData
 } from '../utils/storage'
+import { saveDailyProgressToFirebase } from '../utils/firebaseUserProgress'
 
 const DailyTextCard = () => {
   const [isComplete, setIsComplete] = useState(false)
@@ -21,15 +22,19 @@ const DailyTextCard = () => {
     setStreak(data.currentStreak)
   }, [])
 
-  const handleToggleComplete = () => {
+  const handleToggleComplete = async () => {
     if (isComplete) {
       const data = unmarkDailyTextComplete()
       setIsComplete(false)
       setStreak(data.currentStreak)
+      // Sync to Firebase
+      await saveDailyProgressToFirebase(data)
     } else {
       const data = markDailyTextComplete()
       setIsComplete(true)
       setStreak(data.currentStreak)
+      // Sync to Firebase
+      await saveDailyProgressToFirebase(data)
     }
   }
 

@@ -202,7 +202,7 @@ export function buildLanguageSpecificWebLink(bookNumber, chapter, startVerse = 1
   const startVerseStr = startVerse.toString().padStart(3, '0');
 
   const bibleParam = `${jwOrgBookNumber}${chapterStr}${startVerseStr}`;
-  const webUrl = `https://www.jw.org/finder?srcid=jwlshare&wtlocale=${wtlocale}&prefer=lang&bible=${bibleParam}&pub=nwsty`;
+  const webUrl = `https://www.jw.org/finder?srcid=jwlshare&wtlocale=${wtlocale}&prefer=lang&bible=${bibleParam}&pub=nwtsty`;
 
   // Build JW Library deep link for app opening
   // Format: jwpub://b/NWT/BOOK:CHAPTER:VERSE-BOOK:CHAPTER:VERSE

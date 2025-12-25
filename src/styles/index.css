@@ -1,0 +1,128 @@
+@import "tailwindcss";
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* Card Components */
+@layer components {
+  /* Base Card Styles */
+  .card {
+    @apply bg-white rounded-lg p-4 shadow-sm;
+  }
+
+  .card-indigo {
+    @apply border border-indigo-100;
+  }
+
+  .card-blue {
+    @apply border border-blue-100;
+  }
+
+  .card-green {
+    @apply border border-green-100;
+  }
+
+  /* Card Header */
+  .card-header {
+    @apply font-semibold mb-3 text-base flex items-center gap-2;
+  }
+
+  .card-header-indigo {
+    @apply text-indigo-900;
+  }
+
+  .card-header-blue {
+    @apply text-blue-900;
+  }
+
+  .card-header-green {
+    @apply text-green-900;
+  }
+
+  /* Card Content */
+  .card-description {
+    @apply text-sm text-gray-700 mb-3 italic;
+  }
+
+  /* Card Footer */
+  .card-footer {
+    @apply pt-3 flex items-center justify-between;
+  }
+
+  .card-footer-indigo {
+    @apply border-t border-indigo-200;
+  }
+
+  .card-footer-blue {
+    @apply border-t border-blue-200;
+  }
+
+  .card-footer-green {
+    @apply border-t border-green-200;
+  }
+
+  /* Card Stats */
+  .card-stat-indigo {
+    @apply text-xs text-indigo-700;
+  }
+
+  .card-stat-blue {
+    @apply text-xs text-blue-700;
+  }
+
+  .card-stat-green {
+    @apply text-xs text-green-700;
+  }
+
+  /* Buttons */
+  .btn-open {
+    @apply text-sm font-medium flex items-center gap-1;
+  }
+
+  .btn-open-indigo {
+    @apply text-indigo-900 hover:text-indigo-700;
+  }
+
+  .btn-open-blue {
+    @apply text-blue-900 hover:text-blue-700;
+  }
+
+  .btn-open-green {
+    @apply text-green-900 hover:text-green-700;
+  }
+
+  .btn-action {
+    @apply text-sm text-gray-600 font-medium;
+  }
+
+  .btn-action-hover-green {
+    @apply hover:text-green-600;
+  }
+
+  .btn-action-hover-blue {
+    @apply hover:text-blue-900;
+  }
+
+  .btn-action-hover-indigo {
+    @apply hover:text-indigo-900;
+  }
+
+  /* Status Indicators */
+  .status-complete {
+    @apply text-sm text-green-600 font-medium;
+  }
+
+  .status-incomplete {
+    @apply text-gray-400;
+  }
+}

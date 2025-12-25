@@ -6,6 +6,7 @@ import { fetchScheduleFromWOL, fetchYeartextFromWOL } from '../utils/scheduleUpd
 import { saveScheduleToFirebase, saveYeartextToFirebase } from '../utils/firebaseSchedules'
 import { getOrCreateDeviceId, getDeviceName, setDeviceName, getDeviceInfo } from '../utils/deviceId'
 import { t } from '../config/i18n'
+import { APP_VERSION } from '../config/version'
 import bibleBooks from '../../data/bible-books-en.json'
 
 const SettingsPage = () => {
@@ -777,7 +778,7 @@ const SettingsPage = () => {
 
         {/* Version Info */}
         <div className="text-center text-xs text-gray-500 mt-6 pb-4">
-          <p>{t('settings.version', null, {version: '0.0.1'})}</p>
+          <p>{t('settings.version', null, {version: APP_VERSION})}</p>
           <p className="mt-1">{t('settings.made_with')}</p>
         </div>
       </div>

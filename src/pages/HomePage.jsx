@@ -8,6 +8,7 @@ import { loadYeartextFromFirebase } from '../utils/firebaseSchedules'
 import { fetchYeartextFromWol, saveYeartextToCache, getYeartextFromCache as getCachedYeartext } from '../utils/yeartextFetcher'
 import DailyTextCard from '../components/DailyTextCard'
 import WeeklyReadingCard from '../components/WeeklyReadingCard'
+import PersonalReadingCard from '../components/PersonalReadingCard'
 
 // Yeartext cache for lazy loading
 const yeartextCache = {}
@@ -458,32 +459,8 @@ function HomePage() {
           {/* Weekly Reading */}
           <WeeklyReadingCard />
 
-          {/* Personal Reading - Placeholder */}
-          <div className="bg-white rounded-lg p-4 shadow-sm border border-green-100">
-            <h2 className="font-semibold text-green-900 mb-3 text-base flex items-center gap-2">
-              <BookOpen className="w-4 h-4" />
-              {t('home.personal_reading')}
-            </h2>
-
-            <p className="text-sm text-gray-700 mb-2 italic">
-              {t('home.reading_plan')}
-            </p>
-
-            <div className="flex items-center gap-1 mb-3">
-              <Lightbulb className="w-3 h-3 text-green-700" />
-              <p className="text-sm text-gray-700">
-                <span className="text-xs text-gray-600">{t('home.next_reading')}:</span> <span className="font-medium">Genesis 20-22</span>
-              </p>
-            </div>
-
-            <div className="pt-3 border-t border-green-200 flex items-center justify-between">
-              <p className="text-xs text-green-700">{t('home.day_progress', null, {current: 45, total: 365, percent: 12})}</p>
-              <button className="text-sm text-green-900 font-medium flex items-center gap-1 hover:text-green-700">
-                <ExternalLink className="w-4 h-4" />
-                {t('home.open')}
-              </button>
-            </div>
-          </div>
+          {/* Personal Reading */}
+          <PersonalReadingCard />
         </div>
       </div>
     </div>

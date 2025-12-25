@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { Calendar, BookOpen, Lightbulb, ExternalLink, Settings, X, RefreshCw, LogOut } from 'lucide-react'
+import { Calendar, BookOpen, Lightbulb, ExternalLink, Settings, X, RefreshCw, LogOut, LogIn } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { t, getCurrentLanguage } from '../config/i18n'
@@ -60,6 +60,7 @@ function HomePage() {
   const [currentLanguage, setCurrentLanguage] = useState('en')
   const [showYeartext, setShowYeartext] = useState(true)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
 
   // Pull-to-Refresh state
   const [isPulling, setIsPulling] = useState(false)
@@ -109,16 +110,33 @@ function HomePage() {
     }
   }
 
-  // Handle logout
-  const handleLogout = async () => {
+  // Handle auth button click
+  const handleAuthClick = () => {
+    if (currentUser) {
+      // Show logout confirmation modal
+      setShowLogoutConfirm(true)
+    } else {
+      // Not logged in - go to login page
+      navigate('/login')
+    }
+  }
+
+  // Confirm logout
+  const handleLogoutConfirmed = async () => {
     try {
       setIsLoggingOut(true)
+      setShowLogoutConfirm(false)
       await logout()
       navigate('/login')
     } catch (error) {
       console.error('Logout error:', error)
       setIsLoggingOut(false)
     }
+  }
+
+  // Cancel logout
+  const handleLogoutCancel = () => {
+    setShowLogoutConfirm(false)
   }
 
   // Load test date from localStorage
@@ -336,13 +354,17 @@ function HomePage() {
                 <Settings className="w-5 h-5" />
               </button>
               <button
-                onClick={handleLogout}
+                onClick={handleAuthClick}
                 disabled={isLoggingOut}
-                className="p-2 text-gray-600 hover:text-red-600 hover:bg-white rounded-lg transition-colors disabled:opacity-50"
-                aria-label="Logout"
-                title="Abmelden"
+                className={`p-2 rounded-lg transition-colors disabled:opacity-50 ${
+                  currentUser
+                    ? 'text-gray-600 hover:text-red-600 hover:bg-white'
+                    : 'text-gray-600 hover:text-green-600 hover:bg-white'
+                }`}
+                aria-label={currentUser ? 'Logout' : 'Login'}
+                title={currentUser ? 'Abmelden' : 'Anmelden'}
               >
-                <LogOut className="w-5 h-5" />
+                {currentUser ? <LogOut className="w-5 h-5" /> : <LogIn className="w-5 h-5" />}
               </button>
             </div>
           </div>
@@ -379,6 +401,42 @@ function HomePage() {
               <p className="text-xs text-gray-500 mt-2">
                 {t('datepicker.warning')}
               </p>
+            </div>
+          )}
+
+          {/* Logout Confirmation Modal */}
+          {showLogoutConfirm && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+              <div className="bg-white rounded-lg shadow-lg max-w-sm w-full p-6">
+                <h2 className="text-lg font-bold text-gray-800 mb-4">Abmelden?</h2>
+
+                <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                  <p className="text-sm text-gray-600 mb-2">Angemeldet als:</p>
+                  <p className="text-base font-medium text-gray-800 break-all">
+                    {currentUser?.email}
+                  </p>
+                </div>
+
+                <p className="text-sm text-gray-600 mb-6">
+                  Dein Fortschritt wird automatisch synchronisiert.
+                </p>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleLogoutCancel}
+                    className="flex-1 bg-gray-200 text-gray-800 py-2 px-4 rounded-lg font-medium hover:bg-gray-300 transition-colors"
+                  >
+                    Abbrechen
+                  </button>
+                  <button
+                    onClick={handleLogoutConfirmed}
+                    disabled={isLoggingOut}
+                    className="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-red-700 transition-colors disabled:opacity-50"
+                  >
+                    {isLoggingOut ? 'Abmelden...' : 'Abmelden'}
+                  </button>
+                </div>
+              </div>
             </div>
           )}
         </div>

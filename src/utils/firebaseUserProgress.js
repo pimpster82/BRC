@@ -1,18 +1,20 @@
 /**
- * Firebase User Progress Sync
+ * Firebase User Progress Sync - Phase 3
  *
- * Handles syncing device-specific progress data to Firebase.
- * Each device has a unique ID and stores its own progress data.
+ * Handles syncing user progress data to Firebase with multi-device support.
+ * Each user can sync across multiple devices with timestamp-based merge logic.
  *
- * Firebase Structure:
- * /devices/{deviceId}/progress/ - Progress tracking data
- * /devices/{deviceId}/stats/ - Device statistics
+ * Firebase Structure (Phase 3):
+ * /users/{userId}/progress/daily/ - Daily text progress
+ * /users/{userId}/progress/weekly/ - Weekly reading progress
+ * /users/{userId}/progress/personal/ - Personal reading progress
+ * /users/{userId}/metadata/ - Last login, device info
  *
- * Phase 1: Device-based sync
- * Phase 3: Will support multiple devices per user with userId linking
+ * Phase 1: Device-based sync (legacy - still supported for migration)
+ * Phase 3: User-based sync with authentication
  */
 
-import { database, isFirebaseConfigured } from '../config/firebase'
+import { database, isFirebaseConfigured, auth } from '../config/firebase'
 import { ref, set, get, update, remove } from 'firebase/database'
 import { getOrCreateDeviceId, getDeviceName, getDeviceInfo } from './deviceId'
 import {
@@ -23,6 +25,7 @@ import {
 
 /**
  * Save daily text progress to Firebase
+ * Phase 3: Saves to users/{userId}/progress/daily
  * @param {Object} dailyTextData - { completedDates: [], currentStreak: number, longestStreak: number }
  * @returns {Promise<Object>} - { success: boolean, error?: string }
  */
@@ -33,19 +36,38 @@ export const saveDailyProgressToFirebase = async (dailyTextData) => {
   }
 
   try {
-    const deviceId = getOrCreateDeviceId()
-    const progressRef = ref(database, `devices/${deviceId}/progress/daily`)
+    // Get current user ID from Firebase Auth
+    const userId = auth?.currentUser?.uid
+
+    if (!userId) {
+      console.warn('⚠️ No authenticated user, falling back to device-based sync')
+      // Fallback to Phase 1 device-based sync
+      const deviceId = getOrCreateDeviceId()
+      const progressRef = ref(database, `devices/${deviceId}/progress/daily`)
+      const dataToSave = {
+        completedDates: dailyTextData.completedDates || [],
+        currentStreak: dailyTextData.currentStreak || 0,
+        longestStreak: dailyTextData.longestStreak || 0,
+        lastUpdated: new Date().toISOString()
+      }
+      await set(progressRef, dataToSave)
+      console.log(`✓ Daily progress synced to Firebase (device: ${deviceId.substring(0, 8)}...)`)
+      return { success: true }
+    }
+
+    // Phase 3: Save to users/{userId}/progress/daily
+    const progressRef = ref(database, `users/${userId}/progress/daily`)
 
     const dataToSave = {
       completedDates: dailyTextData.completedDates || [],
       currentStreak: dailyTextData.currentStreak || 0,
       longestStreak: dailyTextData.longestStreak || 0,
-      lastUpdated: new Date().toISOString()
+      lastUpdated: Date.now()  // Use millisecond timestamp for consistent merge logic
     }
 
     await set(progressRef, dataToSave)
 
-    console.log(`✓ Daily progress synced to Firebase (device: ${deviceId.substring(0, 8)}...)`)
+    console.log(`✓ Daily progress synced to Firebase (user: ${userId.substring(0, 8)}...)`)
     return { success: true }
   } catch (error) {
     console.error('✗ Failed to save daily progress to Firebase:', error)
@@ -59,6 +81,7 @@ export const saveDailyProgressToFirebase = async (dailyTextData) => {
 
 /**
  * Save weekly reading progress to Firebase
+ * Phase 3: Saves to users/{userId}/progress/weekly
  * @param {Object} weeklyReadingData - { completedWeeks: [], currentMeetingDay: number }
  * @returns {Promise<Object>} - { success: boolean, error?: string }
  */
@@ -69,18 +92,33 @@ export const saveWeeklyProgressToFirebase = async (weeklyReadingData) => {
   }
 
   try {
-    const deviceId = getOrCreateDeviceId()
-    const progressRef = ref(database, `devices/${deviceId}/progress/weekly`)
+    const userId = auth?.currentUser?.uid
+
+    if (!userId) {
+      console.warn('⚠️ No authenticated user, falling back to device-based sync')
+      const deviceId = getOrCreateDeviceId()
+      const progressRef = ref(database, `devices/${deviceId}/progress/weekly`)
+      const dataToSave = {
+        completedWeeks: weeklyReadingData.completedWeeks || [],
+        currentMeetingDay: weeklyReadingData.currentMeetingDay || 0,
+        lastUpdated: new Date().toISOString()
+      }
+      await set(progressRef, dataToSave)
+      console.log(`✓ Weekly progress synced to Firebase (device: ${deviceId.substring(0, 8)}...)`)
+      return { success: true }
+    }
+
+    const progressRef = ref(database, `users/${userId}/progress/weekly`)
 
     const dataToSave = {
       completedWeeks: weeklyReadingData.completedWeeks || [],
       currentMeetingDay: weeklyReadingData.currentMeetingDay || 0,
-      lastUpdated: new Date().toISOString()
+      lastUpdated: Date.now()
     }
 
     await set(progressRef, dataToSave)
 
-    console.log(`✓ Weekly progress synced to Firebase (device: ${deviceId.substring(0, 8)}...)`)
+    console.log(`✓ Weekly progress synced to Firebase (user: ${userId.substring(0, 8)}...)`)
     return { success: true }
   } catch (error) {
     console.error('✗ Failed to save weekly progress to Firebase:', error)
@@ -94,6 +132,7 @@ export const saveWeeklyProgressToFirebase = async (weeklyReadingData) => {
 
 /**
  * Save personal reading progress to Firebase
+ * Phase 3: Saves to users/{userId}/progress/personal
  * @param {Object} personalReadingData - { chaptersRead: [], selectedPlan: string }
  * @returns {Promise<Object>} - { success: boolean, error?: string }
  */
@@ -104,18 +143,33 @@ export const savePersonalProgressToFirebase = async (personalReadingData) => {
   }
 
   try {
-    const deviceId = getOrCreateDeviceId()
-    const progressRef = ref(database, `devices/${deviceId}/progress/personal`)
+    const userId = auth?.currentUser?.uid
+
+    if (!userId) {
+      console.warn('⚠️ No authenticated user, falling back to device-based sync')
+      const deviceId = getOrCreateDeviceId()
+      const progressRef = ref(database, `devices/${deviceId}/progress/personal`)
+      const dataToSave = {
+        chaptersRead: personalReadingData.chaptersRead || [],
+        selectedPlan: personalReadingData.selectedPlan || 'free',
+        lastUpdated: new Date().toISOString()
+      }
+      await set(progressRef, dataToSave)
+      console.log(`✓ Personal progress synced to Firebase (device: ${deviceId.substring(0, 8)}...)`)
+      return { success: true }
+    }
+
+    const progressRef = ref(database, `users/${userId}/progress/personal`)
 
     const dataToSave = {
       chaptersRead: personalReadingData.chaptersRead || [],
       selectedPlan: personalReadingData.selectedPlan || 'free',
-      lastUpdated: new Date().toISOString()
+      lastUpdated: Date.now()
     }
 
     await set(progressRef, dataToSave)
 
-    console.log(`✓ Personal progress synced to Firebase (device: ${deviceId.substring(0, 8)}...)`)
+    console.log(`✓ Personal progress synced to Firebase (user: ${userId.substring(0, 8)}...)`)
     return { success: true }
   } catch (error) {
     console.error('✗ Failed to save personal progress to Firebase:', error)

@@ -184,50 +184,39 @@ export function buildLanguageSpecificWebLink(bookNumber, chapter, startVerse = 1
   // Get locale info, default to English if language not found
   const localeInfo = LANGUAGE_LOCALES[languageCode] || LANGUAGE_LOCALES['en'];
 
-  // Get localized book slug for this language
-  const bookSlugs = LOCALIZED_BOOK_SLUGS[bookNumber];
-  if (!bookSlugs) {
-    console.error(`Book number ${bookNumber} not found in localized slugs`);
-    return null;
-  }
+  // Map language codes to JW.org wtlocale codes for mobile-friendly finder URLs
+  const localeCodeMap = {
+    'de': 'D',  // Deutsch
+    'en': 'E',  // English
+    'es': 'S',  // Español
+    'it': 'I',  // Italiano
+    'fr': 'F'   // Français
+  };
+  const wtlocale = localeCodeMap[languageCode] || 'E';
 
-  // Use the slug for the current language, fallback to English if not available
-  const bookSlug = bookSlugs[languageCode] || bookSlugs['en'];
-
-  // Build the web URL with the correct language path and localized book name
-  // The path uses the book slug (e.g., 'isaiah', 'genesis', etc.)
-  // The chapter number is appended to the path
-  // Example: https://www.jw.org/de/bibliothek/bibel/studienbibel/buecher/jesaja/9/
-  const baseUrl = `https://www.jw.org${localeInfo.path}`;
-  const webUrl = `${baseUrl}/${bookSlug}/${chapter}/`;
-
-  // Build hash fragment for verse navigation in web link
-  // JW.org uses format: v[BBCCCVVV]-v[BBCCCVVV] where:
-  // BB = book number (01-66, Genesis=01, Matthew=40, etc.)
-  // CCC = chapter (000-999, zero-padded to 3 digits)
-  // VVV = verse (000-999, zero-padded to 3 digits)
-  // Example: https://www.jw.org/en/library/bible/study-bible/books/matthew/24/#v40024014-v40024019
+  // Build mobile-friendly JW.org finder URL (works great on phone)
+  // Format: https://www.jw.org/finder?srcid=jwshare&wtlocale=E&prefer=lang&bible=39004001&pub=nwsty
+  // bible parameter: BB (book 01-66) + CCC (chapter 000-999) + VVV (verse 000-999)
   const jwOrgBookNumber = bookNumber.toString().padStart(2, '0');
   const chapterStr = chapter.toString().padStart(3, '0');
   const startVerseStr = startVerse.toString().padStart(3, '0');
-  const endVerseStr = endVerse ? endVerse.toString().padStart(3, '0') : '999';
 
-  const hashFragment = `#v${jwOrgBookNumber}${chapterStr}${startVerseStr}-v${jwOrgBookNumber}${chapterStr}${endVerseStr}`;
-  const webUrlWithHash = `${webUrl}${hashFragment}`;
+  const bibleParam = `${jwOrgBookNumber}${chapterStr}${startVerseStr}`;
+  const webUrl = `https://www.jw.org/finder?srcid=jwshare&wtlocale=${wtlocale}&prefer=lang&bible=${bibleParam}&pub=nwsty`;
 
-  // Build JW Library deep link as fallback
+  // Build JW Library deep link for app opening
   // Format: jwpub://b/NWT/BOOK:CHAPTER:VERSE-BOOK:CHAPTER:VERSE
-  // Book numbers in JW Library format: Genesis=1, Matthew=39, Revelation=66
+  // Book numbers in JW Library format: Genesis=1, Matthew=40, Revelation=66
   const libraryStartRef = `${bookNumber}:${chapter}:${startVerse}`;
   const libraryEndRef = endVerse ? `${bookNumber}:${chapter}:${endVerse}` : `${bookNumber}:${chapter}:999`;
 
-  // Use jwpub:// protocol which is supported by JW Library
+  // Use jwpub:// protocol which is supported by JW Library app
   const libraryUrl = `jwpub://b/NWT/${libraryStartRef}-${libraryEndRef}`;
 
   return {
-    web: webUrlWithHash,
+    web: webUrl,
     library: libraryUrl,
-    primary: webUrlWithHash  // Primary is web link with hash for direct verse navigation
+    primary: webUrl  // Primary is mobile-friendly finder URL
   };
 }
 
@@ -251,53 +240,54 @@ const ENGLISH_BOOK_NAMES_TO_NUMBER = {
   '2-chronicles': 14,
   'ezra': 15, 'esra': 15,
   'nehemiah': 16, 'nehemia': 16,
-  'job': 17, 'hiob': 17,
-  'psalms': 18, 'psalm': 18,
-  'proverbs': 19, 'sprueche': 19,
-  'ecclesiastes': 20, 'prediger': 20,
-  'song-of-solomon': 21, 'song of solomon': 21, 'hohelied': 21,
-  'isaiah': 22, 'jesaja': 22,
-  'jeremiah': 23, 'jeremia': 23,
-  'lamentations': 24, 'klagelieder': 24,
-  'ezekiel': 25, 'ezechiel': 25,
-  'daniel': 26,
-  'hosea': 27,
-  'joel': 28,
-  'amos': 29,
-  'obadiah': 30, 'obadja': 30,
-  'jonah': 31, 'jona': 31,
-  'micah': 32, 'micha': 32,
-  'nahum': 33,
-  'habakkuk': 34, 'habakuk': 34,
-  'zephaniah': 35, 'zefanja': 35,
-  'haggai': 36,
-  'zechariah': 37, 'sacharja': 37,
-  'malachi': 38, 'maleachi': 38,
-  'matthew': 39, 'matthaeus': 39,
-  'mark': 40, 'markus': 40,
-  'luke': 41, 'lukas': 41,
-  'john': 42, 'johannes': 42,
-  'acts': 43, 'apostelgeschichte': 43,
-  'romans': 44, 'romer': 44,
-  '1-corinthians': 45, '1 corinthians': 45, '1-korinther': 45,
-  '2-corinthians': 46, '2 corinthians': 46, '2-korinther': 46,
-  'galatians': 47, 'galater': 47,
-  'ephesians': 48, 'epheser': 48,
-  'philippians': 49, 'philipper': 49,
-  'colossians': 50, 'kolosser': 50,
-  '1-thessalonians': 51, '1 thessalonians': 51, '1-thessalonicher': 51,
-  '2-thessalonians': 52, '2 thessalonians': 52, '2-thessalonicher': 52,
-  '1-timothy': 53, '1 timothy': 53, '1-timotheus': 53,
-  '2-timothy': 54, '2 timothy': 54, '2-timotheus': 54,
-  'titus': 55,
-  'philemon': 56,
-  'hebrews': 57, 'hebraer': 57,
-  'james': 58, 'jakobus': 58,
-  '1-peter': 59, '1 peter': 59, '1-petrus': 59,
-  '2-peter': 60, '2 peter': 60, '2-petrus': 60,
-  '1-john': 61, '1 john': 61, '1-johannes': 61,
-  '2-john': 62, '2 john': 62, '2-johannes': 62,
-  '3-john': 63, '3 john': 63, '3-johannes': 63,
+  'esther': 17,
+  'job': 18, 'hiob': 18,
+  'psalms': 19, 'psalm': 19,
+  'proverbs': 20, 'sprueche': 20,
+  'ecclesiastes': 21, 'prediger': 21,
+  'song-of-solomon': 22, 'song of solomon': 22, 'hohelied': 22,
+  'isaiah': 23, 'jesaja': 23,
+  'jeremiah': 24, 'jeremia': 24,
+  'lamentations': 25, 'klagelieder': 25,
+  'ezekiel': 26, 'ezechiel': 26,
+  'daniel': 27,
+  'hosea': 28,
+  'joel': 29,
+  'amos': 30,
+  'obadiah': 31, 'obadja': 31,
+  'jonah': 32, 'jona': 32,
+  'micah': 33, 'micha': 33,
+  'nahum': 34,
+  'habakkuk': 35, 'habakuk': 35,
+  'zephaniah': 36, 'zefanja': 36,
+  'haggai': 37,
+  'zechariah': 38, 'sacharja': 38,
+  'malachi': 39, 'maleachi': 39,
+  'matthew': 40, 'matthaeus': 40,
+  'mark': 41, 'markus': 41,
+  'luke': 42, 'lukas': 42,
+  'john': 43, 'johannes': 43,
+  'acts': 44, 'apostelgeschichte': 44,
+  'romans': 45, 'romer': 45,
+  '1-corinthians': 46, '1 corinthians': 46, '1-korinther': 46,
+  '2-corinthians': 47, '2 corinthians': 47, '2-korinther': 47,
+  'galatians': 48, 'galater': 48,
+  'ephesians': 49, 'epheser': 49,
+  'philippians': 50, 'philipper': 50,
+  'colossians': 51, 'kolosser': 51,
+  '1-thessalonians': 52, '1 thessalonians': 52, '1-thessalonicher': 52,
+  '2-thessalonians': 53, '2 thessalonians': 53, '2-thessalonicher': 53,
+  '1-timothy': 54, '1 timothy': 54, '1-timotheus': 54,
+  '2-timothy': 55, '2 timothy': 55, '2-timotheus': 55,
+  'titus': 56,
+  'philemon': 57,
+  'hebrews': 58, 'hebraer': 58,
+  'james': 59, 'jakobus': 59,
+  '1-peter': 60, '1 peter': 60, '1-petrus': 60,
+  '2-peter': 61, '2 peter': 61, '2-petrus': 61,
+  '1-john': 62, '1 john': 62, '1-johannes': 62,
+  '2-john': 63, '2 john': 63, '2-johannes': 63,
+  '3-john': 64, '3 john': 64, '3-johannes': 64,
   'jude': 65, 'judas': 65,
   'revelation': 66, 'offenbarung': 66,
 };

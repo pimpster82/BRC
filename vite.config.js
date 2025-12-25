@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: '/bible-reading-companion/',
+  base: '/', // Vercel deploys to root. For GitHub Pages, change to '/BRC/'
   server: {
     port: 3000,
     hmr: {

@@ -3,80 +3,16 @@
     "devices": {
       "{deviceId}": {
         ".read": true,
-        ".write": true,
-
-        "progress": {
-          "daily": {
-            ".validate": "newData.hasChildren(['completedDates', 'currentStreak', 'longestStreak', 'lastUpdated'])",
-            "completedDates": {
-              ".validate": "newData.hasChildren() || newData.val() === []"
-            },
-            "currentStreak": {
-              ".validate": "newData.isNumber()"
-            },
-            "longestStreak": {
-              ".validate": "newData.isNumber()"
-            },
-            "lastUpdated": {
-              ".validate": "newData.isString()"
-            }
-          },
-          "weekly": {
-            ".validate": "newData.hasChildren(['completedWeeks', 'currentMeetingDay', 'lastUpdated']) || !newData.exists()",
-            "completedWeeks": {
-              ".validate": "newData.hasChildren() || newData.val() === []"
-            },
-            "currentMeetingDay": {
-              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 6"
-            },
-            "lastUpdated": {
-              ".validate": "newData.isString()"
-            }
-          },
-          "personal": {
-            ".validate": "newData.hasChildren(['chaptersRead', 'selectedPlan', 'lastUpdated']) || !newData.exists()",
-            "chaptersRead": {
-              ".validate": "newData.hasChildren() || newData.val() === []"
-            },
-            "selectedPlan": {
-              ".validate": "newData.isString()"
-            },
-            "lastUpdated": {
-              ".validate": "newData.isString()"
-            }
-          }
-        },
-
-        "stats": {
-          ".validate": "newData.hasChildren(['deviceId', 'deviceName', 'lastSync'])",
-          "deviceId": {
-            ".validate": "newData.isString()"
-          },
-          "deviceName": {
-            ".validate": "newData.isString()"
-          },
-          "lastSync": {
-            ".validate": "newData.isString()"
-          }
-        }
+        ".write": true
       }
     },
-
     "schedules": {
       ".read": true,
-      "{year}": {
-        ".write": false,
-        "weeks": {
-          ".validate": "newData.hasChildren() || newData.val() === []"
-        }
-      }
+      ".write": false
     },
-
     "yeartexts": {
       ".read": true,
-      "{year}": {
-        ".write": false
-      }
+      ".write": false
     }
   }
 }

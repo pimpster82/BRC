@@ -58,7 +58,7 @@ const WeeklyReadingPage = () => {
     loadReading()
   }, [])
 
-  const handleSubmitReading = () => {
+  const handleSubmitReading = async () => {
     if (!readingInput.trim()) {
       setInputError(t('weekly.input_error'))
       return

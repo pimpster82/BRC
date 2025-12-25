@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Calendar, BookOpen, Lightbulb, ExternalLink, Settings, X, RefreshCw, LogOut } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { t, getCurrentLanguage } from '../config/i18n'
-import { getYeartextFromCache } from '../utils/storage'
+import { getYeartextFromCache, loadProgressFromFirebase } from '../utils/storage'
 import { loadYeartextFromFirebase } from '../utils/firebaseSchedules'
 import { fetchYeartextFromWol, saveYeartextToCache, getYeartextFromCache as getCachedYeartext } from '../utils/yeartextFetcher'
 import DailyTextCard from '../components/DailyTextCard'
@@ -51,7 +51,7 @@ const loadYeartext = async (year) => {
 
 function HomePage() {
   const navigate = useNavigate()
-  const { logout } = useAuth()
+  const { logout, currentUser } = useAuth()
   const [showDatePicker, setShowDatePicker] = useState(false)
   const [testDate, setTestDate] = useState(null)
   const [yeartext, setYeartext] = useState(null)
@@ -60,6 +60,54 @@ function HomePage() {
   const [currentLanguage, setCurrentLanguage] = useState('en')
   const [showYeartext, setShowYeartext] = useState(true)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+
+  // Pull-to-Refresh state
+  const [isPulling, setIsPulling] = useState(false)
+  const [isRefreshing, setIsRefreshing] = useState(false)
+  const [pullDistance, setPullDistance] = useState(0)
+  const touchStartY = useRef(0)
+  const contentRef = useRef(null)
+  const PULL_THRESHOLD = 100  // pixels needed to trigger refresh
+
+  // Handle pull-to-refresh
+  const handleTouchStart = (e) => {
+    if (contentRef.current?.scrollTop === 0) {
+      touchStartY.current = e.touches[0].clientY
+      setIsPulling(true)
+    }
+  }
+
+  const handleTouchMove = (e) => {
+    if (!isPulling || isRefreshing) return
+
+    const currentY = e.touches[0].clientY
+    const distance = currentY - touchStartY.current
+
+    if (distance > 0) {
+      setPullDistance(distance)    }
+  }
+
+  const handleTouchEnd = async () => {
+    if (!isPulling || isRefreshing) return
+
+    setIsPulling(false)
+
+    if (pullDistance >= PULL_THRESHOLD && currentUser?.uid) {
+      setIsRefreshing(true)
+      try {
+        console.log('🔄 Reloading progress from Firebase...')
+        await loadProgressFromFirebase(currentUser.uid)
+        console.log('✓ Progress reloaded successfully')
+      } catch (error) {
+        console.error('✗ Failed to reload progress:', error)
+      } finally {
+        setIsRefreshing(false)
+        setPullDistance(0)
+      }
+    } else {
+      setPullDistance(0)
+    }
+  }
 
   // Handle logout
   const handleLogout = async () => {
@@ -199,7 +247,39 @@ function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-4">
+    <div
+      className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-4 overflow-y-auto"
+      ref={contentRef}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
+      {/* Pull-to-Refresh Indicator */}
+      {(isPulling || isRefreshing) && (
+        <div
+          className="flex justify-center items-center transition-all duration-300"
+          style={{
+            height: Math.min(pullDistance, 80) + 'px',
+            opacity: Math.min(pullDistance / PULL_THRESHOLD, 1)
+          }}
+        >
+          <div className="flex flex-col items-center">
+            <RefreshCw
+              className={`w-6 h-6 text-indigo-600 ${isRefreshing ? 'animate-spin' : ''}`}
+              style={{
+                transform: isRefreshing ? 'none' : `rotate(${Math.min(pullDistance / 2, 180)}deg)`
+              }}
+            />
+            {!isRefreshing && pullDistance >= PULL_THRESHOLD && (
+              <p className="text-xs text-indigo-600 mt-2">Release to reload</p>
+            )}
+            {isRefreshing && (
+              <p className="text-xs text-indigo-600 mt-2">Reloading...</p>
+            )}
+          </div>
+        </div>
+      )}
+
       <div className="max-w-md mx-auto">
         {/* Yeartext Banner - Overlay Style */}
         {yeartext && showYeartext && (

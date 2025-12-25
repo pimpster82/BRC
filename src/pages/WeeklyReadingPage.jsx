@@ -267,12 +267,31 @@ const WeeklyReadingPage = () => {
     console.log('Start Verse:', startVerse)
     console.log('Chapter Data:', chapterData)
 
-    // Open the web link (always works)
-    // Users can manually open JW Library if they have it installed
-    if (links?.web) {
+    // Progressive Enhancement: Try JW Library first, fallback to web
+    if (links?.library && links?.web) {
+      console.log('🚀 Attempting to open JW Library app...')
+
+      // Try to open JW Library deep link
+      window.location.href = links.library
+
+      // Fallback to web link if JW Library is not installed
+      // Wait 1.5 seconds - if no response from app, open website instead
+      const fallbackTimer = setTimeout(() => {
+        console.log('⚠️ JW Library not responding, falling back to website')
+        window.location.href = links.web
+      }, 1500)
+
+      // If user returns to app within 1.5s, clear the timeout (user has JW Library)
+      const handleFocus = () => {
+        clearTimeout(fallbackTimer)
+        window.removeEventListener('focus', handleFocus)
+        console.log('✓ JW Library app opened successfully')
+      }
+      window.addEventListener('focus', handleFocus)
+    } else if (links?.web) {
+      // Fallback: if no library link, just open web
+      console.log('📱 Opening website...')
       window.open(links.web, '_blank', 'noopener,noreferrer')
-      console.log('Opened web link:', links.web)
-      console.log('If you have JW Library installed, you can also use:', links.library)
     } else {
       console.error('No valid link available')
     }

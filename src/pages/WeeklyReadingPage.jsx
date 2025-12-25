@@ -267,45 +267,11 @@ const WeeklyReadingPage = () => {
     console.log('Start Verse:', startVerse)
     console.log('Chapter Data:', chapterData)
 
-    // Progressive Enhancement: Try JW Library first, fallback to web
-    if (links?.library && links?.web) {
-      console.log('🚀 Attempting to open JW Library app...')
-      console.log('Deep Link URL:', links.library)
-
-      // Standard approach: Use iframe to trigger deep link
-      // This doesn't change the page if app is not installed
-      const iframe = document.createElement('iframe')
-      iframe.style.display = 'none'
-      document.body.appendChild(iframe)
-      iframe.src = links.library
-
-      let iframeRemoved = false
-
-      // Fallback to web link if JW Library is not installed
-      // Wait 1.5 seconds - if no response from app, open website instead
-      const fallbackTimer = setTimeout(() => {
-        console.log('⚠️ JW Library not responding, falling back to website')
-        if (!iframeRemoved && iframe.parentNode) {
-          document.body.removeChild(iframe)
-          iframeRemoved = true
-        }
-        window.open(links.web, '_blank', 'noopener,noreferrer')
-      }, 1500)
-
-      // If user switches to app, clear the timeout (user has JW Library)
-      const handleFocus = () => {
-        clearTimeout(fallbackTimer)
-        window.removeEventListener('focus', handleFocus)
-        if (!iframeRemoved && iframe.parentNode) {
-          document.body.removeChild(iframe)
-          iframeRemoved = true
-        }
-        console.log('✓ JW Library app opened successfully')
-      }
-      window.addEventListener('focus', handleFocus)
-    } else if (links?.web) {
-      // Fallback: if no library link, just open web
-      console.log('📱 Opening website...')
+    // Open the JW.org finder URL
+    // The browser/OS will automatically open JW Library app if installed
+    // Otherwise the web link opens in browser
+    if (links?.web) {
+      console.log('📱 Opening link:', links.web)
       window.open(links.web, '_blank', 'noopener,noreferrer')
     } else {
       console.error('No valid link available')

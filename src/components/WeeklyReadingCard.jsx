@@ -5,52 +5,71 @@ import { t, getCurrentLanguage } from '../config/i18n'
 import { getCurrentWeekReading, loadScheduleForYear } from '../../data/weekly-reading-schedule'
 import { getLocalizedBookName } from '../../data/bible-link-builder'
 import { parseReadingText } from '../utils/scheduleParser'
+import { calculateVerseProgress } from '../utils/verseProgressCalculator'
 
 const WeeklyReadingCard = () => {
   const navigate = useNavigate()
   const [weekReading, setWeekReading] = useState(null)
   const [chaptersRead, setChaptersRead] = useState([])
 
-  useEffect(() => {
-    const loadReading = async () => {
-      // Get test date from localStorage if set
-      const savedTestDate = localStorage.getItem('testDate')
-      const testDate = savedTestDate ? new Date(savedTestDate) : null
+  const loadReading = async () => {
+    // Get test date from localStorage if set
+    const savedTestDate = localStorage.getItem('testDate')
+    const testDate = savedTestDate ? new Date(savedTestDate) : null
 
-      // Get meeting day from settings
-      const meetingDay = parseInt(localStorage.getItem('settings_meetingDay') || '1')
+    // Get meeting day from settings
+    const meetingDay = parseInt(localStorage.getItem('settings_meetingDay') || '1')
 
-      // Determine which year we need
-      const checkDate = testDate ? new Date(testDate) : new Date()
-      const year = checkDate.getFullYear()
+    // Determine which year we need
+    const checkDate = testDate ? new Date(testDate) : new Date()
+    const year = checkDate.getFullYear()
 
-      // Load the schedule for this year if needed
-      const schedule = await loadScheduleForYear(year)
+    // Load the schedule for this year if needed
+    const schedule = await loadScheduleForYear(year)
 
-      if (!schedule) {
-        console.warn(`No schedule available for ${year}. User needs to import via Settings.`)
-        setWeekReading(null)
-        return
-      }
+    if (!schedule) {
+      console.warn(`No schedule available for ${year}. User needs to import via Settings.`)
+      setWeekReading(null)
+      return
+    }
 
-      // Now get current week's reading (after schedule is loaded)
-      const reading = getCurrentWeekReading(meetingDay, testDate)
-      setWeekReading(reading)
+    // Now get current week's reading (after schedule is loaded)
+    const reading = getCurrentWeekReading(meetingDay, testDate)
+    setWeekReading(reading)
 
-      // Load saved progress from localStorage
-      if (reading) {
-        const saved = localStorage.getItem('weeklyReading_current')
-        if (saved) {
-          const data = JSON.parse(saved)
-          // Check if it's the same week
-          if (data.weekStart === reading.weekStart) {
-            setChaptersRead(data.chaptersRead || [])
-          }
+    // Load saved progress from localStorage
+    if (reading) {
+      const saved = localStorage.getItem('weeklyReading_current')
+      if (saved) {
+        const data = JSON.parse(saved)
+        // Check if it's the same week
+        if (data.weekStart === reading.weekStart) {
+          setChaptersRead(data.chaptersRead || [])
         }
       }
     }
+  }
 
+  useEffect(() => {
     loadReading()
+  }, [])
+
+  // Listen for storage changes (from other tabs/components)
+  useEffect(() => {
+    const handleStorageChange = () => {
+      console.log('📱 Storage changed, reloading weekly reading...')
+      loadReading()
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+
+    // Also listen for custom events from the same tab
+    window.addEventListener('weeklyReadingUpdated', handleStorageChange)
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      window.removeEventListener('weeklyReadingUpdated', handleStorageChange)
+    }
   }, [])
 
   const handleOpenReading = () => {
@@ -69,9 +88,17 @@ const WeeklyReadingCard = () => {
     )
   }
 
+  // Calculate verse-based progress instead of chapter-based
+  const verseProgress = calculateVerseProgress(
+    chaptersRead,
+    weekReading.reading.book,
+    Math.min(...weekReading.chapters),
+    Math.max(...weekReading.chapters)
+  )
+
   const totalChapters = weekReading.chapters.length
   const readCount = chaptersRead.length
-  const progressPercent = (readCount / totalChapters) * 100
+  const progressPercent = verseProgress.percentage
 
   return (
     <div className="card card-blue">
@@ -86,7 +113,7 @@ const WeeklyReadingCard = () => {
 
       <div className="card-footer card-footer-blue">
         <p className="card-stat-blue">
-          {t('weekly.chapters_read', null, { current: readCount, total: totalChapters })}
+          {t('weekly.progress', null, { current: verseProgress.versesRead, total: verseProgress.totalVerses, percent: Math.round(progressPercent) })}
         </p>
         <button
           onClick={handleOpenReading}

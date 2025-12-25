@@ -7,6 +7,7 @@ import { buildLanguageSpecificWebLink, getLocalizedBookName } from '../../data/b
 import { t, getCurrentLanguage } from '../config/i18n'
 import { parseReadingText } from '../utils/scheduleParser'
 import { saveWeeklyProgressToFirebase } from '../utils/firebaseUserProgress'
+import { calculateVerseProgress, formatProgressText } from '../utils/verseProgressCalculator'
 
 const WeeklyReadingPage = () => {
   const navigate = useNavigate()
@@ -132,6 +133,8 @@ const WeeklyReadingPage = () => {
         weekStart: weekReading.weekStart,
         chaptersRead: updatedChapters
       }))
+      // Dispatch event so other components (like WeeklyReadingCard) know to refresh
+      window.dispatchEvent(new Event('weeklyReadingUpdated'))
       // Sync to Firebase
       await saveWeeklyProgressToFirebase({
         completedWeeks: [{
@@ -160,6 +163,8 @@ const WeeklyReadingPage = () => {
         weekStart: weekReading.weekStart,
         chaptersRead: lastAction.previousState
       }))
+      // Dispatch event so other components know to refresh
+      window.dispatchEvent(new Event('weeklyReadingUpdated'))
       // Sync to Firebase
       await saveWeeklyProgressToFirebase({
         completedWeeks: [{
@@ -182,6 +187,8 @@ const WeeklyReadingPage = () => {
         weekStart: weekReading.weekStart,
         chaptersRead: []
       }))
+      // Dispatch event so other components know to refresh
+      window.dispatchEvent(new Event('weeklyReadingUpdated'))
       // Sync to Firebase
       await saveWeeklyProgressToFirebase({
         completedWeeks: [{
@@ -226,6 +233,8 @@ const WeeklyReadingPage = () => {
         weekStart: weekReading.weekStart,
         chaptersRead: updated
       }))
+      // Dispatch event so other components know to refresh
+      window.dispatchEvent(new Event('weeklyReadingUpdated'))
       // Sync to Firebase
       await saveWeeklyProgressToFirebase({
         completedWeeks: [{
@@ -300,10 +309,17 @@ const WeeklyReadingPage = () => {
     )
   }
 
+  // Calculate verse-based progress instead of chapter-based
+  const readingRange = weekReading.reading
+  const verseProgress = calculateVerseProgress(
+    chaptersRead,
+    readingRange.book,
+    Math.min(...weekReading.chapters),
+    Math.max(...weekReading.chapters)
+  )
+
   const totalChapters = weekReading.chapters.length
-  // Only count chapters that are in the expected week's reading
-  const readCount = chaptersRead.filter(c => weekReading.chapters.includes(c.chapter)).length
-  const progressPercent = totalChapters > 0 ? (readCount / totalChapters) * 100 : 0
+  const progressPercent = verseProgress.percentage
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-4">
@@ -341,7 +357,7 @@ const WeeklyReadingPage = () => {
               ></div>
             </div>
             <p className="text-sm text-gray-700">
-              {t('weekly.progress', null, { current: readCount, total: totalChapters, percent: Math.round(progressPercent) })}
+              {t('weekly.progress', null, { current: verseProgress.versesRead, total: verseProgress.totalVerses, percent: Math.round(progressPercent) })}
             </p>
           </div>
         </div>
@@ -508,7 +524,7 @@ const WeeklyReadingPage = () => {
                   {t('weekly.undo')}
                 </button>
               )}
-              {readCount > 0 && (
+              {verseProgress.versesRead > 0 && (
                 <button
                   onClick={() => setShowClearConfirm(true)}
                   title={t('weekly.clear_all')}
@@ -610,7 +626,7 @@ const WeeklyReadingPage = () => {
         </div>
 
         {/* Stats Footer */}
-        {readCount === totalChapters && totalChapters > 0 && (
+        {verseProgress.percentage === 100 && totalChapters > 0 && (
           <div className="mt-6 card bg-green-50 border-green-200">
             <p className="text-center text-green-800 font-medium">
               {t('weekly.week_complete')}

@@ -45,13 +45,13 @@ const DailyTextCard = () => {
   }
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-lg p-4 shadow-sm border border-indigo-100">
-      <h2 className="font-semibold text-indigo-900 mb-3 text-base flex items-center gap-2">
+    <div className="bg-white dark:bg-slate-900 rounded-lg p-4 shadow-sm border border-indigo-100 dark:border-indigo-900">
+      <h2 className="font-semibold text-indigo-900 dark:text-indigo-100 mb-3 text-base flex items-center gap-2">
         <Sun className="w-4 h-4" />
         {t('dailytext.title')}
       </h2>
 
-      <p className="text-sm text-gray-700 mb-3 italic">
+      <p className="text-sm text-gray-700 dark:text-gray-300 mb-3 italic">
         {t('dailytext.preview')}
       </p>
 
@@ -59,20 +59,20 @@ const DailyTextCard = () => {
         {!isComplete && (
           <button
             onClick={handleToggleComplete}
-            className="text-sm text-gray-600 hover:text-green-600 font-medium"
+            className="text-sm text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 font-medium"
           >
             {t('dailytext.mark_read')}
           </button>
         )}
       </div>
 
-      <div className="pt-3 border-t border-indigo-200 flex items-center justify-between">
+      <div className="pt-3 border-t border-indigo-200 dark:border-indigo-800 flex items-center justify-between">
         <div className="flex items-center gap-3">
           {isComplete && (
-            <p className="text-sm text-green-600 font-medium">{t('dailytext.marked_read')}</p>
+            <p className="text-sm text-green-600 dark:text-green-400 font-medium">{t('dailytext.marked_read')}</p>
           )}
           {streak > 0 && (
-            <p className="text-xs text-indigo-700 flex items-center gap-1">
+            <p className="text-xs text-indigo-700 dark:text-indigo-300 flex items-center gap-1">
               <Flame className="w-3 h-3" />
               <span className="font-bold">{streak} {streak === 1 ? t('dailytext.day_streak_singular') : t('dailytext.day_streak_plural')}</span>
             </p>
@@ -80,7 +80,7 @@ const DailyTextCard = () => {
         </div>
         <button
           onClick={handleOpenDailyText}
-          className="text-sm text-indigo-900 font-medium flex items-center gap-1 hover:text-indigo-700"
+          className="text-sm text-indigo-900 dark:text-indigo-100 font-medium flex items-center gap-1 hover:text-indigo-700 dark:hover:text-indigo-300"
         >
           <ExternalLink className="w-4 h-4" />
           {t('dailytext.open')}

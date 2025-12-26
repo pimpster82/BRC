@@ -355,7 +355,7 @@ function HomePage() {
         {/* Header with Date and Settings */}
         <div className="mb-4 pt-2">
           <div className="flex items-center justify-between">
-            <h1 className="text-xl font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2">
+            <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
               <button
                 onClick={() => setShowDatePicker(!showDatePicker)}
                 className="p-1 hover:bg-white rounded transition-colors"
@@ -368,7 +368,7 @@ function HomePage() {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => navigate('/settings')}
-                className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 hover:bg-white rounded-lg transition-colors"
+                className="p-2 text-gray-600 dark:text-gray-100 hover:text-gray-900 hover:bg-white rounded-lg transition-colors"
                 aria-label="Einstellungen"
               >
                 <Settings className="w-5 h-5" />
@@ -378,8 +378,8 @@ function HomePage() {
                 disabled={isLoggingOut}
                 className={`p-2 rounded-lg transition-colors disabled:opacity-50 ${
                   currentUser
-                    ? 'text-gray-600 dark:text-gray-400 hover:text-red-600 hover:bg-white'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-green-600 hover:bg-white'
+                    ? 'text-gray-600 dark:text-gray-100 hover:text-red-600 hover:bg-white'
+                    : 'text-gray-600 dark:text-gray-100 hover:text-green-600 hover:bg-white'
                 }`}
                 aria-label={currentUser ? 'Logout' : 'Login'}
                 title={currentUser ? 'Abmelden' : 'Anmelden'}
@@ -393,10 +393,10 @@ function HomePage() {
           {showDatePicker && (
             <div className="mt-3 p-4 bg-white rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-100 shadow-lg">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-semibold text-gray-800 dark:text-gray-200">{t('datepicker.title')}</h3>
+                <h3 className="font-semibold text-gray-800 dark:text-gray-100">{t('datepicker.title')}</h3>
                 <button
                   onClick={() => setShowDatePicker(false)}
-                  className="text-gray-400 hover:text-gray-600 dark:text-gray-400"
+                  className="text-gray-400 hover:text-gray-600 dark:text-gray-100"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -412,13 +412,13 @@ function HomePage() {
               {testDate && (
                 <button
                   onClick={handleResetDate}
-                  className="w-full bg-gray-100 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg font-medium hover:bg-gray-200 transition-colors text-sm"
+                  className="w-full bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-100 py-2 px-4 rounded-lg font-medium hover:bg-gray-200 transition-colors text-sm"
                 >
                   {t('datepicker.reset')}
                 </button>
               )}
 
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+              <p className="text-xs text-gray-500 dark:text-gray-100 mt-2">
                 {t('datepicker.warning')}
               </p>
             </div>
@@ -428,23 +428,23 @@ function HomePage() {
           {showLogoutConfirm && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
               <div className="bg-white rounded-lg shadow-lg max-w-sm w-full p-6">
-                <h2 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-4">Abmelden?</h2>
+                <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">Abmelden?</h2>
 
-                <div className="bg-gray-50 rounded-lg p-4 mb-6">
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Angemeldet als:</p>
-                  <p className="text-base font-medium text-gray-800 dark:text-gray-200 break-all">
+                <div className="bg-gray-50 dark:bg-slate-800 rounded-lg p-4 mb-6">
+                  <p className="text-sm text-gray-600 dark:text-gray-100 mb-2">Angemeldet als:</p>
+                  <p className="text-base font-medium text-gray-800 dark:text-gray-100 break-all">
                     {currentUser?.email}
                   </p>
                 </div>
 
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+                <p className="text-sm text-gray-600 dark:text-gray-100 mb-6">
                   Dein Fortschritt wird automatisch synchronisiert.
                 </p>
 
                 <div className="flex gap-3">
                   <button
                     onClick={handleLogoutCancel}
-                    className="flex-1 bg-gray-200 text-gray-800 dark:text-gray-200 py-2 px-4 rounded-lg font-medium hover:bg-gray-300 transition-colors"
+                    className="flex-1 bg-gray-200 text-gray-800 dark:text-gray-100 py-2 px-4 rounded-lg font-medium hover:bg-gray-300 transition-colors"
                   >
                     Abbrechen
                   </button>

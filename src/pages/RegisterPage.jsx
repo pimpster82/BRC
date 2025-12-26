@@ -74,7 +74,7 @@ const RegisterPage = () => {
         <h1 className="text-3xl font-bold text-center text-indigo-900 mb-2">
           Registrieren
         </h1>
-        <p className="text-center text-gray-600 dark:text-gray-400 mb-8">
+        <p className="text-center text-gray-600 dark:text-gray-100 mb-8">
           Erstellen Sie ein Konto um Ihren Fortschritt zu synchronisieren
         </p>
 
@@ -95,7 +95,7 @@ const RegisterPage = () => {
         <form onSubmit={handleRegister} className="space-y-4">
           {/* Email */}
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-100 mb-2">
               E-Mail Adresse
             </label>
             <input
@@ -111,7 +111,7 @@ const RegisterPage = () => {
 
           {/* Password */}
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-100 mb-2">
               Passwort (mind. 6 Zeichen)
             </label>
             <input
@@ -127,7 +127,7 @@ const RegisterPage = () => {
 
           {/* Confirm Password */}
           <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-100 mb-2">
               Passwort wiederholen
             </label>
             <input
@@ -153,7 +153,7 @@ const RegisterPage = () => {
 
         {/* Login Link */}
         <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700 text-center">
-          <p className="text-gray-600 dark:text-gray-400 text-sm">
+          <p className="text-gray-600 dark:text-gray-100 text-sm">
             Haben Sie bereits ein Konto?{' '}
             <Link to="/login" className="text-indigo-600 hover:text-indigo-700 font-medium">
               Anmelden

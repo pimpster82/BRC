@@ -296,13 +296,13 @@ const WeeklyReadingPage = () => {
         <div className="max-w-md mx-auto">
           <button
             onClick={() => navigate('/')}
-            className="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 mb-4"
+            className="flex items-center gap-2 text-gray-700 dark:text-gray-100 hover:text-gray-900 mb-4"
           >
             <ArrowLeft className="w-5 h-5" />
             {t('nav.back')}
           </button>
           <div className="card card-blue">
-            <p className="text-gray-600 dark:text-gray-400">{t('weekly.no_reading')}</p>
+            <p className="text-gray-600 dark:text-gray-100">{t('weekly.no_reading')}</p>
           </div>
         </div>
       </div>
@@ -328,16 +328,16 @@ const WeeklyReadingPage = () => {
         <div className="mb-4 pt-4">
           <button
             onClick={() => navigate('/')}
-            className="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 mb-4"
+            className="flex items-center gap-2 text-gray-700 dark:text-gray-100 hover:text-gray-900 mb-4"
           >
             <ArrowLeft className="w-5 h-5" />
             {t('nav.back')}
           </button>
 
-          <h1 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2">
+          <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">
             {t('weekly.page_title')}
           </h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-gray-600 dark:text-gray-100">
             {formatWeekRange(weekReading.weekStart, weekReading.weekEnd)}
           </p>
         </div>
@@ -356,7 +356,7 @@ const WeeklyReadingPage = () => {
                 style={{ width: `${progressPercent}%` }}
               ></div>
             </div>
-            <p className="text-sm text-gray-700 dark:text-gray-300">
+            <p className="text-sm text-gray-700 dark:text-gray-100">
               {t('weekly.progress', null, { current: verseProgress.versesRead, total: verseProgress.totalVerses, percent: Math.round(progressPercent) })}
             </p>
           </div>
@@ -417,7 +417,7 @@ const WeeklyReadingPage = () => {
                         </div>
                         <button
                           onClick={() => setSuggestion(null)}
-                          className="text-xs text-gray-600 dark:text-gray-400 mt-2 hover:text-gray-800 dark:text-gray-200"
+                          className="text-xs text-gray-600 dark:text-gray-100 mt-2 hover:text-gray-800 dark:text-gray-100"
                         >
                           {t('weekly.suggest_cancel')}
                         </button>
@@ -441,7 +441,7 @@ const WeeklyReadingPage = () => {
                         </div>
                         <button
                           onClick={() => setSuggestion(null)}
-                          className="text-xs text-gray-600 dark:text-gray-400 mt-2 hover:text-gray-800 dark:text-gray-200"
+                          className="text-xs text-gray-600 dark:text-gray-100 mt-2 hover:text-gray-800 dark:text-gray-100"
                         >
                           {t('weekly.suggest_cancel_new_input')}
                         </button>
@@ -454,7 +454,7 @@ const WeeklyReadingPage = () => {
                         </p>
                         <button
                           onClick={() => setSuggestion(null)}
-                          className="text-xs text-gray-600 dark:text-gray-400 mt-2 hover:text-gray-800 dark:text-gray-200"
+                          className="text-xs text-gray-600 dark:text-gray-100 mt-2 hover:text-gray-800 dark:text-gray-100"
                         >
                           {t('weekly.suggest_ok')}
                         </button>
@@ -479,13 +479,13 @@ const WeeklyReadingPage = () => {
                               className="text-sm bg-white border border-yellow-300 px-3 py-1 rounded hover:bg-yellow-100 text-yellow-900"
                             >
                               <strong>{sug.display}</strong>
-                              <span className="text-xs text-gray-600 dark:text-gray-400 ml-1">({sug.description})</span>
+                              <span className="text-xs text-gray-600 dark:text-gray-100 ml-1">({sug.description})</span>
                             </button>
                           ))}
                         </div>
                         <button
                           onClick={() => setSuggestion(null)}
-                          className="text-xs text-gray-600 dark:text-gray-400 mt-2 hover:text-gray-800 dark:text-gray-200"
+                          className="text-xs text-gray-600 dark:text-gray-100 mt-2 hover:text-gray-800 dark:text-gray-100"
                         >
                           {t('weekly.suggest_cancel_new_input')}
                         </button>
@@ -494,7 +494,7 @@ const WeeklyReadingPage = () => {
                   </div>
                 )}
 
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                <p className="text-xs text-gray-500 dark:text-gray-100 mt-2">
                   Beispiele: <code className="bg-gray-100 px-1">9</code> · <code className="bg-gray-100 px-1">9-10</code> · <code className="bg-gray-100 px-1">9:5-10</code>
                 </p>
               </div>
@@ -512,7 +512,7 @@ const WeeklyReadingPage = () => {
         {/* Chapter List */}
         <div className="space-y-2">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">{t('weekly.chapters')}</h3>
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-100">{t('weekly.chapters')}</h3>
             <div className="flex gap-2">
               {lastAction && (
                 <button
@@ -552,7 +552,7 @@ const WeeklyReadingPage = () => {
                 </button>
                 <button
                   onClick={() => setShowClearConfirm(false)}
-                  className="text-xs bg-gray-300 text-gray-800 dark:text-gray-200 px-3 py-1 rounded hover:bg-gray-400"
+                  className="text-xs bg-gray-300 text-gray-800 dark:text-gray-100 px-3 py-1 rounded hover:bg-gray-400"
                 >
                   {t('weekly.clear_cancel')}
                 </button>
@@ -594,7 +594,7 @@ const WeeklyReadingPage = () => {
                       <p className={`font-medium ${
                         isRead ? 'text-green-900' :
                         isPartial ? 'text-yellow-900' :
-                        'text-gray-800 dark:text-gray-200'
+                        'text-gray-800 dark:text-gray-100'
                       }`}>
                         {`${getLocalizedBookName(weekReading.reading.book, getCurrentLanguage())} ${chapter}`}
                       </p>

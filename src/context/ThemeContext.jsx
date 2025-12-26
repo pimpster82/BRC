@@ -30,10 +30,14 @@ export const ThemeProvider = ({ children }) => {
     const actualTheme = getActualTheme(theme)
     const htmlElement = document.documentElement
 
+    console.log(`🎨 Theme changed: ${theme} → ${actualTheme}`)
+
     if (actualTheme === 'dark') {
       htmlElement.classList.add('dark')
+      console.log('✓ Added dark class to html element')
     } else {
       htmlElement.classList.remove('dark')
+      console.log('✓ Removed dark class from html element')
     }
   }, [theme])
 

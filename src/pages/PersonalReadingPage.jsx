@@ -52,6 +52,30 @@ export default function PersonalReadingPage() {
   const [expandedSections, setExpandedSections] = useState({}) // Track which thematic sections are expanded
   const [expandedTopics, setExpandedTopics] = useState({}) // Track which thematic topics are expanded
 
+  // Find the category ID of the last-read chapter
+  const getLastReadCategoryId = () => {
+    if (!personalData || !personalData.chaptersRead || personalData.chaptersRead.length === 0) {
+      return null
+    }
+
+    // Find the most recently read chapter (by timestamp)
+    const lastChapter = personalData.chaptersRead.reduce((latest, current) => {
+      return (current.timestamp || 0) > (latest.timestamp || 0) ? current : latest
+    })
+
+    if (!lastChapter) return null
+
+    // Find which category contains this book
+    for (const category of readingCategories) {
+      const booksInCat = getBooksInCategory(category.id)
+      if (booksInCat.includes(lastChapter.book)) {
+        return category.id
+      }
+    }
+
+    return null
+  }
+
   // Load data on mount
   useEffect(() => {
     const data = getPersonalReadingData()
@@ -59,6 +83,12 @@ export default function PersonalReadingPage() {
     // Load the selected plan from storage
     if (data.selectedPlan) {
       setSelectedPlan(data.selectedPlan)
+    }
+
+    // Initialize expandedCategories to show only the last-read category
+    const lastReadCategoryId = getLastReadCategoryId()
+    if (lastReadCategoryId) {
+      setExpandedCategories({ [lastReadCategoryId]: true })
     }
   }, [])
 
@@ -367,74 +397,12 @@ export default function PersonalReadingPage() {
         </div>
       </div>
 
-      {/* Plan Selector */}
-      <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          <button
-            onClick={() => {
-              setSelectedPlan('free')
-              savePersonalReadingData({ ...personalData, selectedPlan: 'free' })
-              syncPersonalReadingToFirebase({ ...personalData, selectedPlan: 'free' })
-            }}
-            className={`py-2 px-3 rounded-lg text-sm font-medium transition-all ${
-              selectedPlan === 'free'
-                ? 'bg-blue-600 text-white'
-                : 'bg-white text-gray-700 border border-gray-300 hover:border-gray-400'
-            }`}
-          >
-            {t('reading.plan_free')}
-          </button>
-          <button
-            onClick={() => {
-              setSelectedPlan('thematic')
-              savePersonalReadingData({ ...personalData, selectedPlan: 'thematic' })
-              syncPersonalReadingToFirebase({ ...personalData, selectedPlan: 'thematic' })
-            }}
-            className={`py-2 px-3 rounded-lg text-sm font-medium transition-all ${
-              selectedPlan === 'thematic'
-                ? 'bg-blue-600 text-white'
-                : 'bg-white text-gray-700 border border-gray-300 hover:border-gray-400'
-            }`}
-          >
-            {t('reading.plan_thematic')}
-          </button>
-          <button
-            onClick={() => {
-              setSelectedPlan('chronological')
-              savePersonalReadingData({ ...personalData, selectedPlan: 'chronological' })
-              syncPersonalReadingToFirebase({ ...personalData, selectedPlan: 'chronological' })
-            }}
-            className={`py-2 px-3 rounded-lg text-sm font-medium transition-all ${
-              selectedPlan === 'chronological'
-                ? 'bg-blue-600 text-white'
-                : 'bg-white text-gray-700 border border-gray-300 hover:border-gray-400'
-            }`}
-          >
-            {t('reading.plan_chronological')}
-          </button>
-          <button
-            onClick={() => {
-              setSelectedPlan('oneyear')
-              savePersonalReadingData({ ...personalData, selectedPlan: 'oneyear' })
-              syncPersonalReadingToFirebase({ ...personalData, selectedPlan: 'oneyear' })
-            }}
-            className={`py-2 px-3 rounded-lg text-sm font-medium transition-all ${
-              selectedPlan === 'oneyear'
-                ? 'bg-blue-600 text-white'
-                : 'bg-white text-gray-700 border border-gray-300 hover:border-gray-400'
-            }`}
-          >
-            {t('reading.plan_oneyear')}
-          </button>
-        </div>
-      </div>
-
       {/* Content - Plan-Specific Views */}
       <div className="p-4 pb-32">
         {selectedPlan === 'free' && (
           <div className="space-y-6">
             {readingCategories.map((category) => {
-              const isExpanded = expandedCategories[category.id] !== false // Default to expanded
+              const isExpanded = expandedCategories[category.id] === true // Default to collapsed
               const booksInCategory = getBooksInCategory(category.id)
 
               return (

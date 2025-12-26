@@ -14,6 +14,7 @@ const SettingsPage = () => {
 
   // Expanded sections
   const [expandedSection, setExpandedSection] = useState(null)
+  const [expandedReadingPlanDropdown, setExpandedReadingPlanDropdown] = useState(false)
 
   // Language
   const [language, setLanguage] = useState(getCurrentLanguage())
@@ -85,6 +86,7 @@ const SettingsPage = () => {
   const handleReadingPlanChange = (plan) => {
     setReadingPlan(plan)
     localStorage.setItem('settings_readingPlan', plan)
+    setExpandedReadingPlanDropdown(false)
   }
 
   const handleDailyReminderToggle = () => {
@@ -266,10 +268,9 @@ const SettingsPage = () => {
 
   const readingPlans = [
     { value: 'free', label: t('readingplan.free') },
-    { value: '1year', label: t('readingplan.1year') },
-    { value: '2years', label: t('readingplan.2years') },
     { value: 'chronological', label: t('readingplan.chronological') },
-    { value: 'bookByBook', label: t('readingplan.bookbybook') }
+    { value: 'oneyear', label: t('readingplan.oneyear') },
+    { value: 'thematic', label: t('readingplan.thematic') }
   ]
 
   return (
@@ -451,22 +452,42 @@ const SettingsPage = () => {
 
           {expandedSection === 'personal' && (
             <div className="mt-4 pt-4 border-t border-gray-200">
-              <div>
+              <div className="relative">
                 <label className="text-sm font-medium text-gray-700 block mb-2">
                   {t('settings.reading_plan')}
                 </label>
-                <select
-                  value={readingPlan}
-                  onChange={(e) => handleReadingPlanChange(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+
+                {/* Dropdown Trigger */}
+                <button
+                  onClick={() => setExpandedReadingPlanDropdown(!expandedReadingPlanDropdown)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-left text-gray-700 font-medium flex items-center justify-between hover:border-gray-400 transition-colors"
                 >
-                  {readingPlans.map((plan) => (
-                    <option key={plan.value} value={plan.value}>
-                      {plan.label}
-                    </option>
-                  ))}
-                </select>
-                <p className="text-xs text-gray-500 mt-1">
+                  {readingPlans.find(p => p.value === readingPlan)?.label || t('readingplan.free')}
+                  <ChevronDown className={`w-4 h-4 text-gray-600 transition-transform ${expandedReadingPlanDropdown ? 'rotate-180' : ''}`} />
+                </button>
+
+                {/* Dropdown Menu */}
+                {expandedReadingPlanDropdown && (
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-50">
+                    <div className="py-2">
+                      {readingPlans.map((plan) => (
+                        <button
+                          key={plan.value}
+                          onClick={() => handleReadingPlanChange(plan.value)}
+                          className={`w-full text-left px-3 py-2 transition-all ${
+                            readingPlan === plan.value
+                              ? 'bg-blue-100 text-blue-900 font-medium'
+                              : 'text-gray-700 hover:bg-gray-50'
+                          }`}
+                        >
+                          {plan.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <p className="text-xs text-gray-500 mt-3">
                   {t('settings.reading_plan_note')}
                 </p>
               </div>

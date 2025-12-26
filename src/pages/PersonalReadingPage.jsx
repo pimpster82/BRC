@@ -473,7 +473,7 @@ export default function PersonalReadingPage() {
 
                   {/* Category Books Grid */}
                   {isExpanded && (
-                    <div className="p-4 bg-white">
+                    <div className="p-4 bg-white dark:bg-slate-800">
                       <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-7 lg:grid-cols-8 gap-2">
                         {booksInCategory.map((bookNumber) => {
                           const book = bibleBooks.books[bookNumber - 1]
@@ -568,7 +568,7 @@ export default function PersonalReadingPage() {
 
                   {/* Topics in Section */}
                   {isExpanded && (
-                    <div className="p-4 bg-white space-y-2">
+                    <div className="p-4 bg-white dark:bg-slate-800 space-y-2">
                       {topicsInSection.map((topic) => {
                         const isTopicExpanded = expandedTopics[topic.id]
                         const isCompleted = isThematicTopicComplete(topic.id)
@@ -617,7 +617,7 @@ export default function PersonalReadingPage() {
 
                             {/* Topic Content - Scripture References */}
                             {isTopicExpanded && (
-                              <div className={`border-t p-3 ${isCompleted ? 'border-purple-200 bg-white' : 'border-gray-100 dark:border-gray-800 bg-white'}`}>
+                              <div className={`border-t p-3 ${isCompleted ? 'border-purple-200 dark:border-purple-900 bg-white dark:bg-slate-800' : 'border-gray-100 dark:border-gray-800 bg-white dark:bg-slate-800'}`}>
                                 {(() => {
                                   const versesLinks = parseMultipleVerses(topic.verses, language)
                                   return (

@@ -323,16 +323,16 @@ function HomePage() {
         {yeartext && showYeartext && (
           <div className="pt-4 pb-2">
             <div className="relative">
-              <div className={`text-center px-4 py-3 bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-indigo-500/10 rounded-xl backdrop-blur-sm border rounded-xl backdrop-blur-sm shadow-sm ${!translationAvailable ? 'border-yellow-300' : 'border-indigo-200/30'}`}>
-                <p className="text-sm font-semibold text-indigo-900/80 mb-1">
+              <div className={`text-center px-4 py-3 bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-indigo-500/10 dark:from-indigo-900/20 dark:via-purple-900/20 dark:to-indigo-900/20 rounded-xl backdrop-blur-sm border rounded-xl backdrop-blur-sm shadow-sm ${!translationAvailable ? 'border-yellow-300 dark:border-yellow-600' : 'border-indigo-200/30 dark:border-indigo-800/30'}`}>
+                <p className="text-sm font-semibold text-indigo-900/80 dark:text-indigo-100/80 mb-1">
                   {yeartext.year} {t('home.yeartext')}
                 </p>
 
                 {/* Display yeartext in current language */}
-                <p className="text-lg font-bold text-indigo-900 leading-snug mb-1">
+                <p className="text-lg font-bold text-indigo-900 dark:text-indigo-100 leading-snug mb-1">
                   "{yeartext.text}"
                 </p>
-                <p className="text-sm text-indigo-700/70 font-medium mb-2">
+                <p className="text-sm text-indigo-700/70 dark:text-indigo-300/70 font-medium mb-2">
                   — {yeartext.scripture}
                 </p>
 
@@ -358,7 +358,7 @@ function HomePage() {
             <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
               <button
                 onClick={() => setShowDatePicker(!showDatePicker)}
-                className="p-1 hover:bg-white rounded transition-colors"
+                className="p-1 hover:bg-white dark:hover:bg-slate-800 rounded transition-colors"
                 title="Datum ändern (Test)"
               >
                 <Calendar className={`w-5 h-5 ${testDate ? 'text-orange-600' : ''}`} />
@@ -368,7 +368,7 @@ function HomePage() {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => navigate('/settings')}
-                className="p-2 text-gray-600 dark:text-gray-100 hover:text-gray-900 hover:bg-white rounded-lg transition-colors"
+                className="p-2 text-gray-600 dark:text-gray-100 hover:text-gray-900 hover:bg-white dark:hover:bg-slate-800 rounded-lg transition-colors"
                 aria-label="Einstellungen"
               >
                 <Settings className="w-5 h-5" />
@@ -378,8 +378,8 @@ function HomePage() {
                 disabled={isLoggingOut}
                 className={`p-2 rounded-lg transition-colors disabled:opacity-50 ${
                   currentUser
-                    ? 'text-gray-600 dark:text-gray-100 hover:text-red-600 hover:bg-white'
-                    : 'text-gray-600 dark:text-gray-100 hover:text-green-600 hover:bg-white'
+                    ? 'text-gray-600 dark:text-gray-100 hover:text-red-600 hover:bg-white dark:hover:bg-slate-800'
+                    : 'text-gray-600 dark:text-gray-100 hover:text-green-600 hover:bg-white dark:hover:bg-slate-800'
                 }`}
                 aria-label={currentUser ? 'Logout' : 'Login'}
                 title={currentUser ? 'Abmelden' : 'Anmelden'}
@@ -427,7 +427,7 @@ function HomePage() {
           {/* Logout Confirmation Modal */}
           {showLogoutConfirm && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-              <div className="bg-white rounded-lg shadow-lg max-w-sm w-full p-6">
+              <div className="bg-white dark:bg-slate-900 rounded-lg shadow-lg max-w-sm w-full p-6">
                 <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">Abmelden?</h2>
 
                 <div className="bg-gray-50 dark:bg-slate-800 rounded-lg p-4 mb-6">

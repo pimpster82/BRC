@@ -58,7 +58,7 @@ const ParserTestBench = () => {
               <p className="text-yellow-700 mb-1">{t('test.suggested_books')}</p>
               <div className="flex flex-wrap gap-1">
                 {parseResult.suggestion.suggestions.map(book => (
-                  <span key={book.number} className="bg-white px-2 py-1 rounded text-yellow-900 text-xs">
+                  <span key={book.number} className="bg-white dark:bg-slate-800 px-2 py-1 rounded text-yellow-900 dark:text-yellow-100 text-xs">
                     {book.name}
                   </span>
                 ))}
@@ -75,7 +75,7 @@ const ParserTestBench = () => {
               <p className="text-yellow-700 mb-1">{t('test.did_you_mean')}</p>
               <div className="flex flex-wrap gap-2">
                 {parseResult.suggestion.suggestions.map((sug, idx) => (
-                  <span key={idx} className="bg-white px-3 py-2 rounded text-yellow-900 text-sm">
+                  <span key={idx} className="bg-white dark:bg-slate-800 px-3 py-2 rounded text-yellow-900 dark:text-yellow-100 text-sm">
                     <strong>{sug.display}</strong>
                     <span className="text-xs text-gray-600 ml-2">({sug.description})</span>
                   </span>
@@ -96,7 +96,7 @@ const ParserTestBench = () => {
           </div>
 
           {parseResult.book && (
-            <div className="mb-3 p-2 bg-white rounded">
+            <div className="mb-3 p-2 bg-white dark:bg-slate-800 rounded">
               <p className="text-sm text-gray-700">
                 <strong>Buch:</strong> {parseResult.book.name} (#{parseResult.book.number})
               </p>
@@ -108,7 +108,7 @@ const ParserTestBench = () => {
               Kapitel ({parseResult.chapters.length}):
             </p>
             {parseResult.chapters.map((chapter, idx) => (
-              <div key={idx} className="p-2 bg-white rounded">
+              <div key={idx} className="p-2 bg-white dark:bg-slate-800 rounded">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">
                     Kapitel {chapter.chapter}

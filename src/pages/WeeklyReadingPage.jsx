@@ -409,7 +409,7 @@ const WeeklyReadingPage = () => {
                             <button
                               key={book.number}
                               onClick={() => handleAcceptSuggestion(book)}
-                              className="text-sm bg-white border border-yellow-300 px-3 py-1 rounded hover:bg-yellow-100 text-yellow-900"
+                              className="text-sm bg-white dark:bg-slate-800 border border-yellow-300 dark:border-yellow-600 px-3 py-1 rounded hover:bg-yellow-100 dark:hover:bg-slate-700 text-yellow-900 dark:text-yellow-100"
                             >
                               {book.name}
                             </button>
@@ -433,7 +433,7 @@ const WeeklyReadingPage = () => {
                             <button
                               key={book.number}
                               onClick={() => handleAcceptSuggestion(book)}
-                              className="text-sm bg-white border border-yellow-300 px-3 py-1 rounded hover:bg-yellow-100 text-yellow-900"
+                              className="text-sm bg-white dark:bg-slate-800 border border-yellow-300 dark:border-yellow-600 px-3 py-1 rounded hover:bg-yellow-100 dark:hover:bg-slate-700 text-yellow-900 dark:text-yellow-100"
                             >
                               {book.name}
                             </button>
@@ -476,7 +476,7 @@ const WeeklyReadingPage = () => {
                                 setReadingInput(`${suggestion.bookName} ${sug.display}`)
                                 setSuggestion(null)
                               }}
-                              className="text-sm bg-white border border-yellow-300 px-3 py-1 rounded hover:bg-yellow-100 text-yellow-900"
+                              className="text-sm bg-white dark:bg-slate-800 border border-yellow-300 dark:border-yellow-600 px-3 py-1 rounded hover:bg-yellow-100 dark:hover:bg-slate-700 text-yellow-900 dark:text-yellow-100"
                             >
                               <strong>{sug.display}</strong>
                               <span className="text-xs text-gray-600 dark:text-gray-100 ml-1">({sug.description})</span>

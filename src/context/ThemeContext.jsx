@@ -9,7 +9,7 @@ const ThemeContext = createContext()
 export const ThemeProvider = ({ children }) => {
   // Theme can be: 'light', 'dark', or 'system'
   const [theme, setTheme] = useState(() => {
-    return localStorage.getItem('settings_theme') || 'light'
+    return localStorage.getItem('settings_theme') || 'system'
   })
 
   /**

@@ -196,6 +196,18 @@
   - **Behavior:** Users can now click next reading from home card, jumps to that chapter modal in PBP page
   - **Status:** ✅ IMPLEMENTED
 
+### Date Formatting
+- [x] **Date display always in German, should be language-specific** ✅ FIXED
+  - **Root Cause:** `HomePage.jsx` hardcoded `toLocaleDateString('de-DE', options)` regardless of selected language
+  - **Fix Applied:** Made date formatting respect current language with locale mapping (Commit af23d38)
+  - **Implementation:**
+    - Add locale map: `de: 'de-DE'`, `en: 'en-US'`, `es: 'es-ES'`, `it: 'it-IT'`, `fr: 'fr-FR'`
+    - Call `getCurrentLanguage()` in `getFormattedDate()`
+    - Pass correct locale to `toLocaleDateString()`
+  - **Also Fixed:** Removed "TODAY" label from date display (shows only formatted date)
+  - **Behavior:** Date now displays in user's language (Monday/Montag/Lunes/Lunedì/Lundi)
+  - **Status:** ✅ FIXED - File: `src/pages/HomePage.jsx` lines 248-265
+
 ### User Interface & Navigation
 - [ ] **PersonalReadingPage link/info integration requires refactoring**
   - **Issue:** Multiple link sources (JW.org, next reading, continue position) need unified navigation strategy
@@ -355,12 +367,12 @@
 | Category | Total | Completed | Status |
 |----------|-------|-----------|--------|
 | Critical Bugs | 1 | 1 | ✅ COMPLETE |
-| Testing Findings (New) | 6 | 4 | 🟡 MEDIUM (2 pending) |
+| Testing Findings (New) | 6 | 6 | ✅ COMPLETE |
 | Multi-Device Sync | 9 | 0 | 🟡 MEDIUM |
 | Schedule Management | 3 | 1 | 🟡 MEDIUM (2 pending) |
 | UI/UX Bugs | 4 | 4 | ✅ COMPLETE |
 | Documentation | 1 | 0 | 🟢 LOW |
-| **TOTAL** | **24** | **10** | **42% Complete** |
+| **TOTAL** | **24** | **12** | **50% Complete** |
 
 ---
 
@@ -386,12 +398,13 @@
 
 ---
 
-**Last Updated:** 2025-12-26 (Auto-fixing phase: 10/24 completed)
+**Last Updated:** 2025-12-26 (All 6 testing findings fixed: 12/24 completed)
 **Total Tasks:** 24 (18 original + 6 new from testing)
-**Progress:** 10/24 (42%)
+**Progress:** 12/24 (50%)
 **Recent Fixes:**
 - 0d042f3: Language initialization (browser locale detection)
 - cde7b58: Weekly reading UX (error state with Settings link)
 - 6d15652: Thematic links (verse range support in JW.org URLs)
 - 28a441d: PBP Next link (interactive button with query params)
 - 50e4852: Firebase-first schedule loading (Priority #3: Firebase before static files)
+- af23d38: Date formatting (language-specific with locale mapping, removed TODAY label)

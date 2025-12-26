@@ -195,6 +195,9 @@ export const translations = {
     'common.chapters': 'Kapitel',
     'common.save': 'Speichern',
     'common.cancel': 'Abbrechen',
+    'common.select': 'Auswählen',
+    'common.mark_done': 'Als gelesen markieren',
+    'common.mark_undone': 'Als ungelesen markieren',
     'common.mark_all': 'Alle markieren',
     'common.unmark_all': 'Alle abwählen',
 
@@ -405,6 +408,9 @@ export const translations = {
     'common.chapters': 'Chapters',
     'common.save': 'Save',
     'common.cancel': 'Cancel',
+    'common.select': 'Select',
+    'common.mark_done': 'Mark as Read',
+    'common.mark_undone': 'Mark as Unread',
     'common.mark_all': 'Mark All',
     'common.unmark_all': 'Unmark All',
 
@@ -615,6 +621,9 @@ export const translations = {
     'common.chapters': 'Capítulos',
     'common.save': 'Guardar',
     'common.cancel': 'Cancelar',
+    'common.select': 'Seleccionar',
+    'common.mark_done': 'Marcar como leído',
+    'common.mark_undone': 'Marcar como no leído',
     'common.mark_all': 'Marcar todo',
     'common.unmark_all': 'Desmarcar todo',
 
@@ -827,6 +836,9 @@ export const translations = {
     'common.cancel': 'Annulla',
     'common.mark_all': 'Segna tutto',
     'common.unmark_all': 'Deseleziona tutto',
+    'common.select': 'Selezionare',
+    'common.mark_done': 'Segna come letto',
+    'common.mark_undone': 'Segna come non letto',
 
     // Parser suggestions & status
     'reading.suggest_chapter_verse': 'Capitolo {chapter}, Versetto {verse}',
@@ -882,6 +894,9 @@ export const translations = {
     // Common
     'common.open': 'Ouvrir',
     'common.updating': 'Mise à jour...',
+    'common.select': 'Sélectionner',
+    'common.mark_done': 'Marquer comme lu',
+    'common.mark_undone': 'Marquer comme non lu',
 
     // Date Picker
     'datepicker.title': 'Choisir Date de Test',

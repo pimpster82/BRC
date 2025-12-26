@@ -51,6 +51,8 @@ export default function PersonalReadingPage() {
   const [expandedCategories, setExpandedCategories] = useState({}) // Track which categories are expanded
   const [expandedSections, setExpandedSections] = useState({}) // Track which thematic sections are expanded
   const [expandedTopics, setExpandedTopics] = useState({}) // Track which thematic topics are expanded
+  const [isSelectMode, setIsSelectMode] = useState(false) // Chapter selection mode
+  const [selectedChapters, setSelectedChapters] = useState(new Set()) // Selected chapters for batch operations
 
   // Find the category ID of the last-read chapter
   const getLastReadCategoryId = () => {
@@ -623,39 +625,70 @@ export default function PersonalReadingPage() {
                 <p className="text-sm text-gray-600">{bibleBooks.books[selectedBook - 1]?.chapters} {t('common.chapters')}</p>
               </div>
               <button
-                onClick={() => setShowChapterModal(false)}
+                onClick={() => {
+                  setShowChapterModal(false)
+                  setIsSelectMode(false)
+                  setSelectedChapters(new Set())
+                }}
                 className="text-gray-500 hover:text-gray-700 text-2xl"
               >
                 ✕
               </button>
             </div>
 
-            {/* Mark All / Unmark All */}
+            {/* Select Mode Toggle & Actions */}
             <div className="sticky top-16 bg-gray-50 border-b border-gray-200 px-4 py-3 flex gap-2">
-              <button
-                onClick={() => {
-                  for (let i = 1; i <= (bibleBooks.books[selectedBook - 1]?.chapters || 1); i++) {
-                    if (getChapterStatus(selectedBook, i) === null) {
-                      markChapterComplete(selectedBook, i)
-                    }
-                  }
-                }}
-                className="flex-1 py-2 px-3 bg-green-100 text-green-700 rounded font-medium hover:bg-green-200 text-sm"
-              >
-                ✓ {t('common.mark_all')}
-              </button>
-              <button
-                onClick={() => {
-                  const updated = { ...personalData }
-                  updated.chaptersRead = updated.chaptersRead.filter(ch => ch.book !== selectedBook)
-                  saveAndSync(updated)
-                  setPersonalData(updated)
-                  window.dispatchEvent(new Event('personalReadingUpdated'))
-                }}
-                className="flex-1 py-2 px-3 bg-gray-200 text-gray-700 rounded font-medium hover:bg-gray-300 text-sm"
-              >
-                ✕ {t('common.unmark_all')}
-              </button>
+              {!isSelectMode ? (
+                <button
+                  onClick={() => {
+                    setIsSelectMode(true)
+                    setSelectedChapters(new Set())
+                  }}
+                  className="flex-1 py-2 px-3 bg-blue-100 text-blue-700 rounded font-medium hover:bg-blue-200 text-sm"
+                >
+                  ☑ {t('common.select')}
+                </button>
+              ) : (
+                <>
+                  <button
+                    onClick={() => {
+                      setIsSelectMode(false)
+                      setSelectedChapters(new Set())
+                    }}
+                    className="flex-1 py-2 px-3 bg-gray-200 text-gray-700 rounded font-medium hover:bg-gray-300 text-sm"
+                  >
+                    {t('common.cancel')}
+                  </button>
+                  <button
+                    onClick={() => {
+                      selectedChapters.forEach(chapter => {
+                        markChapterComplete(selectedBook, chapter)
+                      })
+                      setSelectedChapters(new Set())
+                      setIsSelectMode(false)
+                    }}
+                    disabled={selectedChapters.size === 0}
+                    className="flex-1 py-2 px-3 bg-green-100 text-green-700 rounded font-medium hover:bg-green-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                  >
+                    ✓ {t('common.mark_done')}
+                  </button>
+                  <button
+                    onClick={() => {
+                      const updated = { ...personalData }
+                      updated.chaptersRead = updated.chaptersRead.filter(ch => !(ch.book === selectedBook && selectedChapters.has(ch.chapter)))
+                      saveAndSync(updated)
+                      setPersonalData(updated)
+                      setSelectedChapters(new Set())
+                      setIsSelectMode(false)
+                      window.dispatchEvent(new Event('personalReadingUpdated'))
+                    }}
+                    disabled={selectedChapters.size === 0}
+                    className="flex-1 py-2 px-3 bg-red-100 text-red-700 rounded font-medium hover:bg-red-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                  >
+                    ✕ {t('common.mark_undone')}
+                  </button>
+                </>
+              )}
             </div>
 
             {/* Chapters Grid */}
@@ -667,32 +700,52 @@ export default function PersonalReadingPage() {
                     const status = getChapterStatus(selectedBook, chapter)
                     const totalVerses = getVerseCount(selectedBook, chapter)
                     const readVersesCount = getChapterVerses(selectedBook, chapter)
+                    const isSelected = selectedChapters.has(chapter)
 
                     return (
                       <div key={chapter} className="relative">
                         <button
                           onClick={() => {
-                            if (status === 'complete') {
-                              unmarkChapter(selectedBook, chapter)
+                            if (isSelectMode) {
+                              // Select Mode: Toggle checkbox
+                              const newSelected = new Set(selectedChapters)
+                              if (newSelected.has(chapter)) {
+                                newSelected.delete(chapter)
+                              } else {
+                                newSelected.add(chapter)
+                              }
+                              setSelectedChapters(newSelected)
                             } else {
-                              markChapterComplete(selectedBook, chapter)
+                              // Normal Mode: Open deeplink
+                              const link = buildLanguageSpecificWebLink(
+                                selectedBook,
+                                chapter,
+                                chapter,
+                                language
+                              )
+                              window.open(link, '_blank')
                             }
                           }}
                           onRightClick={(e) => {
                             e.preventDefault()
                             setEditingPartialChapter({ chapter, verses: readVersesCount })
                           }}
-                          className={`w-full py-2 rounded font-semibold text-sm transition-all ${
-                            status === 'complete'
+                          className={`w-full py-2 rounded font-semibold text-sm transition-all relative ${
+                            isSelectMode
+                              ? isSelected
+                                ? 'bg-blue-600 text-white ring-2 ring-blue-300'
+                                : 'bg-gray-100 text-gray-700 hover:bg-blue-50'
+                              : status === 'complete'
                               ? 'bg-green-600 text-white'
                               : status === 'partial'
                               ? 'bg-yellow-500 text-white'
                               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                           }`}
                         >
+                          {isSelectMode && isSelected && <span className="absolute top-0 right-1 text-white">✓</span>}
                           {chapter}
                         </button>
-                        {status === 'partial' && (
+                        {status === 'partial' && !isSelectMode && (
                           <div className="text-xs text-gray-600 text-center mt-1">
                             {readVersesCount}/{totalVerses}v
                           </div>

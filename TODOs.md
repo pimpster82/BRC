@@ -188,13 +188,13 @@
   - **Status:** ✅ FIXED
 
 ### Personal Bible Program Card
-- [ ] **PersonalReadingCard "Next: {chapter}" text should be interactive link**
-  - **Issue:** "Next: Genesis 1" shows computed position but is non-interactive
-  - **Expected:** Click link → navigate to `/personal-reading?book={bookNumber}&chapter={chapterNumber}`
-  - **Implementation:** Wrap reading position in `<Link>` component with query parameters
-  - **Files:** `src/components/PersonalReadingCard.jsx` (lines 98-99)
-  - **Priority:** MEDIUM (usability enhancement)
-  - **Status:** NEEDS IMPLEMENTATION
+- [x] **PersonalReadingCard "Next: {chapter}" text should be interactive link** ✅ IMPLEMENTED
+  - **Fix Applied:** Convert "Next: Genesis 1" text to clickable button with query params (Commit 28a441d)
+  - **Implementation:**
+    - PersonalReadingCard: Button navigates to `/personal-reading?book={bookNumber}&chapter={chapterNumber}`
+    - PersonalReadingPage: Reads query params, automatically opens chapter modal for requested book
+  - **Behavior:** Users can now click next reading from home card, jumps to that chapter modal in PBP page
+  - **Status:** ✅ IMPLEMENTED
 
 ### User Interface & Navigation
 - [ ] **PersonalReadingPage link/info integration requires refactoring**
@@ -356,12 +356,12 @@
 | Category | Total | Completed | Status |
 |----------|-------|-----------|--------|
 | Critical Bugs | 1 | 1 | ✅ COMPLETE |
-| Testing Findings (New) | 6 | 3 | 🔴 HIGH (3 pending) |
+| Testing Findings (New) | 6 | 4 | 🟡 MEDIUM (2 pending) |
 | Multi-Device Sync | 9 | 0 | 🟡 MEDIUM |
 | Schedule Management | 3 | 0 | 🟡 MEDIUM |
 | UI/UX Bugs | 4 | 4 | ✅ COMPLETE |
 | Documentation | 1 | 0 | 🟢 LOW |
-| **TOTAL** | **24** | **8** | **33% Complete** |
+| **TOTAL** | **24** | **9** | **38% Complete** |
 
 ---
 
@@ -387,10 +387,11 @@
 
 ---
 
-**Last Updated:** 2025-12-26 (Auto-fixing phase: 8/24 completed)
+**Last Updated:** 2025-12-26 (Auto-fixing phase: 9/24 completed)
 **Total Tasks:** 24 (18 original + 6 new from testing)
-**Progress:** 8/24 (33%)
+**Progress:** 9/24 (38%)
 **Recent Fixes:**
 - 0d042f3: Language initialization (browser locale detection)
 - cde7b58: Weekly reading UX (error state with Settings link)
 - 6d15652: Thematic links (verse range support in JW.org URLs)
+- 28a441d: PBP Next link (interactive button with query params)

@@ -83,7 +83,13 @@ const WeeklyReadingCard = () => {
           <Calendar className="w-4 h-4" />
           {t('weekly.title')}
         </h2>
-        <p className="text-sm text-gray-600">{t('weekly.no_reading')}</p>
+        <p className="text-sm text-gray-600 mb-3">{t('weekly.no_reading')}</p>
+        <button
+          onClick={() => navigate('/settings')}
+          className="text-xs font-medium text-blue-600 hover:text-blue-800 transition-colors"
+        >
+          → {t('settings.schedule_update')} ({t('common.open')})
+        </button>
       </div>
     )
   }

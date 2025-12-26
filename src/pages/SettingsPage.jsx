@@ -253,7 +253,7 @@ const SettingsPage = () => {
   }
 
   const getReadingPlanName = () => {
-    return readingPlans.find(p => p.value === readingPlan)?.label || t('readingplan.free')
+    return readingPlans.find(p => p.value === readingPlan)?.label || t('reading.plan_free')
   }
 
   const weekDays = [
@@ -267,10 +267,10 @@ const SettingsPage = () => {
   ]
 
   const readingPlans = [
-    { value: 'free', label: t('readingplan.free') },
-    { value: 'chronological', label: t('readingplan.chronological') },
-    { value: 'oneyear', label: t('readingplan.oneyear') },
-    { value: 'thematic', label: t('readingplan.thematic') }
+    { value: 'free', label: t('reading.plan_free') },
+    { value: 'chronological', label: t('reading.plan_chronological') },
+    { value: 'oneyear', label: t('reading.plan_oneyear') },
+    { value: 'thematic', label: t('reading.plan_thematic') }
   ]
 
   return (

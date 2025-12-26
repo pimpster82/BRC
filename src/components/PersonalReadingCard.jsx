@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { ChevronRight, BookOpen, ExternalLink } from 'lucide-react'
+import { BookOpen, ExternalLink } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { t, getCurrentLanguage } from '../config/i18n'
 import { getPersonalReadingData } from '../utils/storage'
@@ -27,14 +27,15 @@ export default function PersonalReadingCard() {
     const data = getPersonalReadingData()
     setPersonalData(data)
 
-    // Get plan name translation
+    // Get plan name translation from settings (consistent with SettingsPage and PersonalReadingPage)
+    const savedPlan = localStorage.getItem('settings_readingPlan') || 'free'
     const plans = {
       free: 'reading.plan_free',
       chronological: 'reading.plan_chronological',
       oneyear: 'reading.plan_oneyear',
       thematic: 'reading.plan_thematic'
     }
-    setPlanName(t(plans[data.selectedPlan] || 'reading.plan_free'))
+    setPlanName(t(plans[savedPlan] || 'reading.plan_free'))
 
     // Calculate next reading
     if (data.chaptersRead && data.chaptersRead.length > 0) {
@@ -83,7 +84,7 @@ export default function PersonalReadingCard() {
     navigate('/personal-reading')
   }
 
-  if (!personalData || !nextReading || !nextReadingLink) {
+  if (!personalData || !nextReading) {
     return null
   }
 
@@ -108,7 +109,7 @@ export default function PersonalReadingCard() {
           onClick={handleOpenPersonalReading}
           className="btn-open btn-open-green"
         >
-          <ChevronRight className="w-4 h-4" />
+          <ExternalLink className="w-4 h-4" />
           {t('common.open')}
         </button>
       </div>

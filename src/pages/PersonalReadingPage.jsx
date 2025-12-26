@@ -80,10 +80,9 @@ export default function PersonalReadingPage() {
   useEffect(() => {
     const data = getPersonalReadingData()
     setPersonalData(data)
-    // Load the selected plan from storage
-    if (data.selectedPlan) {
-      setSelectedPlan(data.selectedPlan)
-    }
+    // Load the selected plan from Settings (consistent with SettingsPage)
+    const savedPlan = localStorage.getItem('settings_readingPlan') || 'free'
+    setSelectedPlan(savedPlan)
 
     // Initialize expandedCategories to show only the last-read category
     const lastReadCategoryId = getLastReadCategoryId()

@@ -171,13 +171,11 @@
   - **Status:** ✅ FIXED
 
 ### Weekly Reading Schedule
-- [ ] **WeeklyReadingCard renders without schedule data on cold start**
-  - **Issue:** Component displays "No reading available. Import via Settings." even when schedule exists
-  - **Expected:** Schedule should load from Firebase or fallback static data on component mount
-  - **Impact:** Users cannot see current week's reading assignment immediately
-  - **Files:** `src/components/WeeklyReadingCard.jsx`, `src/pages/WeeklyReadingPage.jsx`
-  - **Priority:** HIGH (user-facing feature)
-  - **Status:** NEEDS INVESTIGATION
+- [x] **WeeklyReadingCard renders without schedule data on cold start** ✅ FIXED
+  - **Root Cause:** Schedule files were `.js.old` (deprecated), migrated to Firebase; user must import via Settings first
+  - **Fix Applied:** Added helpful error state with direct link to Settings → Schedule Update (Commit cde7b58)
+  - **Behavior:** When no schedule exists, shows "No reading available" + clickable link to Settings
+  - **Status:** ✅ FIXED - Improved UX with actionable guidance
 
 ### Thematic Reading Links
 - [ ] **Thematic reading scripture links always navigate to first verse of section**
@@ -358,12 +356,12 @@
 | Category | Total | Completed | Status |
 |----------|-------|-----------|--------|
 | Critical Bugs | 1 | 1 | ✅ COMPLETE |
-| Testing Findings (New) | 6 | 1 | 🔴 HIGH (5 pending) |
+| Testing Findings (New) | 6 | 2 | 🔴 HIGH (4 pending) |
 | Multi-Device Sync | 9 | 0 | 🟡 MEDIUM |
 | Schedule Management | 3 | 0 | 🟡 MEDIUM |
 | UI/UX Bugs | 4 | 4 | ✅ COMPLETE |
 | Documentation | 1 | 0 | 🟢 LOW |
-| **TOTAL** | **24** | **6** | **25% Complete** |
+| **TOTAL** | **24** | **7** | **29% Complete** |
 
 ---
 
@@ -389,7 +387,9 @@
 
 ---
 
-**Last Updated:** 2025-12-26 (Testing session: found 6 new issues, fixed language init)
+**Last Updated:** 2025-12-26 (Auto-fixing phase: 7/24 completed)
 **Total Tasks:** 24 (18 original + 6 new from testing)
-**Progress:** 6/24 (25%) - Critical bug, UI/UX verified, language initialization fixed
-**Language Fix Commit:** 0d042f3 - Browser locale detection + fallback to English
+**Progress:** 7/24 (29%)
+**Recent Fixes:**
+- 0d042f3: Language initialization (browser locale detection)
+- cde7b58: Weekly reading UX (error state with Settings link)

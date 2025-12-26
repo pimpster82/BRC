@@ -8,7 +8,7 @@
  * - PATCH: Bug fixes
  */
 
-export const APP_VERSION = '0.1.0'
+export const APP_VERSION = '0.1.1'
 
 /**
  * Build Information
@@ -19,6 +19,14 @@ export const BUILD_INFO = `v${APP_VERSION} (${BUILD_DATE})`
 
 /**
  * Version History
+ *
+ * 0.1.1 (Dark Mode Bug Fix Release)
+ * - Fixed theme toggle buttons to properly override system preference
+ * - Added dark mode styling to yeartext component (now fully readable)
+ * - Fixed remaining white backgrounds across all pages
+ * - Comprehensive dark mode coverage for all UI elements
+ * - Default theme changed from 'light' to 'system' for better UX
+ * - Hover states properly styled for dark mode
  *
  * 0.1.0 (Multi-Device Sync + Personal Reading Release)
  * - Firebase authentication (email/password)

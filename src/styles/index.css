@@ -7,6 +7,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  @apply bg-white dark:bg-slate-950 text-gray-900 dark:text-gray-50 transition-colors duration-300;
 }
 
 #root {
@@ -17,112 +18,112 @@ body {
 @layer components {
   /* Base Card Styles */
   .card {
-    @apply bg-white rounded-lg p-4 shadow-sm;
+    @apply bg-white dark:bg-slate-900 rounded-lg p-4 shadow-sm dark:shadow-lg transition-colors;
   }
 
   .card-indigo {
-    @apply border border-indigo-100;
+    @apply border border-indigo-100 dark:border-indigo-900;
   }
 
   .card-blue {
-    @apply border border-blue-100;
+    @apply border border-blue-100 dark:border-blue-900;
   }
 
   .card-green {
-    @apply border border-green-100;
+    @apply border border-green-100 dark:border-green-900;
   }
 
   /* Card Header */
   .card-header {
-    @apply font-semibold mb-3 text-base flex items-center gap-2;
+    @apply font-semibold mb-3 text-base flex items-center gap-2 text-gray-900 dark:text-gray-50;
   }
 
   .card-header-indigo {
-    @apply text-indigo-900;
+    @apply text-indigo-900 dark:text-indigo-100;
   }
 
   .card-header-blue {
-    @apply text-blue-900;
+    @apply text-blue-900 dark:text-blue-100;
   }
 
   .card-header-green {
-    @apply text-green-900;
+    @apply text-green-900 dark:text-green-100;
   }
 
   /* Card Content */
   .card-description {
-    @apply text-sm text-gray-700 mb-3 italic;
+    @apply text-sm text-gray-700 dark:text-gray-300 mb-3 italic;
   }
 
   /* Card Footer */
   .card-footer {
-    @apply pt-3 flex items-center justify-between;
+    @apply pt-3 flex items-center justify-between border-gray-200 dark:border-gray-700;
   }
 
   .card-footer-indigo {
-    @apply border-t border-indigo-200;
+    @apply border-t border-indigo-200 dark:border-indigo-800;
   }
 
   .card-footer-blue {
-    @apply border-t border-blue-200;
+    @apply border-t border-blue-200 dark:border-blue-800;
   }
 
   .card-footer-green {
-    @apply border-t border-green-200;
+    @apply border-t border-green-200 dark:border-green-800;
   }
 
   /* Card Stats */
   .card-stat-indigo {
-    @apply text-xs text-indigo-700;
+    @apply text-xs text-indigo-700 dark:text-indigo-300;
   }
 
   .card-stat-blue {
-    @apply text-xs text-blue-700;
+    @apply text-xs text-blue-700 dark:text-blue-300;
   }
 
   .card-stat-green {
-    @apply text-xs text-green-700;
+    @apply text-xs text-green-700 dark:text-green-300;
   }
 
   /* Buttons */
   .btn-open {
-    @apply text-sm font-medium flex items-center gap-1;
+    @apply text-sm font-medium flex items-center gap-1 transition-colors;
   }
 
   .btn-open-indigo {
-    @apply text-indigo-900 hover:text-indigo-700;
+    @apply text-indigo-900 dark:text-indigo-100 hover:text-indigo-700 dark:hover:text-indigo-300;
   }
 
   .btn-open-blue {
-    @apply text-blue-900 hover:text-blue-700;
+    @apply text-blue-900 dark:text-blue-100 hover:text-blue-700 dark:hover:text-blue-300;
   }
 
   .btn-open-green {
-    @apply text-green-900 hover:text-green-700;
+    @apply text-green-900 dark:text-green-100 hover:text-green-700 dark:hover:text-green-300;
   }
 
   .btn-action {
-    @apply text-sm text-gray-600 font-medium;
+    @apply text-sm text-gray-600 dark:text-gray-400 font-medium transition-colors;
   }
 
   .btn-action-hover-green {
-    @apply hover:text-green-600;
+    @apply hover:text-green-600 dark:hover:text-green-400;
   }
 
   .btn-action-hover-blue {
-    @apply hover:text-blue-900;
+    @apply hover:text-blue-900 dark:hover:text-blue-300;
   }
 
   .btn-action-hover-indigo {
-    @apply hover:text-indigo-900;
+    @apply hover:text-indigo-900 dark:hover:text-indigo-300;
   }
 
   /* Status Indicators */
   .status-complete {
-    @apply text-sm text-green-600 font-medium;
+    @apply text-sm text-green-600 dark:text-green-400 font-medium;
   }
 
   .status-incomplete {
-    @apply text-gray-400;
+    @apply text-gray-400 dark:text-gray-600;
   }
 }

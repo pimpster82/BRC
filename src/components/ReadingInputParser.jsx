@@ -107,7 +107,7 @@ const ReadingInputParser = ({
                     <button
                       key={book.number}
                       onClick={() => handleAcceptSuggestion(book)}
-                      className="text-sm bg-white border border-yellow-300 px-3 py-1 rounded hover:bg-yellow-100 text-yellow-900"
+                      className="text-sm bg-white dark:bg-slate-900 border border-yellow-300 px-3 py-1 rounded hover:bg-yellow-100 text-yellow-900"
                     >
                       {book.name}
                     </button>
@@ -131,7 +131,7 @@ const ReadingInputParser = ({
                     <button
                       key={book.number}
                       onClick={() => handleAcceptSuggestion(book)}
-                      className="text-sm bg-white border border-yellow-300 px-3 py-1 rounded hover:bg-yellow-100 text-yellow-900"
+                      className="text-sm bg-white dark:bg-slate-900 border border-yellow-300 px-3 py-1 rounded hover:bg-yellow-100 text-yellow-900"
                     >
                       {book.name}
                     </button>
@@ -175,7 +175,7 @@ const ReadingInputParser = ({
                         setInput(`${suggestion.bookName} ${sug.display}`)
                         setSuggestion(null)
                       }}
-                      className="text-sm bg-white border border-yellow-300 px-3 py-1 rounded hover:bg-yellow-100 text-yellow-900"
+                      className="text-sm bg-white dark:bg-slate-900 border border-yellow-300 px-3 py-1 rounded hover:bg-yellow-100 text-yellow-900"
                     >
                       <strong>{sug.display}</strong>
                       <span className="text-xs text-gray-600 ml-1">({sug.description})</span>
@@ -197,11 +197,11 @@ const ReadingInputParser = ({
         {showExamples && (
           <div className="mt-2 text-xs text-gray-600">
             <p className="font-medium mb-1">Beispiele:</p>
-            <p>• <code className="bg-gray-100 px-1 rounded">3</code> → Kapitel 3 komplett</p>
-            <p>• <code className="bg-gray-100 px-1 rounded">3-5</code> → Kapitel 3 bis 5</p>
-            <p>• <code className="bg-gray-100 px-1 rounded">3-4:15</code> → Kap 3 komplett, 4 bis Vers 15</p>
-            <p>• <code className="bg-gray-100 px-1 rounded">3:1,2</code> → Kap 3 Verse 1 und 2</p>
-            <p>• <code className="bg-gray-100 px-1 rounded">3:1,2; 4:15</code> → Kap 3 V. 1-2 und Kap 4 V. 15</p>
+            <p>• <code className="bg-gray-100 dark:bg-slate-800 px-1 rounded">3</code> → Kapitel 3 komplett</p>
+            <p>• <code className="bg-gray-100 dark:bg-slate-800 px-1 rounded">3-5</code> → Kapitel 3 bis 5</p>
+            <p>• <code className="bg-gray-100 dark:bg-slate-800 px-1 rounded">3-4:15</code> → Kap 3 komplett, 4 bis Vers 15</p>
+            <p>• <code className="bg-gray-100 dark:bg-slate-800 px-1 rounded">3:1,2</code> → Kap 3 Verse 1 und 2</p>
+            <p>• <code className="bg-gray-100 dark:bg-slate-800 px-1 rounded">3:1,2; 4:15</code> → Kap 3 V. 1-2 und Kap 4 V. 15</p>
             <p className="mt-1 text-gray-500">
               <strong>Trenner:</strong> <code>,</code> = und · <code>;</code> = weiterer Text · <code>-</code> = bis
             </p>

@@ -45,7 +45,7 @@ const DailyTextCard = () => {
   }
 
   return (
-    <div className="bg-white rounded-lg p-4 shadow-sm border border-indigo-100">
+    <div className="bg-white dark:bg-slate-900 rounded-lg p-4 shadow-sm border border-indigo-100">
       <h2 className="font-semibold text-indigo-900 mb-3 text-base flex items-center gap-2">
         <Sun className="w-4 h-4" />
         {t('dailytext.title')}

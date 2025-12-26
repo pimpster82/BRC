@@ -407,7 +407,7 @@ export default function PersonalReadingPage() {
   return (
     <div className="min-h-screen bg-white pb-20">
       {/* Header */}
-      <div className="sticky top-0 bg-white border-b border-gray-200 z-40">
+      <div className="sticky top-0 bg-white border-b border-gray-200 dark:border-gray-700 z-40">
         <div className="flex items-center gap-4 p-4">
           <button
             onClick={() => navigate('/')}
@@ -427,7 +427,7 @@ export default function PersonalReadingPage() {
 
         {/* Total Progress Bar (Verse-Based) */}
         <div className="px-4 pb-4">
-          <div className="flex justify-between text-xs text-gray-600 mb-2">
+          <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-2">
             <span>{totalProgress.versesRead} / {totalProgress.totalVerses} {t('reading.verses')}</span>
             <span>{totalProgress.percentage}%</span>
           </div>
@@ -449,7 +449,7 @@ export default function PersonalReadingPage() {
               const booksInCategory = getBooksInCategory(category.id)
 
               return (
-                <div key={category.id} className="border border-gray-200 rounded-lg overflow-hidden">
+                <div key={category.id} className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
                   {/* Category Header */}
                   <button
                     onClick={() => {
@@ -458,7 +458,7 @@ export default function PersonalReadingPage() {
                         [category.id]: !prev[category.id]
                       }))
                     }}
-                    className="w-full bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 px-4 py-3 flex items-center justify-between border-b border-gray-200"
+                    className="w-full bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 px-4 py-3 flex items-center justify-between border-b border-gray-200 dark:border-gray-700"
                   >
                     <div className="flex items-center gap-3 flex-1">
                       <ChevronDown
@@ -466,7 +466,7 @@ export default function PersonalReadingPage() {
                         className={`text-blue-600 transition-transform ${isExpanded ? 'rotate-0' : '-rotate-90'}`}
                       />
                       <div className="text-left">
-                        <h3 className="font-bold text-gray-800">{t(category.translationKey)}</h3>
+                        <h3 className="font-bold text-gray-800 dark:text-gray-200">{t(category.translationKey)}</h3>
                       </div>
                     </div>
                   </button>
@@ -486,7 +486,7 @@ export default function PersonalReadingPage() {
                                 setSelectedBook(bookNumber)
                                 setShowChapterModal(true)
                               }}
-                              className={`aspect-square p-1 rounded-lg border-2 border-gray-200 transition-all flex flex-col justify-center items-center ${getProgressColor(progress.percentage)}`}
+                              className={`aspect-square p-1 rounded-lg border-2 border-gray-200 dark:border-gray-700 transition-all flex flex-col justify-center items-center ${getProgressColor(progress.percentage)}`}
                               title={book?.name}
                             >
                               <div className="text-white font-bold text-center flex items-center justify-center h-full text-xs sm:text-sm">
@@ -506,15 +506,15 @@ export default function PersonalReadingPage() {
 
         {selectedPlan === 'chronological' && (
           <div className="text-center py-12">
-            <p className="text-gray-600 mb-2">{t('reading.plan_chronological')}</p>
-            <p className="text-sm text-gray-500">{t('reading.coming_soon')}</p>
+            <p className="text-gray-600 dark:text-gray-400 mb-2">{t('reading.plan_chronological')}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{t('reading.coming_soon')}</p>
           </div>
         )}
 
         {selectedPlan === 'oneyear' && (
           <div className="text-center py-12">
-            <p className="text-gray-600 mb-2">{t('reading.plan_oneyear')}</p>
-            <p className="text-sm text-gray-500">{t('reading.coming_soon')}</p>
+            <p className="text-gray-600 dark:text-gray-400 mb-2">{t('reading.plan_oneyear')}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{t('reading.coming_soon')}</p>
           </div>
         )}
 
@@ -525,7 +525,7 @@ export default function PersonalReadingPage() {
               const progress = getThematicProgress()
               return (
                 <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-4 border border-purple-100">
-                  <div className="flex justify-between text-sm text-gray-700 mb-2">
+                  <div className="flex justify-between text-sm text-gray-700 dark:text-gray-300 mb-2">
                     <span className="font-medium">{t('reading.plan_thematic')}</span>
                     <span className="font-semibold">{progress.completed}/{progress.total} {t('reading.topics_completed')}</span>
                   </div>
@@ -535,7 +535,7 @@ export default function PersonalReadingPage() {
                       style={{ width: `${progress.percentage}%` }}
                     />
                   </div>
-                  <div className="text-xs text-gray-600 mt-2">{progress.percentage}% {t('reading.complete')}</div>
+                  <div className="text-xs text-gray-600 dark:text-gray-400 mt-2">{progress.percentage}% {t('reading.complete')}</div>
                 </div>
               )
             })()}
@@ -546,7 +546,7 @@ export default function PersonalReadingPage() {
               const topicsInSection = getTopicsInSection(section.key)
 
               return (
-                <div key={section.key} className="border border-gray-200 rounded-lg overflow-hidden">
+                <div key={section.key} className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
                   {/* Section Header */}
                   <button
                     onClick={() => {
@@ -555,14 +555,14 @@ export default function PersonalReadingPage() {
                         [section.key]: !prev[section.key]
                       }))
                     }}
-                    className="w-full bg-gradient-to-r from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 px-4 py-3 flex items-center justify-between border-b border-gray-200"
+                    className="w-full bg-gradient-to-r from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 px-4 py-3 flex items-center justify-between border-b border-gray-200 dark:border-gray-700"
                   >
                     <div className="flex items-center gap-3 flex-1">
                       <ChevronDown
                         size={20}
                         className={`text-purple-600 transition-transform ${isExpanded ? 'rotate-0' : '-rotate-90'}`}
                       />
-                      <h3 className="font-bold text-gray-800">{t(section.titleKey)}</h3>
+                      <h3 className="font-bold text-gray-800 dark:text-gray-200">{t(section.titleKey)}</h3>
                     </div>
                   </button>
 
@@ -574,7 +574,7 @@ export default function PersonalReadingPage() {
                         const isCompleted = isThematicTopicComplete(topic.id)
 
                         return (
-                          <div key={topic.id} className={`border rounded-lg overflow-hidden transition-colors ${isCompleted ? 'border-purple-300 bg-purple-50' : 'border-gray-100'}`}>
+                          <div key={topic.id} className={`border rounded-lg overflow-hidden transition-colors ${isCompleted ? 'border-purple-300 bg-purple-50' : 'border-gray-100 dark:border-gray-800'}`}>
                             {/* Topic Header (Clickable) */}
                             <div className="flex items-center gap-2">
                               <button
@@ -607,9 +607,9 @@ export default function PersonalReadingPage() {
                               >
                                 <ChevronRight
                                   size={18}
-                                  className={`text-gray-600 transition-transform flex-shrink-0 ${isTopicExpanded ? 'rotate-90' : 'rotate-0'}`}
+                                  className={`text-gray-600 dark:text-gray-400 transition-transform flex-shrink-0 ${isTopicExpanded ? 'rotate-90' : 'rotate-0'}`}
                                 />
-                                <span className={`font-medium text-sm text-left flex-1 ${isCompleted ? 'text-purple-700 line-through' : 'text-gray-700'}`}>
+                                <span className={`font-medium text-sm text-left flex-1 ${isCompleted ? 'text-purple-700 line-through' : 'text-gray-700 dark:text-gray-300'}`}>
                                   {t(topic.titleKey)}
                                 </span>
                               </button>
@@ -617,7 +617,7 @@ export default function PersonalReadingPage() {
 
                             {/* Topic Content - Scripture References */}
                             {isTopicExpanded && (
-                              <div className={`border-t p-3 ${isCompleted ? 'border-purple-200 bg-white' : 'border-gray-100 bg-white'}`}>
+                              <div className={`border-t p-3 ${isCompleted ? 'border-purple-200 bg-white' : 'border-gray-100 dark:border-gray-800 bg-white'}`}>
                                 {(() => {
                                   const versesLinks = parseMultipleVerses(topic.verses, language)
                                   return (
@@ -657,10 +657,10 @@ export default function PersonalReadingPage() {
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
           <div className="bg-white w-full max-w-2xl rounded-lg max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
-            <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex justify-between items-center">
+            <div className="sticky top-0 bg-white border-b border-gray-200 dark:border-gray-700 p-4 flex justify-between items-center">
               <div className="flex-1">
                 <h3 className="text-lg font-bold">{bibleBooks.books[selectedBook - 1]?.name}</h3>
-                <p className="text-sm text-gray-600">{bibleBooks.books[selectedBook - 1]?.chapters} {t('common.chapters')}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{bibleBooks.books[selectedBook - 1]?.chapters} {t('common.chapters')}</p>
               </div>
               <button
                 onClick={() => {
@@ -668,14 +668,14 @@ export default function PersonalReadingPage() {
                   setIsSelectMode(false)
                   setSelectedChapters(new Set())
                 }}
-                className="text-gray-500 hover:text-gray-700 text-2xl"
+                className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300 text-2xl"
               >
                 ✕
               </button>
             </div>
 
             {/* Select Mode Toggle & Actions */}
-            <div className="sticky top-16 bg-gray-50 border-b border-gray-200 px-4 py-3 flex gap-2">
+            <div className="sticky top-16 bg-gray-50 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex gap-2">
               {!isSelectMode ? (
                 <button
                   onClick={() => {
@@ -693,7 +693,7 @@ export default function PersonalReadingPage() {
                       setIsSelectMode(false)
                       setSelectedChapters(new Set())
                     }}
-                    className="flex-1 py-2 px-3 bg-gray-200 text-gray-700 rounded font-medium hover:bg-gray-300 text-sm"
+                    className="flex-1 py-2 px-3 bg-gray-200 text-gray-700 dark:text-gray-300 rounded font-medium hover:bg-gray-300 text-sm"
                   >
                     {t('common.cancel')}
                   </button>
@@ -747,7 +747,7 @@ export default function PersonalReadingPage() {
                       ? 'bg-yellow-500'
                       : 'bg-gray-100'
 
-                    const baseText = status ? 'text-white' : 'text-gray-700'
+                    const baseText = status ? 'text-white' : 'text-gray-700 dark:text-gray-300'
 
                     return (
                       <div key={chapter} className="relative">
@@ -792,7 +792,7 @@ export default function PersonalReadingPage() {
                           {chapter}
                         </button>
                         {status === 'partial' && (
-                          <div className={`text-xs text-center mt-1 ${isSelectMode && isSelected ? 'text-blue-600 font-medium' : 'text-gray-600'}`}>
+                          <div className={`text-xs text-center mt-1 ${isSelectMode && isSelected ? 'text-blue-600 font-medium' : 'text-gray-600 dark:text-gray-400'}`}>
                             {readVersesCount}/{totalVerses}v
                           </div>
                         )}
@@ -807,7 +807,7 @@ export default function PersonalReadingPage() {
       )}
 
       {/* Footer Progress Input */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 dark:border-gray-700 p-4">
         {!showProgressForm ? (
           <button
             onClick={() => setShowProgressForm(true)}
@@ -819,7 +819,7 @@ export default function PersonalReadingPage() {
           <div className="space-y-3">
             {/* Unified Book + Chapter Input */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 {t('reading.chapter')}
               </label>
               <input
@@ -840,7 +840,7 @@ export default function PersonalReadingPage() {
                 }`}
                 placeholder="z.B. 1mo 2-5 oder 1mo 2:5-16 oder Matthäus 24:3-14"
               />
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
                 Format: Buchname oder Abkürzung, dann Kapitel/Verse. Z.B. "1mo 3", "Jes 41:10", "Mt 5-7"
               </p>
             </div>
@@ -890,7 +890,7 @@ export default function PersonalReadingPage() {
                   setProgressError(null)
                   setProgressSuggestion(null)
                 }}
-                className="flex-1 py-2 bg-gray-300 text-gray-800 rounded font-semibold hover:bg-gray-400"
+                className="flex-1 py-2 bg-gray-300 text-gray-800 dark:text-gray-200 rounded font-semibold hover:bg-gray-400"
               >
                 {t('common.cancel')}
               </button>

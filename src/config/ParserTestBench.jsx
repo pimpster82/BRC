@@ -137,7 +137,7 @@ const ParserTestBench = () => {
     }
 
     return (
-      <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg">
+      <div className="p-3 bg-gray-50 border border-gray-200 dark:border-gray-700 rounded-lg">
         <p className="text-sm text-gray-600">Kein Ergebnis</p>
       </div>
     )
@@ -233,7 +233,7 @@ const ParserTestBench = () => {
         )}
 
         {/* Quick Test Examples */}
-        <div className="mt-8 card bg-white border border-gray-200">
+        <div className="mt-8 card bg-white border border-gray-200 dark:border-gray-700">
           <h3 className="font-semibold text-gray-800 mb-3">Quick Tests</h3>
           <div className="grid grid-cols-2 gap-2">
             {[

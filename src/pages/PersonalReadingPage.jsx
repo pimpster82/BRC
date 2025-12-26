@@ -702,6 +702,15 @@ export default function PersonalReadingPage() {
                     const readVersesCount = getChapterVerses(selectedBook, chapter)
                     const isSelected = selectedChapters.has(chapter)
 
+                    // Determine base background color based on status
+                    const baseColor = status === 'complete'
+                      ? 'bg-green-600'
+                      : status === 'partial'
+                      ? 'bg-yellow-500'
+                      : 'bg-gray-100'
+
+                    const baseText = status ? 'text-white' : 'text-gray-700'
+
                     return (
                       <div key={chapter} className="relative">
                         <button
@@ -717,36 +726,35 @@ export default function PersonalReadingPage() {
                               setSelectedChapters(newSelected)
                             } else {
                               // Normal Mode: Open deeplink
-                              const link = buildLanguageSpecificWebLink(
+                              const linkObj = buildLanguageSpecificWebLink(
                                 selectedBook,
                                 chapter,
-                                chapter,
+                                1,  // startVerse (defaults to verse 1)
+                                null,  // endVerse (null = read whole chapter)
                                 language
                               )
-                              window.open(link, '_blank')
+                              window.open(linkObj.web, '_blank')
                             }
                           }}
-                          onRightClick={(e) => {
+                          onContextMenu={(e) => {
                             e.preventDefault()
                             setEditingPartialChapter({ chapter, verses: readVersesCount })
                           }}
                           className={`w-full py-2 rounded font-semibold text-sm transition-all relative ${
+                            baseColor
+                          } ${baseText} ${
                             isSelectMode
                               ? isSelected
-                                ? 'bg-blue-600 text-white ring-2 ring-blue-300'
-                                : 'bg-gray-100 text-gray-700 hover:bg-blue-50'
-                              : status === 'complete'
-                              ? 'bg-green-600 text-white'
-                              : status === 'partial'
-                              ? 'bg-yellow-500 text-white'
-                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                ? 'ring-4 ring-blue-400'
+                                : 'opacity-75 hover:opacity-100'
+                              : status ? 'hover:opacity-90' : 'hover:bg-gray-200'
                           }`}
                         >
-                          {isSelectMode && isSelected && <span className="absolute top-0 right-1 text-white">✓</span>}
+                          {isSelectMode && isSelected && <span className="absolute top-1 right-2 text-white text-lg font-bold">✓</span>}
                           {chapter}
                         </button>
-                        {status === 'partial' && !isSelectMode && (
-                          <div className="text-xs text-gray-600 text-center mt-1">
+                        {status === 'partial' && (
+                          <div className={`text-xs text-center mt-1 ${isSelectMode && isSelected ? 'text-blue-600 font-medium' : 'text-gray-600'}`}>
                             {readVersesCount}/{totalVerses}v
                           </div>
                         )}

@@ -150,12 +150,12 @@
 
 ## 🔴 CRITICAL BUGS (High Priority)
 
-- [ ] **getCurrentWeekReading() Off-By-One Week Bug**
+- [x] **getCurrentWeekReading() Off-By-One Week Bug** ✅ FIXED
   - Issue: Searches for LAST meeting day instead of NEXT meeting day
   - Impact: Users see wrong Bible reading week
   - File: `/data/weekly-reading-schedule.js` line 142-198
-  - Fix: Change `daysSinceLastMeeting` → `daysUntilNextMeeting`
-  - Status: NOT STARTED
+  - Fix: Changed `daysSinceLastMeeting` → `daysUntilNextMeeting`
+  - Status: ✅ COMPLETED - Commit 0f77e39
 
 ---
 
@@ -258,33 +258,21 @@
 
 ## 🐛 UI/UX Bugs (High Priority)
 
-- [ ] **Back Button in Settings should use browser back (navigate(-1)) instead of always going home**
-  - Current: Navigates to `/` (homepage)
-  - Better: Use `navigate(-1)` to go to previous page
-  - Impact: Better UX when accessing Settings from different pages
-  - Files: `src/pages/SettingsPage.jsx` line 281
-  - Status: NOT STARTED
+- [x] **Back Button in Settings should use browser back (navigate(-1)) instead of always going home** ✅ VERIFIED
+  - Current: Already uses `navigate(-1)` correctly
+  - Status: ✅ ALREADY IMPLEMENTED (line 282)
 
-- [ ] **Personal Reading Card "Open" link should go to /personal-reading, not directly to chapter**
-  - Current: Opens JW.org link directly to next chapter
-  - Better: Navigate to `/personal-reading` page first
-  - Impact: User can manage reading plans, track progress, see all chapters
-  - Files: `src/components/PersonalReadingCard.jsx` line 118-133
-  - Status: NOT STARTED
+- [x] **Personal Reading Card "Open" link should go to /personal-reading, not directly to chapter** ✅ VERIFIED
+  - Current: Already navigates to `/personal-reading` correctly
+  - Status: ✅ ALREADY IMPLEMENTED (line 84)
 
-- [ ] **Personal Reading Plan names are inconsistent with available plans**
-  - Problem: Dropdown shows plan names that don't match available plans, defaults to "Freies Lesen"
-  - Current plans: 'free', 'chronological', 'oneyear', 'thematic'
-  - Issue: Translation keys or plan selection logic broken
-  - Files: `src/pages/PersonalReadingPage.jsx`, `src/config/i18n.js`
-  - Status: NOT STARTED
+- [x] **Personal Reading Plan names are inconsistent with available plans** ✅ FIXED
+  - Problem: Fallback translation key used wrong namespace
+  - Fixed: Changed `t('readingplan.free')` to `t('reading.plan_free')` in SettingsPage.jsx line 465
+  - Status: ✅ COMPLETED - Commit 0f77e39
 
-- [ ] **Free Reading topics should be collapsed by default, only expand last-read topic**
-  - Current: All topics shown expanded
-  - Better: Collapse all topics, only expand the one where user last read
-  - Impact: Better UX for large topic lists, easier to find last position
-  - Files: `src/pages/PersonalReadingPage.jsx` (Free Reading section)
-  - Status: NOT STARTED
+- [x] **Free Reading topics should be collapsed by default, only expand last-read topic** ✅ VERIFIED
+  - Status: ✅ ALREADY IMPLEMENTED (initializes expandedCategories with only last-read category expanded)
 
 ---
 
@@ -304,12 +292,12 @@
 
 | Category | Total | Completed | Status |
 |----------|-------|-----------|--------|
-| Critical Bugs | 1 | 0 | 🔴 HIGH |
+| Critical Bugs | 1 | 1 | ✅ COMPLETE |
 | Multi-Device Sync | 9 | 0 | 🟡 MEDIUM |
 | Schedule Management | 3 | 0 | 🟡 MEDIUM |
-| UI/UX Bugs | 4 | 0 | 🔴 HIGH |
+| UI/UX Bugs | 4 | 4 | ✅ COMPLETE |
 | Documentation | 1 | 0 | 🟢 LOW |
-| **TOTAL** | **18** | **0** | **0% Complete** |
+| **TOTAL** | **18** | **5** | **28% Complete** |
 
 ---
 
@@ -335,6 +323,6 @@
 
 ---
 
-**Last Updated:** 2025-12-26 (Updated with UI/UX bugs)
+**Last Updated:** 2025-12-26 (Fixed critical bugs and UI/UX issues)
 **Total Tasks:** 18
-**Progress:** 0/18 (0%)
+**Progress:** 5/18 (28%) - Critical bug + all UI/UX checks completed

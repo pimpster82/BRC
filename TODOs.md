@@ -209,13 +209,21 @@
   - **Status:** ✅ FIXED - File: `src/pages/HomePage.jsx` lines 248-265
 
 ### User Interface & Navigation
-- [ ] **PersonalReadingPage link/info integration requires refactoring**
+- [x] **PersonalReadingPage link/info integration requires refactoring** ✅ COMPLETED
   - **Issue:** Multiple link sources (JW.org, next reading, continue position) need unified navigation strategy
-  - **Current State:** Links functional but inconsistent behavior across reading types
-  - **Required:** Audit all reading page link handlers and standardize behavior
-  - **Files:** `src/pages/PersonalReadingPage.jsx`, `src/pages/WeeklyReadingPage.jsx`, `src/components/*.jsx`
+  - **Solution Implemented:** "Continue Where You Left Off" pattern for all reading plans
+  - **Implementation Details:**
+    - Unified "next link" concept in PersonalReadingCard.jsx
+    - Free Plan: Shows next chapter based on chaptersRead array
+    - Thematic Plan: Shows next unread topic based on thematicTopicsRead array
+    - Both navigate intelligently to continue exactly where user left off
+  - **Documentation:** Added comprehensive "Next Link Strategy" section to CLAUDE.md with templates for future plans
+  - **Files Updated:**
+    - `src/components/PersonalReadingCard.jsx` - Plan-aware next link logic
+    - `src/pages/PersonalReadingPage.jsx` - Proper topic expansion and "last read" tracking
+    - `CLAUDE.md` - Architecture documentation for next link pattern
   - **Priority:** MEDIUM (design consistency)
-  - **Status:** DESIGN PHASE
+  - **Status:** ✅ COMPLETED - Commits 21edcea, 3fca0c4
 
 ### Application Icon Design
 - [ ] **Design and implement app icon (open Bible 3D outline style)**
@@ -350,13 +358,18 @@
 
 ## 📖 Documentation
 
-- [ ] **Clarify Weekly Reading Logic in Doku: Lesewoche läuft VON (Tag nach Meeting) BIS (nächster Meeting-Tag)**
-  - Current doc: Confusing explanation of weekStartDay vs meetingDay
-  - Better: Explain that reading week determined by NEXT meeting day
-  - Add: Concrete example with dates (e.g., Meeting=Tuesday, 17.12-23.12 reads Jesaja 11-13)
-  - Files: `CLAUDE.md`, `docs/GOALS.md`
-  - Status: NOT STARTED
-  - See also: Related to CRITICAL BUG #1
+- [x] **Clarify Weekly Reading Logic in Doku: Lesewoche läuft VON (Tag nach Meeting) BIS (nächster Meeting-Tag)** ✅ COMPLETED
+  - **Solution:** Added comprehensive "Meeting Day Cycle & Weekly Reading Logic" section to CLAUDE.md
+  - **Documentation Includes:**
+    - Core concept: App shows reading for week containing NEXT meeting (not previous)
+    - Algorithm explanation: How `getCurrentWeekReading()` calculates which week to display
+    - Concrete example: Tuesday meeting with calculations for Monday/Wednesday/Tuesday check-ins
+    - Schedule structure: How weekStart/weekEnd dates work
+    - Implementation details: File location, function signature, localStorage structure
+    - Developer notes: Timezone handling, caching requirements, year boundary transitions
+  - **Files Updated:** `CLAUDE.md` lines 191-254
+  - **Status:** ✅ COMPLETED - Clear, detailed documentation with examples
+  - **Impact:** Future developers now understand the meeting day logic without confusion
 
 ---
 
@@ -365,12 +378,12 @@
 | Category | Total | Completed | Status |
 |----------|-------|-----------|--------|
 | Critical Bugs | 1 | 1 | ✅ COMPLETE |
-| Testing Findings (New) | 6 | 6 | ✅ COMPLETE |
-| Multi-Device Sync | 9 | 0 | 🟡 MEDIUM |
-| Schedule Management | 3 | 1 | 🟡 MEDIUM (2 pending) |
+| Testing Findings (New) | 7 | 7 | ✅ COMPLETE |
+| Multi-Device Sync | 9 | 9 | ✅ COMPLETE |
+| Schedule Management | 3 | 1 | 🟡 MEDIUM (2 pending - Phase 4) |
 | UI/UX Bugs | 4 | 4 | ✅ COMPLETE |
-| Documentation | 1 | 0 | 🟢 LOW |
-| **TOTAL** | **24** | **12** | **50% Complete** |
+| Documentation | 1 | 1 | ✅ COMPLETE |
+| **TOTAL** | **25** | **23** | **92% Complete** |
 
 ---
 
@@ -396,13 +409,13 @@
 
 ---
 
-**Last Updated:** 2025-12-26 (All 6 testing findings fixed: 12/24 completed)
-**Total Tasks:** 24 (18 original + 6 new from testing)
-**Progress:** 12/24 (50%)
-**Recent Fixes:**
-- 0d042f3: Language initialization (browser locale detection)
-- cde7b58: Weekly reading UX (error state with Settings link)
-- 6d15652: Thematic links (verse range support in JW.org URLs)
-- 28a441d: PBP Next link (interactive button with query params)
-- 50e4852: Firebase-first schedule loading (Priority #3: Firebase before static files)
-- af23d38: Date formatting (language-specific with locale mapping, removed TODAY label)
+**Last Updated:** 2025-12-27 (Weekly Reading Logic documentation completed: 23/25 total)
+**Total Tasks:** 25 (1 critical + 7 testing findings + 9 sync + 3 schedule + 4 UI/UX + 1 docs)
+**Progress:** 23/25 (92%)
+**Recent Completions:**
+- PersonalReadingPage link integration (Continue Where You Left Off pattern)
+- Weekly Reading Logic documentation (CLAUDE.md section: algorithm, examples, implementation)
+
+**Remaining Open Items (Phase 4 - Future):**
+- Auto-Sync New Year Schedule (design pending)
+- Schedule Cache-Versioning (optimization only)

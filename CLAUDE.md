@@ -188,10 +188,70 @@ docs/
 - **jw-links.js** - URL format: `bible=BBCCCVVV-BBCCCVVV` (BB=book, CCC=chapter, VVV=verse)
 - **scheduleUpdater.js** - Dynamically fetches and generates reading schedules
 
-### Meeting Day Cycle
-- Weekly reading is based on configurable meeting day (0-6, where 0=Sunday)
-- One week = meeting day to meeting day
-- This is stored in localStorage settings
+### Meeting Day Cycle & Weekly Reading Logic
+
+**Core Concept:** The app shows the Bible reading for the week containing the user's NEXT meeting, not the previous meeting.
+
+**Why This Design:**
+- Users prepare for an upcoming meeting by reading the designated Scripture
+- The reading schedule is organized by meeting day to meeting day
+- On any given day, users see "what should I read before my next meeting?"
+
+**How It Works - The Algorithm:**
+
+The function `getCurrentWeekReading(meetingDay, date)` in `data/weekly-reading-schedule.js` implements this logic:
+
+1. **Determine the next meeting date:**
+   - Input: Current day of week + user's configured meeting day
+   - Calculate: How many days until the next occurrence of that meeting day
+   - Example: If today is Wednesday and meeting is Tuesday → next meeting is next Tuesday (in 6 days)
+
+2. **Find the schedule week containing that next meeting:**
+   - Look through the schedule array for the week that contains the next meeting date
+   - Return that week's reading assignment
+
+3. **Deduplication:** If today IS the meeting day, distance = 0 (show reading for today's meeting)
+
+**Concrete Example:**
+
+Let's say the user's meeting is on **Tuesday** and they check the app on different days:
+
+```
+Monday, Jan 13:
+  - Days until next Tuesday = 1 day
+  - Next meeting = Tuesday, Jan 14
+  - Schedule contains: weekStart='Jan 13', weekEnd='Jan 19'
+  - Shows reading for week of Jan 13-19 ✅
+
+Wednesday, Jan 15:
+  - Days until next Tuesday = 6 days
+  - Next meeting = Tuesday, Jan 21
+  - Schedule contains: weekStart='Jan 20', weekEnd='Jan 26'
+  - Shows reading for week of Jan 20-26 ✅
+
+Tuesday, Jan 14 (MEETING DAY):
+  - Days until next Tuesday = 0 days (today IS Tuesday)
+  - Next meeting = Tuesday, Jan 14 (today)
+  - Schedule contains: weekStart='Jan 13', weekEnd='Jan 19'
+  - Shows reading for week of Jan 13-19 ✅
+```
+
+**Reading Schedule Structure:**
+- Each schedule week has `weekStart` and `weekEnd` dates (Monday-Sunday or according to local preferences)
+- The meeting day typically falls WITHIN this week (not at the boundary)
+- Example: If meeting is Tuesday and weekStart is Monday, Tuesday is day 2 of the week
+
+**Implementation Details:**
+- **File:** `data/weekly-reading-schedule.js` lines 161-220
+- **Function:** `getCurrentWeekReading(meetingDay = 1, date = null)`
+- **Settings:** Meeting day stored in localStorage as `settings_meetingDay` (0=Sunday, 1=Monday, ..., 6=Saturday)
+- **Returns:** Week object with `{ weekStart, weekEnd, reading, chapters }`
+
+**Key Points for Developers:**
+- ✅ The bug was fixed in commit 0f77e39 (was searching LAST meeting day, now searches NEXT)
+- ✅ Must call `loadScheduleForYear()` before using `getCurrentWeekReading()` (synchronous, needs cached data)
+- ✅ Works correctly for year boundary transitions (December → January)
+- ✅ Timezone-aware: Uses `checkDate.setHours(0, 0, 0, 0)` to avoid timezone issues
 
 ### Offline-Capable (Not Full PWA)
 - All data stored locally in localStorage (primary storage)

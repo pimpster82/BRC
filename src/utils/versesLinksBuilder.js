@@ -50,8 +50,8 @@ export const parseVersesString = (versesString, language = null) => {
   const lang = language || getCurrentLanguage()
   const trimmed = versesString.trim()
 
-  // Pattern 1: "Book chapters? 1-4" (e.g., "Ruth chapters 1-4" or "Ruth chapter 1-4")
-  const chapterRangeMatch = trimmed.match(/^([A-Za-z\s\.]+?)\s+chapters?\s+(\d+)\s*-\s*(\d+)$/i)
+  // Pattern 1: "Book chapters? 1-4" (e.g., "Ruth chapters 1-4" or "Ruth chapter 1-4" or "1 Samuel chapters 1-4")
+  const chapterRangeMatch = trimmed.match(/^([\d\s]*[A-Za-z\s\.]+?)\s+chapters?\s+(\d+)\s*-\s*(\d+)$/i)
   if (chapterRangeMatch) {
     const book = findBookByName(chapterRangeMatch[1], lang)
     if (book) {
@@ -67,7 +67,7 @@ export const parseVersesString = (versesString, language = null) => {
   }
 
   // Pattern 2: "Book chapter 5" or "Book chapters 5" (e.g., "Daniel chapter 6", "1 Samuel chapter 17")
-  const singleChapterMatch = trimmed.match(/^([A-Za-z\s\.]+?)\s+chapters?\s+(\d+)$/i)
+  const singleChapterMatch = trimmed.match(/^([\d\s]*[A-Za-z\s\.]+?)\s+chapters?\s+(\d+)$/i)
   if (singleChapterMatch) {
     const book = findBookByName(singleChapterMatch[1], lang)
     if (book) {
@@ -83,7 +83,7 @@ export const parseVersesString = (versesString, language = null) => {
   }
 
   // Pattern 3: "Book chapter:verse–chapter:verse" (e.g., "Genesis 6:9–9:19", "Exodus 13:17–14:31")
-  const verseRangeMatch = trimmed.match(/^([A-Za-z\s\.]+?)\s+(\d+):(\d+)[–-](\d+):(\d+)$/i)
+  const verseRangeMatch = trimmed.match(/^([\d\s]*[A-Za-z\s\.]+?)\s+(\d+):(\d+)[–-](\d+):(\d+)$/i)
   if (verseRangeMatch) {
     const book = findBookByName(verseRangeMatch[1], lang)
     if (book) {
@@ -99,7 +99,7 @@ export const parseVersesString = (versesString, language = null) => {
   }
 
   // Pattern 4: "Book chapter:verse-verse" within same chapter (e.g., "1 Samuel 25:2-35")
-  const sameChapterMatch = trimmed.match(/^([A-Za-z\s\.]+?)\s+(\d+):(\d+)-(\d+)$/i)
+  const sameChapterMatch = trimmed.match(/^([\d\s]*[A-Za-z\s\.]+?)\s+(\d+):(\d+)-(\d+)$/i)
   if (sameChapterMatch) {
     const book = findBookByName(sameChapterMatch[1], lang)
     if (book) {
@@ -114,8 +114,8 @@ export const parseVersesString = (versesString, language = null) => {
     }
   }
 
-  // Pattern 5: "Book chapter" or "Book chapter:verse" (e.g., "Psalm 23", "Psalm 55:22")
-  const singleVerseMatch = trimmed.match(/^([A-Za-z\s\.]+?)\s+(\d+)(?::(\d+))?$/i)
+  // Pattern 5: "Book chapter" or "Book chapter:verse" (e.g., "Psalm 23", "Psalm 55:22", "1 Peter 5:7")
+  const singleVerseMatch = trimmed.match(/^([\d\s]*[A-Za-z\s\.]+?)\s+(\d+)(?::(\d+))?$/i)
   if (singleVerseMatch) {
     const book = findBookByName(singleVerseMatch[1], lang)
     if (book) {
@@ -192,8 +192,8 @@ export const parseMultipleVerses = (versesString, language = null) => {
 
   for (const section of sections) {
     // For each section, check if it has comma-separated verses
-    // Pattern: "Book chapter:verse, verse, verse" or "Book chapter:verse-verse"
-    const commaMatch = section.match(/^([A-Za-z\s\.]+?)\s+(\d+):(\d+)(?:,\s*(\d+))+/)
+    // Pattern: "Book chapter:verse, verse, verse" or "Book chapter:verse-verse" (with optional leading number like "1 Samuel")
+    const commaMatch = section.match(/^([\d\s]*[A-Za-z\s\.]+?)\s+(\d+):(\d+)(?:,\s*(\d+))+/)
 
     if (commaMatch) {
       // This is a comma-separated verses within same chapter (e.g., "Ephesians 5:28, 29, 33")

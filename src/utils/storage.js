@@ -52,6 +52,9 @@ export const markDailyTextComplete = (date) => {
     // Calculate streak
     data.currentStreak = calculateStreak(data.completedDates)
 
+    // SYNC FIX: Set timestamp at action time (not upload time!)
+    data.lastUpdated = Date.now()
+
     saveDailyTextData(data)
   }
 
@@ -67,6 +70,9 @@ export const unmarkDailyTextComplete = (date) => {
 
   // Recalculate streak
   data.currentStreak = calculateStreak(data.completedDates)
+
+  // SYNC FIX: Set timestamp at action time (not upload time!)
+  data.lastUpdated = Date.now()
 
   saveDailyTextData(data)
   return data

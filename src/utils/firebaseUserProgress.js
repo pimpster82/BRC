@@ -62,7 +62,9 @@ export const saveDailyProgressToFirebase = async (dailyTextData) => {
       completedDates: dailyTextData.completedDates || [],
       currentStreak: dailyTextData.currentStreak || 0,
       longestStreak: dailyTextData.longestStreak || 0,
-      lastUpdated: Date.now()  // Use millisecond timestamp for consistent merge logic
+      // SYNC FIX: Use existing timestamp from local action (set in storage.js)
+      // Only use current time if timestamp missing (legacy data migration)
+      lastUpdated: dailyTextData.lastUpdated || Date.now()
     }
 
     await set(progressRef, dataToSave)
@@ -116,7 +118,9 @@ export const saveWeeklyProgressToFirebase = async (weeklyReadingData) => {
     const dataToSave = {
       completedWeeks: weeklyReadingData.completedWeeks || [],
       currentMeetingDay: weeklyReadingData.currentMeetingDay || 0,
-      lastUpdated: Date.now()
+      // SYNC FIX: Use existing timestamp from local action (set in storage.js)
+      // Only use current time if timestamp missing (legacy data migration)
+      lastUpdated: weeklyReadingData.lastUpdated || Date.now()
     }
 
     console.log(`   Saving to path: users/${userId}/progress/weekly`)
@@ -168,7 +172,9 @@ export const savePersonalProgressToFirebase = async (personalReadingData) => {
     const dataToSave = {
       chaptersRead: personalReadingData.chaptersRead || [],
       selectedPlan: personalReadingData.selectedPlan || 'free',
-      lastUpdated: Date.now()
+      // SYNC FIX: Use existing timestamp from local action (set in storage.js)
+      // Only use current time if timestamp missing (legacy data migration)
+      lastUpdated: personalReadingData.lastUpdated || Date.now()
     }
 
     await set(progressRef, dataToSave)

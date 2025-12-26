@@ -109,17 +109,23 @@ export const buildVersesLink = (versesString, language = null) => {
   if (!parsed) return null
 
   try {
-    const link = buildLanguageSpecificWebLink(
-      parsed.book.number,
-      parsed.startChapter,
-      parsed.startVerse === 1 ? 1 : parsed.startVerse,
-      parsed.endChapter,
-      parsed.endVerse === -1 ? null : parsed.endVerse
+    const lang = language || getCurrentLanguage()
+
+    // For multi-chapter ranges (e.g., "Ruth chapters 1-4"), open the first chapter
+    // For verse ranges within a chapter, include the start and end verses
+    const linkObj = buildLanguageSpecificWebLink(
+      parsed.book.number,           // bookNumber
+      parsed.startChapter,          // chapter (use startChapter)
+      parsed.startVerse,            // startVerse
+      parsed.endChapter === parsed.startChapter && parsed.endVerse !== -1
+        ? parsed.endVerse           // endVerse only if within same chapter
+        : null,
+      lang                          // languageCode
     )
 
     return {
       text: parsed.text,
-      url: link,
+      url: linkObj.web,             // Use linkObj.web, not linkObj directly
       book: parsed.book.name
     }
   } catch (error) {

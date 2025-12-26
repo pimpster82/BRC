@@ -993,6 +993,132 @@ useEffect(() => {
 - ✅ Cross-device sync (working with timestamp-based merge)
 - 🔶 Native iOS companion app backend (Firebase structure ready)
 
+## "Continue Where You Left Off" - Next Link Strategy
+
+### Overview
+
+The Personal Bible Program (PBP) Card implements a unified **"next link"** concept that shows users where to continue reading, regardless of which reading plan they've selected. This pattern should be applied consistently across all reading plans.
+
+### Current Implementation
+
+**PersonalReadingCard.jsx** displays:
+- **Free Plan:** Next chapter (e.g., "Genesis 5")
+  - Based on: `chaptersRead` array sorted by book/chapter
+  - Link navigates to: `/personal-reading?book=1&chapter=5`
+  - Shows: "Next: Genesis 5" (clickable button)
+
+- **Thematic Plan:** Next unread topic (e.g., "Noah")
+  - Based on: `thematicTopicsRead` array
+  - Link navigates to: `/personal-reading` (with plan already set to thematic)
+  - Shows: "Next: Noah" (clickable button)
+
+### Design Pattern
+
+**Key Principle:** The "Next" link represents **"continue from where I left off"** - always showing the user's actual progress point, not a preset sequence.
+
+**Flow:**
+```
+User's Reading Progress → PBP Card calculates "next" → Click link → Open that chapter/topic
+```
+
+**Per Reading Plan:**
+
+1. **Free Plan (Categories):**
+   - Progress tracked: `chaptersRead[]` (array of chapter objects with book/chapter/timestamp)
+   - Next determination: Find highest book/chapter, increment by 1
+   - Link format: `/personal-reading?book=1&chapter=5`
+   - Use case: User reads Genesis 1-4, next shows "Genesis 5"
+
+2. **Thematic Plan (17 Topics):**
+   - Progress tracked: `thematicTopicsRead[]` (array of topic IDs)
+   - Next determination: Find first topic ID NOT in completed array
+   - Link format: `/personal-reading` (plan context auto-loads thematic view)
+   - Use case: User reads "Noah" topic, next shows "Moses" (first unread topic)
+
+3. **Chronological Plan (Future):**
+   - Progress tracked: `chaptersRead[]` (same as Free, but in chronological order)
+   - Next determination: Same logic as Free plan
+   - Link format: `/personal-reading?book=X&chapter=Y`
+   - Link generation: Based on chronological order, not canonical order
+   - Use case: User follows chronological sequence through Bible
+
+4. **One-Year Plan (Future):**
+   - Progress tracked: `weeklyReading.completedWeeks[]` or similar per-plan data
+   - Next determination: Find next week in yearly progression
+   - Link format: `/personal-reading?week=X` (or date-based)
+   - Use case: User follows yearly reading plan schedule
+
+### Implementation for Chronological & One-Year Plans
+
+When implementing future plans, follow this pattern in `PersonalReadingCard.jsx`:
+
+```javascript
+// Detect reading plan type
+const savedPlan = localStorage.getItem('settings_readingPlan') || 'free'
+
+if (savedPlan === 'thematic') {
+  // Find next unread topic from thematicTopicsRead
+  const nextTopic = thematicTopics.find(t => !data.thematicTopicsRead.includes(t.id))
+  setNextReading({ displayText: t(nextTopic.titleKey), isThematic: true })
+
+} else if (savedPlan === 'chronological') {
+  // Find next chapter in chronological order
+  // Load chronological sequence from config
+  // Find where user is in sequence
+  // Return next chapter in chronological order
+  setNextReading({ displayText: '...', bookNumber: X, chapter: Y, isChronological: true })
+
+} else if (savedPlan === 'oneyear') {
+  // Find next week in year progression
+  // Calculate which week user should read next
+  setNextReading({ displayText: '...', week: W, isOneYear: true })
+
+} else {
+  // Default: Free plan
+  // Find next chapter in canonical order
+  setNextReading({ displayText: '...', bookNumber: X, chapter: Y, isFree: true })
+}
+```
+
+### Data Structure Requirements
+
+For each plan type to work with this pattern, ensure:
+
+**Free Plan:**
+- ✅ `chaptersRead: [{ book: 1, chapter: 1, timestamp, status }, ...]`
+- ✅ Incrementing chapter number finds next reading
+
+**Thematic Plan:**
+- ✅ `thematicTopicsRead: [1, 3, 5, ...]` (array of completed topic IDs)
+- ✅ Topics config available to find next unread
+
+**Chronological Plan:**
+- 🔲 `chaptersRead` (same as Free) OR
+- 🔲 `chronologicalProgress: { currentSequenceIndex: N }` (if using numbered sequence)
+- 🔲 Chronological sequence definition in config
+
+**One-Year Plan:**
+- 🔲 `weeklyProgress: { currentWeek: N }` OR
+- 🔲 `yearlyReading: [{ week: 1, chapters: [...] }, ...]` (with completion tracking)
+- 🔲 Year definition in config
+
+### Benefits of This Pattern
+
+1. **Consistency:** User always sees "where to continue" from any plan
+2. **Low Friction:** Single click from home card to next reading
+3. **Plan-Agnostic:** Works the same conceptually across all plan types
+4. **User Expectation:** "Next" means "next from where I left off", not "next in a predefined order"
+5. **Progress Visibility:** Emphasizes user's actual reading progress
+
+### Future Considerations
+
+- Sync "next reading" metadata to Firebase for cross-device consistency
+- Show progress percentage alongside next link (e.g., "3/66 books read")
+- Allow users to "jump to next" from any page
+- Statistics: Track average time between chapters to predict completion date
+
+---
+
 ## Developer Quick Reference
 
 ### What You Can Build With (85% complete)

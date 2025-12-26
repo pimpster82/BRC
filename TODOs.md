@@ -159,6 +159,71 @@
 
 ---
 
+## 🔧 NEW BUGS FOUND DURING TESTING (Testing Session 2025-12-26)
+
+### Language Initialization
+- [x] **Language Settings Mismatch: Settings UI showed English while App UI rendered German**
+  - **Root Cause:** Two `getCurrentLanguage()` functions with inconsistent defaults
+    - `languages.js`: `DEFAULT_LANGUAGE = 'en'`
+    - `i18n.js`: fallback to `'de'`
+  - **Fix Applied:** Both functions now detect browser locale and default to 'en' (Commit 0d042f3)
+  - **Behavior:** Auto-detect `navigator.language` from browser, respect localStorage override
+  - **Status:** ✅ FIXED
+
+### Weekly Reading Schedule
+- [ ] **WeeklyReadingCard renders without schedule data on cold start**
+  - **Issue:** Component displays "No reading available. Import via Settings." even when schedule exists
+  - **Expected:** Schedule should load from Firebase or fallback static data on component mount
+  - **Impact:** Users cannot see current week's reading assignment immediately
+  - **Files:** `src/components/WeeklyReadingCard.jsx`, `src/pages/WeeklyReadingPage.jsx`
+  - **Priority:** HIGH (user-facing feature)
+  - **Status:** NEEDS INVESTIGATION
+
+### Thematic Reading Links
+- [ ] **Thematic reading scripture links always navigate to first verse of section**
+  - **Issue:** Links in `src/pages/PersonalReadingPage.jsx` thematic section don't respect verse range
+  - **Current Behavior:** Click any verse range (e.g., "Psalm 117-119:10") → redirects to Genesis 1:1
+  - **Expected Behavior:** Highlight entire scripture section or individual verses within range
+  - **Implementation:** `buildLanguageSpecificWebLink()` in `data/bible-link-builder.js` needs enhancement
+  - **Files:** `src/pages/PersonalReadingPage.jsx`, `data/bible-link-builder.js`
+  - **Priority:** MEDIUM
+  - **Status:** NEEDS ANALYSIS
+
+### Personal Bible Program Card
+- [ ] **PersonalReadingCard "Next: {chapter}" text should be interactive link**
+  - **Issue:** "Next: Genesis 1" shows computed position but is non-interactive
+  - **Expected:** Click link → navigate to `/personal-reading?book={bookNumber}&chapter={chapterNumber}`
+  - **Implementation:** Wrap reading position in `<Link>` component with query parameters
+  - **Files:** `src/components/PersonalReadingCard.jsx` (lines 98-99)
+  - **Priority:** MEDIUM (usability enhancement)
+  - **Status:** NEEDS IMPLEMENTATION
+
+### User Interface & Navigation
+- [ ] **PersonalReadingPage link/info integration requires refactoring**
+  - **Issue:** Multiple link sources (JW.org, next reading, continue position) need unified navigation strategy
+  - **Current State:** Links functional but inconsistent behavior across reading types
+  - **Required:** Audit all reading page link handlers and standardize behavior
+  - **Files:** `src/pages/PersonalReadingPage.jsx`, `src/pages/WeeklyReadingPage.jsx`, `src/components/*.jsx`
+  - **Priority:** MEDIUM (design consistency)
+  - **Status:** DESIGN PHASE
+
+### Application Icon Design
+- [ ] **Design and implement app icon (open Bible 3D outline style)**
+  - **Spec:**
+    - Style: Open Bible in outline form (thick white lines)
+    - Perspective: 45°/30° rotation from top-right angle
+    - Format: SVG preferred for scalability
+    - Use Cases: favicon, web app manifest, launcher icon
+  - **Deliverables:**
+    - Create `public/icons/` directory structure
+    - Generate icon variants (16x16, 32x32, 192x192, 512x512)
+    - Update `public/manifest.json` icon paths
+  - **Files:** `public/manifest.json`, `public/index.html`, new icon assets
+  - **Priority:** LOW (PWA polish)
+  - **Status:** DESIGN PENDING
+
+---
+
 ## 📱 Multi-Device Sync System (Phase Enhancement)
 
 - [ ] **Fix Firebase Sync: Timestamp beim Markieren setzen, nicht beim Upload**
@@ -293,11 +358,12 @@
 | Category | Total | Completed | Status |
 |----------|-------|-----------|--------|
 | Critical Bugs | 1 | 1 | ✅ COMPLETE |
+| Testing Findings (New) | 6 | 1 | 🔴 HIGH (5 pending) |
 | Multi-Device Sync | 9 | 0 | 🟡 MEDIUM |
 | Schedule Management | 3 | 0 | 🟡 MEDIUM |
 | UI/UX Bugs | 4 | 4 | ✅ COMPLETE |
 | Documentation | 1 | 0 | 🟢 LOW |
-| **TOTAL** | **18** | **5** | **28% Complete** |
+| **TOTAL** | **24** | **6** | **25% Complete** |
 
 ---
 
@@ -323,6 +389,7 @@
 
 ---
 
-**Last Updated:** 2025-12-26 (Fixed critical bugs and UI/UX issues)
-**Total Tasks:** 18
-**Progress:** 5/18 (28%) - Critical bug + all UI/UX checks completed
+**Last Updated:** 2025-12-26 (Testing session: found 6 new issues, fixed language init)
+**Total Tasks:** 24 (18 original + 6 new from testing)
+**Progress:** 6/24 (25%) - Critical bug, UI/UX verified, language initialization fixed
+**Language Fix Commit:** 0d042f3 - Browser locale detection + fallback to English

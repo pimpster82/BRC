@@ -292,13 +292,20 @@
 
 ## 📚 Weekly Schedule Management
 
+- [x] **Implement Schedule Sync Strategy: lokaler Cache → Firebase → WOL Fallback** ✅ DONE
+  - **Completed:** Firebase is now Priority #3 in loadScheduleForYear() (Commit 50e4852)
+  - Priority order: Memory → LocalStorage → **Firebase** → Static Files (Offline)
+  - One admin generates schedule once (via Settings), all users load from Firebase
+  - No more individual users downloading from WOL (too many requests!)
+  - Status: ✅ IMPLEMENTED - Firebase-first strategy active
+
 - [ ] **Auto-Sync New Year Schedule: Ab Dezember täglich prüfen ob nächstes Jahr auf WOL/Firebase verfügbar ist**
   - Logic: In December, daily check if next year's schedule available
-  - Option 1: Admin manually publishes to Firebase
-  - Option 2: Automatic fetch from WOL if available
+  - Phase 3 (Current): Admin manually publishes to Firebase via Settings
+  - Phase 4 (Future): Automatic fetch from WOL in December if not yet published
   - When found: Save to Firebase, notify users via Settings
-  - Files: New `scheduleAutoSync.js` utility
-  - Status: DESIGN PHASE - Decide admin vs automatic
+  - Files: New `scheduleAutoSync.js` utility (Phase 4)
+  - Status: PHASE 3 (manual), PHASE 4 (design pending)
   - Notes: Schedule usually available Sept/Oct on WOL
 
 - [ ] **Schedule Cache-Versioning: Nur neu downloaden wenn Firebase-Version neuer**
@@ -307,15 +314,7 @@
   - Only download if Firebase version is newer
   - Structure: `/schedules/{year}/metadata/{ version, hash, lastUpdated }`
   - Files: `firebaseSchedules.js`, `storage.js`
-  - Status: NOT STARTED
-
-- [ ] **Implement Schedule Sync Strategy: lokaler Cache → Firebase → WOL Fallback**
-  - Priority order: localStorage cache → Firebase → WOL (never!)
-  - One admin generates schedule once, all users load from Firebase
-  - No more individual users downloading from WOL (too many requests!)
-  - Function: `loadScheduleForYear(year)` enhanced with version check
-  - Files: `weekly-reading-schedule.js`, `firebaseSchedules.js`
-  - Status: PARTIAL - Basic structure exists, needs versioning
+  - Status: NOT STARTED (Phase 4 - optimization)
 
 ---
 
@@ -358,10 +357,10 @@
 | Critical Bugs | 1 | 1 | ✅ COMPLETE |
 | Testing Findings (New) | 6 | 4 | 🟡 MEDIUM (2 pending) |
 | Multi-Device Sync | 9 | 0 | 🟡 MEDIUM |
-| Schedule Management | 3 | 0 | 🟡 MEDIUM |
+| Schedule Management | 3 | 1 | 🟡 MEDIUM (2 pending) |
 | UI/UX Bugs | 4 | 4 | ✅ COMPLETE |
 | Documentation | 1 | 0 | 🟢 LOW |
-| **TOTAL** | **24** | **9** | **38% Complete** |
+| **TOTAL** | **24** | **10** | **42% Complete** |
 
 ---
 
@@ -387,11 +386,12 @@
 
 ---
 
-**Last Updated:** 2025-12-26 (Auto-fixing phase: 9/24 completed)
+**Last Updated:** 2025-12-26 (Auto-fixing phase: 10/24 completed)
 **Total Tasks:** 24 (18 original + 6 new from testing)
-**Progress:** 9/24 (38%)
+**Progress:** 10/24 (42%)
 **Recent Fixes:**
 - 0d042f3: Language initialization (browser locale detection)
 - cde7b58: Weekly reading UX (error state with Settings link)
 - 6d15652: Thematic links (verse range support in JW.org URLs)
 - 28a441d: PBP Next link (interactive button with query params)
+- 50e4852: Firebase-first schedule loading (Priority #3: Firebase before static files)

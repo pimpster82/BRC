@@ -111,15 +111,23 @@ export const buildVersesLink = (versesString, language = null) => {
   try {
     const lang = language || getCurrentLanguage()
 
-    // For multi-chapter ranges (e.g., "Ruth chapters 1-4"), open the first chapter
-    // For verse ranges within a chapter, include the start and end verses
+    // Determine the end verse for the link
+    // - If single verse or verse range within same chapter: use endVerse
+    // - If multi-chapter range: end at verse 999 (last verse of end chapter)
+    // - If full chapters: end at verse 999
+    const linkEndVerse = parsed.endChapter === parsed.startChapter && parsed.endVerse !== -1
+      ? parsed.endVerse           // Verse range within same chapter
+      : (parsed.endVerse === -1 ? 999 : parsed.endVerse)  // Full chapter(s) or verse range
+
+    // For multi-chapter ranges, we need to handle them differently
+    // For now, we'll only link to the start chapter and let JW.org show context
     const linkObj = buildLanguageSpecificWebLink(
       parsed.book.number,           // bookNumber
-      parsed.startChapter,          // chapter (use startChapter)
+      parsed.startChapter,          // chapter (always use startChapter)
       parsed.startVerse,            // startVerse
-      parsed.endChapter === parsed.startChapter && parsed.endVerse !== -1
-        ? parsed.endVerse           // endVerse only if within same chapter
-        : null,
+      parsed.endChapter === parsed.startChapter
+        ? linkEndVerse              // If same chapter, include endVerse
+        : null,                      // If multi-chapter, let link default to chapter end
       lang                          // languageCode
     )
 

@@ -195,13 +195,24 @@ export function buildLanguageSpecificWebLink(bookNumber, chapter, startVerse = 1
   const wtlocale = localeCodeMap[languageCode] || 'E';
 
   // Build mobile-friendly JW.org finder URL (works great on phone)
-  // Format: https://www.jw.org/finder?srcid=jwlshare&wtlocale=E&prefer=lang&bible=39004001&pub=nwsty
+  // Format: https://www.jw.org/finder?srcid=jwlshare&wtlocale=E&prefer=lang&bible=39004001-39004005&pub=nwsty
   // bible parameter: BB (book 01-66) + CCC (chapter 000-999) + VVV (verse 000-999)
+  // For ranges: BBCCCVVV-BBCCCVVV (start-end)
   const jwOrgBookNumber = bookNumber.toString().padStart(2, '0');
   const chapterStr = chapter.toString().padStart(3, '0');
   const startVerseStr = startVerse.toString().padStart(3, '0');
 
-  const bibleParam = `${jwOrgBookNumber}${chapterStr}${startVerseStr}`;
+  // Support verse ranges if endVerse is specified
+  let bibleParam;
+  if (endVerse && endVerse !== -1) {
+    // Create a verse range: BBCCCVVV-BBCCCVVV
+    const endVerseStr = endVerse.toString().padStart(3, '0');
+    bibleParam = `${jwOrgBookNumber}${chapterStr}${startVerseStr}-${jwOrgBookNumber}${chapterStr}${endVerseStr}`;
+  } else {
+    // Single verse or full chapter (default to first verse to last verse of chapter)
+    bibleParam = `${jwOrgBookNumber}${chapterStr}${startVerseStr}-${jwOrgBookNumber}${chapterStr}999`;
+  }
+
   const webUrl = `https://www.jw.org/finder?srcid=jwlshare&wtlocale=${wtlocale}&prefer=lang&bible=${bibleParam}&pub=nwtsty`;
 
   // Build JW Library deep link for app opening

@@ -164,22 +164,25 @@ export const getCurrentWeekReading = (meetingDay = 1, date = null) => {
     return null
   }
 
-  // Find the most recent meeting day
+  // Find the NEXT meeting day (when to prepare for next meeting)
   const todayDayOfWeek = checkDate.getDay()
-  let daysSinceLastMeeting
+  let daysUntilNextMeeting
 
-  if (todayDayOfWeek >= meetingDay) {
-    // Meeting day has already passed this week
-    daysSinceLastMeeting = todayDayOfWeek - meetingDay
+  if (todayDayOfWeek < meetingDay) {
+    // Meeting day is still coming this week
+    daysUntilNextMeeting = meetingDay - todayDayOfWeek
+  } else if (todayDayOfWeek > meetingDay) {
+    // Meeting day already passed, it's in the next week
+    daysUntilNextMeeting = 7 - todayDayOfWeek + meetingDay
   } else {
-    // Meeting day hasn't happened yet, use last week's meeting
-    daysSinceLastMeeting = 7 - meetingDay + todayDayOfWeek
+    // Today IS the meeting day
+    daysUntilNextMeeting = 0
   }
 
-  const lastMeetingDate = new Date(checkDate)
-  lastMeetingDate.setDate(checkDate.getDate() - daysSinceLastMeeting)
+  const nextMeetingDate = new Date(checkDate)
+  nextMeetingDate.setDate(checkDate.getDate() + daysUntilNextMeeting)
 
-  // Find which schedule week this meeting date falls into
+  // Find which schedule week this next meeting date falls into
   for (const week of schedule) {
     const scheduleStart = new Date(week.weekStart)
     scheduleStart.setHours(0, 0, 0, 0)
@@ -187,8 +190,8 @@ export const getCurrentWeekReading = (meetingDay = 1, date = null) => {
     const scheduleEnd = new Date(week.weekEnd)
     scheduleEnd.setHours(23, 59, 59, 999)
 
-    // Check if the most recent meeting day falls within this schedule period
-    if (lastMeetingDate >= scheduleStart && lastMeetingDate <= scheduleEnd) {
+    // Check if the next meeting day falls within this schedule period
+    if (nextMeetingDate >= scheduleStart && nextMeetingDate <= scheduleEnd) {
       return week
     }
   }

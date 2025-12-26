@@ -462,7 +462,7 @@ const SettingsPage = () => {
                   onClick={() => setExpandedReadingPlanDropdown(!expandedReadingPlanDropdown)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-left text-gray-700 font-medium flex items-center justify-between hover:border-gray-400 transition-colors"
                 >
-                  {readingPlans.find(p => p.value === readingPlan)?.label || t('readingplan.free')}
+                  {readingPlans.find(p => p.value === readingPlan)?.label || t('reading.plan_free')}
                   <ChevronDown className={`w-4 h-4 text-gray-600 transition-transform ${expandedReadingPlanDropdown ? 'rotate-180' : ''}`} />
                 </button>
 

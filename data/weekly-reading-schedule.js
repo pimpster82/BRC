@@ -4,6 +4,7 @@
 
 // Import Firebase cache utilities
 import { getScheduleFromCache } from '../src/utils/storage'
+import { loadScheduleFromFirebase } from '../src/utils/firebaseSchedules'
 
 // Map of available schedule years (only what's available locally)
 // This will be populated dynamically based on what files exist
@@ -20,16 +21,17 @@ const scheduleCache = {}
 
 /**
  * Dynamically load a schedule file
- * Tries multiple sources:
+ * Tries multiple sources (in priority order):
  * 1. In-memory cache (fastest)
- * 2. LocalStorage cache (from Firebase save)
- * 3. Dynamic import from data files (legacy)
+ * 2. LocalStorage cache (from previous Firebase save)
+ * 3. Firebase Realtime Database (admin-published schedules)
+ * 4. Dynamic import from data files (offline fallback)
  *
  * @param {number} year - The year to load
  * @returns {Promise<Array>} - Weekly schedule array, or null if not available
  */
 export const loadScheduleForYear = async (year) => {
-  // 1. Check in-memory cache first
+  // 1. Check in-memory cache first (fastest)
   if (scheduleCache[year]) {
     return scheduleCache[year]
   }
@@ -42,7 +44,7 @@ export const loadScheduleForYear = async (year) => {
       scheduleCache[year] = cachedSchedule
       if (!AVAILABLE_SCHEDULES[year]) {
         AVAILABLE_SCHEDULES[year] = true
-        console.log(`✓ Schedule for year ${year} loaded from cache`)
+        console.log(`✓ Schedule for year ${year} loaded from local cache`)
       }
       return cachedSchedule
     }
@@ -50,7 +52,24 @@ export const loadScheduleForYear = async (year) => {
     console.warn(`Error loading schedule from cache: ${error.message}`)
   }
 
-  // 3. Try to dynamically import the schedule file (legacy/fallback)
+  // 3. Try to load from Firebase (admin-published schedules)
+  try {
+    const result = await loadScheduleFromFirebase(year)
+    if (result.success && result.schedule) {
+      const schedule = result.schedule
+      // Cache it in memory
+      scheduleCache[year] = schedule
+      if (!AVAILABLE_SCHEDULES[year]) {
+        AVAILABLE_SCHEDULES[year] = true
+        console.log(`✓ Schedule for year ${year} loaded from Firebase`)
+      }
+      return schedule
+    }
+  } catch (error) {
+    console.warn(`⚠️ Error loading from Firebase: ${error.message}`)
+  }
+
+  // 4. Try to dynamically import the schedule file (legacy/offline fallback)
   try {
     const module = await import(`./weekly-reading-schedule-${year}.js`)
     const schedule = module[`weeklyReadingSchedule${year}`] || module.default
@@ -61,12 +80,12 @@ export const loadScheduleForYear = async (year) => {
     // Mark it as available if it wasn't already
     if (!AVAILABLE_SCHEDULES[year]) {
       AVAILABLE_SCHEDULES[year] = true
-      console.log(`✓ Schedule for year ${year} found and loaded from data files`)
+      console.log(`✓ Schedule for year ${year} found and loaded from fallback data files`)
     }
 
     return schedule
   } catch (error) {
-    console.warn(`⚠️ Schedule for year ${year} not found in cache or data files. User can import via Settings.`)
+    console.warn(`⚠️ Schedule for year ${year} not found anywhere. User can import via Settings.`)
     return null
   }
 }

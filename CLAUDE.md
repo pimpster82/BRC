@@ -272,10 +272,15 @@ The Firebase integration enables:
 
 ### LoadingStrategy (Multi-Tier)
 
+**Priority order for schedules:**
 1. **In-Memory Cache** (fastest) - Already loaded in this session
 2. **LocalStorage Cache** (fast) - Persisted from previous Firebase saves
-3. **Dynamic Import** (fallback) - Legacy data files (weekly-reading-schedule-2025.js, yeartext-2025.js)
-4. **Firebase** (if configured) - Real-time sync for future multi-user features
+3. **Firebase Realtime Database** (PRIMARY) - Admin-published schedules (new default!)
+   - Admin publishes schedules via Settings (manual, Phase 3)
+   - Or automated sync every December (Phase 4)
+4. **Dynamic Import** (offline fallback) - Legacy static data files
+
+**Key Change:** Firebase is now Priority #3 (not last resort). If schedule not locally cached, app fetches from Firebase automatically on load.
 
 ### Configuration
 
@@ -311,28 +316,45 @@ VITE_FIREBASE_APP_ID=...
 - `getYeartextFromCache(year, language)` / `saveYeartextToCache(year, yeartextData, language)`
 - `getCachedScheduleYears()` / `getCachedYeartextYears()`
 
-### User Flow: Download Schedule
+### User Flow: Schedule Loading (Standard)
 
-1. User goes to Settings → "Schedule Update" section
+**Normal User - App Start (Priority Order):**
+1. WeeklyReadingCard loads on app start
+2. `loadScheduleForYear()` tries:
+   - Memory cache? (fastest)
+   - LocalStorage? (previously saved)
+   - **Firebase? (NEW DEFAULT!)** → Fetches admin-published schedule
+   - Fallback to static files if offline
+3. Reading displays for current week
+
+**Admin/Settings - Publish Schedule (Phase 3+):**
+
+*Current (Phase 2)* - Manual import via Settings:
+1. Admin user goes to Settings → "Schedule Update"
 2. Enters year and clicks "Download Schedule"
-3. App fetches from JW.org via CORS proxy (real data, never invented)
+3. App fetches from JW.org (real data, never invented)
 4. `SettingsPage.jsx:handleFetchSchedule()`:
    - Calls `fetchScheduleFromWOL()` and `fetchYeartextFromWOL()`
    - Saves to Firebase via `saveScheduleToFirebase()` and `saveYeartextToFirebase()`
-   - Data automatically cached in localStorage
-   - Shows success message with yeartext info
-5. Data is now available locally and via Firebase
+   - Published for ALL users
+5. All regular users get it via Firebase on next app start
+
+*Future (Phase 4)* - Automated December sync (planned):
+- In December, admin publishes next year's schedule automatically
+- All users get updated schedule without manual action
+- Or: App auto-detects new schedule on JW.org in December
 
 ### User Flow: View Weekly Reading
 
 1. User navigates to home or WeeklyReadingCard loads
 2. `WeeklyReadingCard.jsx` calls `loadScheduleForYear(year)`
-3. `loadScheduleForYear()` in `data/weekly-reading-schedule.js`:
-   - Checks in-memory cache first
-   - Falls back to localStorage cache (from Firebase save)
-   - Falls back to dynamic import of data files
-   - Returns schedule for current week display
-4. If no schedule found: shows "No reading available. Import via Settings."
+3. `loadScheduleForYear()` in `data/weekly-reading-schedule.js` tries (in order):
+   - 💨 In-memory cache (fastest)
+   - 💾 LocalStorage cache (from previous Firebase save)
+   - 🔥 **Firebase Realtime DB** (admin-published schedules) ← NEW PRIORITY!
+   - 📄 Dynamic import of data files (offline fallback)
+4. Returns schedule for current week display
+5. If no schedule found anywhere: shows helpful message with link to Settings
 
 ### Multi-User Vision (Phase 3)
 

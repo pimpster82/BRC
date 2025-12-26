@@ -525,6 +525,247 @@ weeks: [
 
 ---
 
+## Multi-Device Sync System (Phase 3: Complete ✅)
+
+### Overview
+
+The multi-device sync system enables users to sync their Bible reading progress across multiple devices (phone, tablet, desktop) with proper offline support. The key innovation is **timestamp-based conflict resolution**, ensuring the user's actual action time (not upload time) determines which version wins in conflicts.
+
+### Architecture
+
+**Three-Tier Sync Strategy:**
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│ User Performs Action (mark/unmark daily text)                       │
+└─────────────────────────────────────────────────────────────────────┘
+                               │
+                    Device Online/Offline?
+                         │          │
+                    Online │        │ Offline
+                         │          │
+                ┌────────▼───┐   ┌──▼─────────┐
+                │  Update    │   │   Queue    │
+                │ LocalStore │   │   Item in  │
+                │  + Firebase│   │ localStorage│
+                └────────────┘   └──┬─────────┘
+                         │          │ Device Comes Online
+                         │          │
+                         └──────────┤
+                                    │
+                    ┌───────────────▼────────────────┐
+                    │ processPendingSyncQueue()      │
+                    │ (FIFO, Retry Logic)            │
+                    └───────────────┬────────────────┘
+                                    │
+                    ┌───────────────▼────────────────┐
+                    │  Merge with Firebase Version   │
+                    │  (Action Timestamp Wins)       │
+                    └───────────────┬────────────────┘
+                                    │
+                    ┌───────────────▼────────────────┐
+                    │ All Devices Show Same State    │
+                    │ (Eventual Consistency)         │
+                    └────────────────────────────────┘
+```
+
+### Queue System (Offline-First)
+
+When a user is offline, actions are stored in a **sync queue** using event-sourcing:
+
+**Queue Item Structure:**
+```javascript
+{
+  id: 'daily_2025-12-25_mark_complete',    // Composite key: section_identifier_action
+  section: 'daily',                         // daily, weekly, or personal
+  action: 'mark_complete',                  // The action type
+  data: { date: '2025-12-25' },            // Action-specific data
+  timestamp: 1703520000000,                 // ACTION TIME (when user marked it)
+  synced: false,                            // Has this synced to Firebase yet?
+  retries: 0                                // Retry counter for failed syncs
+}
+```
+
+**Key Features:**
+
+1. **Deduplication by Composite Key:**
+   - Same action on same item replaces previous entry in queue
+   - Example: If user marks date X, then unmarks X, then marks X again:
+     - Queue after mark: `[{ id: 'daily_X_mark_complete', ... }]`
+     - Queue after unmark: `[{ id: 'daily_X_unmark_complete', ... }]` (replaced!)
+     - Queue after 2nd mark: `[{ id: 'daily_X_mark_complete', ... }]` (replaced!)
+   - Only final action syncs when device comes online ✅
+
+2. **FIFO Processing:**
+   - When device comes online, queue items processed in order (by sequence number)
+   - Each action replayed locally, then synced to Firebase
+   - Ensures correct final state even with multiple offline changes
+
+3. **Event-Sourcing:**
+   - Complete action history stored in queue
+   - Actions replayed sequentially when syncing
+   - Final state computed from replay (not from state snapshot alone)
+
+4. **Retry Logic:**
+   - Failed syncs automatically retry (up to 3 attempts)
+   - Exponential backoff for network errors
+   - After 3 retries, item marked as failed but skipped to allow next item
+
+### Timestamp-Based Conflict Resolution
+
+**The Problem (Before):**
+```javascript
+// Device A: Marks date 2025-12-25 at 11:00 AM
+completedDates: ['2025-12-25']
+lastUpdated: 1703545000000  // Set WHEN UPLOADING to Firebase at 14:00 PM
+
+// Device B: Unmarks date 2025-12-25 at 10:00 AM, syncs immediately
+completedDates: []
+lastUpdated: 1703541600000  // Set WHEN UPLOADING to Firebase at 11:30 AM
+
+// Merge result: WRONG! Device B wins because upload was later (11:30 > 10:00)
+// But Device A's action (11:00) is actually more recent than B's (10:00)!
+```
+
+**The Solution (After):**
+```javascript
+// Device A: Marks date 2025-12-25 at 11:00 AM
+completedDates: ['2025-12-25']
+lastUpdated: 1703520000000  // Set WHEN USER MARKS (11:00 AM)
+
+// Device B: Unmarks date 2025-12-25 at 10:00 AM
+completedDates: []
+lastUpdated: 1703516400000  // Set WHEN USER UNMARKS (10:00 AM)
+
+// When Device B syncs and merges with Firebase version from Device A:
+// Merge logic: 1703520000000 (A's action) > 1703516400000 (B's action)
+// Result: Device A's version wins ✅ CORRECT!
+```
+
+**Merge Logic (in `userProgress.js`):**
+```javascript
+const mergeProgress = (localData, firebaseData) => {
+  const localTimestamp = localData.lastUpdated || 0
+  const firebaseTimestamp = firebaseData.lastUpdated || 0
+
+  // Last-write-wins: NEWER ACTION TIMESTAMP WINS
+  if (firebaseTimestamp > localTimestamp) {
+    return firebaseData  // Firebase action is more recent
+  } else if (localTimestamp > firebaseTimestamp) {
+    return localData     // Local action is more recent
+  } else {
+    return firebaseData  // Equal timestamps: Firebase wins as tiebreaker
+  }
+}
+```
+
+### Event Listeners (App.jsx)
+
+The app listens for online/offline transitions and triggers queue processing:
+
+```javascript
+// In App.jsx, AppContent component:
+useEffect(() => {
+  const handleOnline = async () => {
+    console.log('📡 Device came online - processing pending sync queue...')
+    if (currentUser?.uid) {
+      try {
+        const result = await processPendingSyncQueue(currentUser.uid)
+        console.log(`✓ Sync queue processed: ${result.processed} items`)
+      } catch (error) {
+        console.error('✗ Error processing sync queue:', error)
+      }
+    }
+  }
+
+  window.addEventListener('online', handleOnline)
+
+  return () => {
+    window.removeEventListener('online', handleOnline)
+  }
+}, [currentUser])
+```
+
+**How It Works:**
+1. User marks item while offline → Item queued with timestamp
+2. Device connection status changes → `window.online` event fires
+3. `handleOnline()` called → Calls `processPendingSyncQueue(userId)`
+4. Queue processor replays all offline actions in FIFO order
+5. After each action: Local state + Firebase sync (with merged conflict resolution)
+6. Queue items marked as synced, removed from queue
+7. Result: All devices now have identical state ✅
+
+### Implementation Files
+
+| Component | File | Lines | Status |
+|-----------|------|-------|--------|
+| **Queue Management** | `src/utils/syncQueue.js` | 1-160 | ✅ Complete |
+| **Queue Storage/Retrieval** | `src/utils/storage.js` | 43-82, 557-582 | ✅ Complete |
+| **Queue Processing** | `src/utils/firebaseUserProgress.js` | 367-481 | ✅ Complete |
+| **Event Listeners** | `src/App.jsx` | 41-72 | ✅ Complete |
+| **Merge Logic** | `src/utils/userProgress.js` | 145-231 | ✅ Complete |
+| **Test Documentation** | `docs/MULTI_DEVICE_SYNC_TESTS.md` | 1-343 | ✅ Complete |
+
+### Example Workflow: Two Devices Offline
+
+**Setup:**
+- Device A (Phone): Online, marks 2025-12-24 at 11:00 AM
+- Device B (Tablet): Offline, can't sync
+
+**Timeline:**
+
+```
+11:00 - Device A marks 2025-12-24 online
+        → Timestamp: 1703520000000 (11:00 AM)
+        → Syncs immediately to Firebase
+
+11:30 - Device B marks 2025-12-25 offline (user unaware A already marked)
+        → Timestamp: 1703521800000 (11:30 AM)
+        → Queued: [{ id: 'daily_2025-12-25_mark_complete', timestamp: 1703521800000 }]
+
+12:00 - Device B user unmarks 2025-12-25 (changed mind), still offline
+        → Timestamp: 1703525400000 (12:00 PM)
+        → Queue REPLACED: [{ id: 'daily_2025-12-25_unmark_complete', timestamp: 1703525400000 }]
+
+14:00 - Device B comes online
+        → processPendingSyncQueue() runs
+        → Replays: unmark 2025-12-25 locally
+        → Syncs to Firebase with timestamp 1703525400000
+        → Merges: 1703525400000 (B's unmark) > any previous Firebase version
+        → Result: All devices show 2025-12-25 as UNMARKED ✅
+```
+
+### Current Limitations
+
+1. **Daily Text Only** - Queue system fully works for daily text; weekly/personal not yet integrated
+2. **No Persistence** - Queue lost if app crashes (acceptable for now)
+3. **No Offline UI Indicators** - App doesn't show "queued X items" in UI
+4. **No Batch Syncing** - Each action sent individually; could batch multiple in one Firebase write
+
+### Future Improvements (Phase 4+)
+
+- [ ] Extend queue system to weekly/personal reading
+- [ ] Add "Syncing 5/10..." progress indicator in UI
+- [ ] Batch sync (send multiple items per Firebase write)
+- [ ] Offline mode UI indicator
+- [ ] Manual conflict resolution UI (let user choose which version to keep)
+- [ ] Sync analytics (success rate, retry counts, latency metrics)
+
+### Testing
+
+**Manual Testing Checklist:**
+- [ ] Mark daily text offline, come online, verify Firebase synced
+- [ ] Mark same date multiple times offline, verify queue deduplication (only final action syncs)
+- [ ] Conflict resolution: Device A marks online, Device B unmarks offline, device B comes online last → shows Device A's version
+- [ ] Large queue: Mark 20 dates offline, come online, verify all synced in order
+
+**For Automated Tests:**
+- See: `docs/MULTI_DEVICE_SYNC_TESTS.md` - 5 complete test scenarios with code examples
+- Framework recommended: Vitest + React Testing Library
+- Key scenarios to test: offline queue, conflict resolution, deduplication, retry logic
+
+---
+
 ## Data Flow & Storage Schema
 
 ```javascript

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { ChevronLeft, ExternalLink, Check, Edit2, ChevronDown, ChevronRight, Settings } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { t, getCurrentLanguage } from '../config/i18n'
 import { getBibleBooks } from '../config/languages'
 import { readingCategories, getBooksInCategory } from '../config/reading-categories'
@@ -35,6 +35,7 @@ import {
 
 export default function PersonalReadingPage() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const language = getCurrentLanguage()
   const bibleBooks = getBibleBooks(language)
 
@@ -91,7 +92,19 @@ export default function PersonalReadingPage() {
     if (lastReadCategoryId) {
       setExpandedCategories({ [lastReadCategoryId]: true })
     }
-  }, [])
+
+    // Handle query parameters (e.g., ?book=1&chapter=5)
+    const bookParam = searchParams.get('book')
+    const chapterParam = searchParams.get('chapter')
+    if (bookParam && chapterParam) {
+      const bookNumber = parseInt(bookParam)
+      const chapterNumber = parseInt(chapterParam)
+      if (bookNumber >= 1 && bookNumber <= 66 && chapterNumber >= 1) {
+        setSelectedBook(bookNumber)
+        setShowChapterModal(true)
+      }
+    }
+  }, [searchParams])
 
   // Helper: Save to localStorage and sync to Firebase if authenticated
   const saveAndSync = async (data) => {

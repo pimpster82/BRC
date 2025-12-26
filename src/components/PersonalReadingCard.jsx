@@ -96,7 +96,13 @@ export default function PersonalReadingCard() {
       </h2>
 
       <p className="card-description">
-        {planName} • {t('reading.next')}: {nextReading.displayText}
+        {planName} • {t('reading.next')}:{' '}
+        <button
+          onClick={() => navigate(`/personal-reading?book=${nextReading.bookNumber}&chapter=${nextReading.chapter}`)}
+          className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors"
+        >
+          {nextReading.displayText}
+        </button>
       </p>
 
       <div className="card-footer card-footer-green">

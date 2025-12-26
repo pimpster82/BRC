@@ -143,8 +143,14 @@ const validateCompletedDates = (completedDates) => {
 }
 
 /**
- * Merge local progress with Firebase progress using timestamp-based logic
- * Last-write-wins: if Firebase version is newer, use it; otherwise use local
+ * Merge local progress with Firebase progress using CORRECT action-based timestamps
+ *
+ * PHASE 3 FIX (Step 1): Timestamps are now set at ACTION TIME (not upload time!)
+ * - When user marks item locally: timestamp = Date.now()
+ * - Timestamp is preserved when uploading to Firebase
+ * - Merge logic uses these ACTION timestamps for last-write-wins
+ *
+ * Last-write-wins strategy: if Firebase version is newer, use it; otherwise use local
  *
  * This is the core multi-device sync logic:
  * - If Firebase data is newer: use Firebase version
@@ -153,16 +159,19 @@ const validateCompletedDates = (completedDates) => {
  *
  * IMPORTANT: Validates completedDates to prevent corruption from invalid date formats
  *
- * @param {Object} localData - Local progress data (from localStorage)
- * @param {Object} firebaseData - Firebase progress data
- * @returns {Object} Merged progress data with merged lastUpdated timestamp
+ * @param {Object} localData - Local progress data (from localStorage, with action-time timestamp!)
+ * @param {Object} firebaseData - Firebase progress data (with preserved action-time timestamp)
+ * @returns {Object} Merged progress data with correct lastUpdated timestamp
  *
  * @example
+ * // Device A marks date 2025-12-25 at 11:00 AM → timestamp = 1703520000000 (11:00)
+ * // Device B marks date 2025-12-25 at 10:00 AM → timestamp = 1703516400000 (10:00)
+ * // When merged: Device A's timestamp is newer → Device A's version wins ✅ (correct!)
  * const merged = mergeProgress(
- *   { completedDates: [...], lastUpdated: 1000 },
- *   { completedDates: [...], lastUpdated: 2000 }
+ *   { completedDates: ['2025-12-25'], lastUpdated: 1703520000000 }, // A's action time
+ *   { completedDates: ['2025-12-25'], lastUpdated: 1703516400000 }  // B's action time
  * )
- * // Returns version with lastUpdated: 2000 (Firebase version won)
+ * // Returns A's version with lastUpdated: 1703520000000 (A marked it later)
  */
 export const mergeProgress = (localData, firebaseData) => {
   // If one is missing, return the other (with validation)
@@ -182,9 +191,10 @@ export const mergeProgress = (localData, firebaseData) => {
   const localTimestamp = localData.lastUpdated || 0
   const firebaseTimestamp = firebaseData.lastUpdated || 0
 
-  // Last-write-wins: newer timestamp overwrites
+  // Last-write-wins: newer ACTION timestamp overwrites
+  // (These are now real action timestamps, not upload timestamps!)
   if (firebaseTimestamp > localTimestamp) {
-    console.log(`ℹ️ Firebase version is newer (${firebaseTimestamp} > ${localTimestamp}), using Firebase data`)
+    console.log(`ℹ️ Firebase action is newer (${firebaseTimestamp} > ${localTimestamp}), using Firebase data`)
     // Validate Firebase data before returning
     if (firebaseData?.completedDates) {
       const validatedDates = validateCompletedDates(firebaseData.completedDates)
@@ -195,7 +205,7 @@ export const mergeProgress = (localData, firebaseData) => {
     }
     return firebaseData
   } else if (localTimestamp > firebaseTimestamp) {
-    console.log(`ℹ️ Local version is newer (${localTimestamp} > ${firebaseTimestamp}), using local data`)
+    console.log(`ℹ️ Local action is newer (${localTimestamp} > ${firebaseTimestamp}), using local data`)
     // Validate local data
     if (localData?.completedDates) {
       const validatedDates = validateCompletedDates(localData.completedDates)
@@ -207,7 +217,7 @@ export const mergeProgress = (localData, firebaseData) => {
     return localData
   } else {
     // Equal timestamps - use Firebase as tiebreaker
-    console.log(`ℹ️ Timestamps equal, using Firebase version as tiebreaker`)
+    console.log(`ℹ️ Action timestamps equal, using Firebase version as tiebreaker`)
     // Validate Firebase data
     if (firebaseData?.completedDates) {
       const validatedDates = validateCompletedDates(firebaseData.completedDates)

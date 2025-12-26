@@ -245,11 +245,21 @@ function HomePage() {
     return new Date()
   }
 
-  // Get today's date in German format
+  // Get today's date in language-specific format
   const getFormattedDate = () => {
     const date = getCurrentDate()
+    const language = getCurrentLanguage()
+    // Map app language codes to Intl locale codes
+    const localeMap = {
+      de: 'de-DE',
+      en: 'en-US',
+      es: 'es-ES',
+      it: 'it-IT',
+      fr: 'fr-FR'
+    }
+    const locale = localeMap[language] || 'en-US'
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
-    const formatted = date.toLocaleDateString('de-DE', options)
+    const formatted = date.toLocaleDateString(locale, options)
     // Capitalize first letter
     return formatted.charAt(0).toUpperCase() + formatted.slice(1)
   }
@@ -353,7 +363,7 @@ function HomePage() {
               >
                 <Calendar className={`w-5 h-5 ${testDate ? 'text-orange-600' : ''}`} />
               </button>
-              {t('nav.today')} - {getFormattedDate()}
+              {getFormattedDate()}
             </h1>
             <div className="flex items-center gap-2">
               <button

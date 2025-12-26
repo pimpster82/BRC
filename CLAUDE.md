@@ -376,13 +376,57 @@ const userProgress = {
 // Parents and kids download same schedule once, sync to one place
 ```
 
-### iOS Native App Roadiness
+### Modular Reading Plans (Phase 5+)
+
+**Current State (Phase 1-4):**
+- **Free Plan** & **Thematic Plan:** Hardcoded in source (`reading-categories.js`, `thematic-topics.js`)
+- Require code changes and deployment to modify
+- Works offline without issues
+
+**Future State (Phase 5+) - Downloadable Plan Modules:**
+- **Chronological Plan** & **One-Year Plan** (and others) will be Firebase-installable
+- Users can download/install custom reading plans like "app modules"
+- Admin can publish new plans without code deployment
+
+**Firebase Structure (Phase 5):**
+```
+/reading-plans/
+  ├── chronological/
+  │   ├── metadata.json { name, version, author, compatible_versions }
+  │   └── data.json { chapters, order, pacing }
+  │
+  ├── one-year/
+  │   ├── metadata.json
+  │   └── data.json
+  │
+  └── custom-plans/ (Phase 5+)
+      ├── {planSlug}/
+      │   ├── metadata.json
+      │   └── data.json
+```
+
+**Loading Strategy (Phase 5):**
+1. Check app-bundled plans (Free, Thematic) - static
+2. Check localStorage for installed plans
+3. Check Firebase for available plans to download
+4. Show "Install" button in UI for new plans
+5. Users can enable/disable installed plans
+
+**Benefits:**
+- ✅ Zero deployment for new plans
+- ✅ Users can customize (create community plans)
+- ✅ Offline support (cached after install)
+- ✅ Easy rollback (just uninstall module)
+- ✅ Versioning and compatibility checks
+
+### iOS Native App Readiness
 
 The Firebase backend enables building a native iOS app that:
 - Reads schedules from `/schedules/{year}/` (shared)
 - Stores user progress at `users/{userId}/` (private)
 - Uses Firebase Cloud Messaging for notifications
 - Syncs offline changes when back online
+- **Future:** Supports modular reading plans from Firebase
 
 No backend API server needed - Firebase Realtime Database handles all data needs.
 

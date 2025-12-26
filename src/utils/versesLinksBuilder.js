@@ -50,7 +50,7 @@ export const parseVersesString = (versesString, language = null) => {
   const lang = language || getCurrentLanguage()
   const trimmed = versesString.trim()
 
-  // Pattern 1: "Book chapter-chapter" (e.g., "Ruth chapters 1-4")
+  // Pattern 1: "Book chapters? 1-4" (e.g., "Ruth chapters 1-4" or "Ruth chapter 1-4")
   const chapterRangeMatch = trimmed.match(/^([A-Za-z\s\.]+?)\s+chapters?\s+(\d+)\s*-\s*(\d+)$/i)
   if (chapterRangeMatch) {
     const book = findBookByName(chapterRangeMatch[1], lang)
@@ -66,7 +66,23 @@ export const parseVersesString = (versesString, language = null) => {
     }
   }
 
-  // Pattern 2: "Book chapter:verse–chapter:verse" (e.g., "Genesis 6:9–9:19")
+  // Pattern 2: "Book chapter 5" or "Book chapters 5" (e.g., "Daniel chapter 6", "1 Samuel chapter 17")
+  const singleChapterMatch = trimmed.match(/^([A-Za-z\s\.]+?)\s+chapters?\s+(\d+)$/i)
+  if (singleChapterMatch) {
+    const book = findBookByName(singleChapterMatch[1], lang)
+    if (book) {
+      return {
+        book,
+        startChapter: parseInt(singleChapterMatch[2]),
+        startVerse: 1,
+        endChapter: parseInt(singleChapterMatch[2]),
+        endVerse: -1, // -1 means full chapter
+        text: trimmed
+      }
+    }
+  }
+
+  // Pattern 3: "Book chapter:verse–chapter:verse" (e.g., "Genesis 6:9–9:19", "Exodus 13:17–14:31")
   const verseRangeMatch = trimmed.match(/^([A-Za-z\s\.]+?)\s+(\d+):(\d+)[–-](\d+):(\d+)$/i)
   if (verseRangeMatch) {
     const book = findBookByName(verseRangeMatch[1], lang)
@@ -82,7 +98,23 @@ export const parseVersesString = (versesString, language = null) => {
     }
   }
 
-  // Pattern 3: "Book chapter:verse" (e.g., "Psalm 23")
+  // Pattern 4: "Book chapter:verse-verse" within same chapter (e.g., "1 Samuel 25:2-35")
+  const sameChapterMatch = trimmed.match(/^([A-Za-z\s\.]+?)\s+(\d+):(\d+)-(\d+)$/i)
+  if (sameChapterMatch) {
+    const book = findBookByName(sameChapterMatch[1], lang)
+    if (book) {
+      return {
+        book,
+        startChapter: parseInt(sameChapterMatch[2]),
+        startVerse: parseInt(sameChapterMatch[3]),
+        endChapter: parseInt(sameChapterMatch[2]),
+        endVerse: parseInt(sameChapterMatch[4]),
+        text: trimmed
+      }
+    }
+  }
+
+  // Pattern 5: "Book chapter" or "Book chapter:verse" (e.g., "Psalm 23", "Psalm 55:22")
   const singleVerseMatch = trimmed.match(/^([A-Za-z\s\.]+?)\s+(\d+)(?::(\d+))?$/i)
   if (singleVerseMatch) {
     const book = findBookByName(singleVerseMatch[1], lang)
@@ -143,19 +175,52 @@ export const buildVersesLink = (versesString, language = null) => {
 }
 
 /**
- * Parse multiple verses strings (separated by semicolon)
+ * Parse multiple verses strings (separated by semicolon or comma)
+ * Handles formats like:
+ * - "Psalm 55:22; 62:8; 1 John 5:14" (semicolon-separated)
+ * - "Ephesians 5:28, 29, 33; 6:1-4" (mixed comma and semicolon)
  * Returns array of link objects
  */
 export const parseMultipleVerses = (versesString, language = null) => {
   if (!versesString || typeof versesString !== 'string') return []
 
-  const parts = versesString.split(/;\s*/)
+  const lang = language || getCurrentLanguage()
   const links = []
 
-  for (const part of parts) {
-    const link = buildVersesLink(part, language)
-    if (link) {
-      links.push(link)
+  // First, split by semicolon to get main sections
+  const sections = versesString.split(/;\s*/)
+
+  for (const section of sections) {
+    // For each section, check if it has comma-separated verses
+    // Pattern: "Book chapter:verse, verse, verse" or "Book chapter:verse-verse"
+    const commaMatch = section.match(/^([A-Za-z\s\.]+?)\s+(\d+):(\d+)(?:,\s*(\d+))+/)
+
+    if (commaMatch) {
+      // This is a comma-separated verses within same chapter (e.g., "Ephesians 5:28, 29, 33")
+      // Try to parse each verse individually
+      const bookName = commaMatch[1]
+      const chapter = commaMatch[2]
+
+      // Extract all verse numbers
+      const verseMatches = section.matchAll(/(\d+)/g)
+      const verses = Array.from(verseMatches).map(m => m[1])
+
+      if (verses.length > 0) {
+        // Use the first verse as representative link
+        const firstVerse = verses[0]
+        const link = buildVersesLink(`${bookName} ${chapter}:${firstVerse}`, lang)
+        if (link) {
+          // Update text to show all verses
+          link.text = section.trim()
+          links.push(link)
+        }
+      }
+    } else {
+      // Regular parsing for non-comma verses
+      const link = buildVersesLink(section, lang)
+      if (link) {
+        links.push(link)
+      }
     }
   }
 

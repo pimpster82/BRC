@@ -591,27 +591,23 @@ export default function PersonalReadingPage() {
                               <div className={`border-t p-3 ${isCompleted ? 'border-purple-200 bg-white' : 'border-gray-100 bg-white'}`}>
                                 {(() => {
                                   const versesLinks = parseMultipleVerses(topic.verses, language)
-                                  if (versesLinks.length > 0) {
-                                    return (
-                                      <div className="flex flex-wrap gap-2">
-                                        {versesLinks.map((link, idx) => (
-                                          <a
-                                            key={idx}
-                                            href={link.url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="inline-block px-2 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 hover:text-blue-900 rounded text-xs font-medium transition-colors"
-                                            title={`Open ${link.book} on JW.org`}
-                                          >
-                                            {link.text}
-                                            <ExternalLink className="inline w-3 h-3 ml-1" />
-                                          </a>
-                                        ))}
-                                      </div>
-                                    )
-                                  } else {
-                                    return <p className="text-xs text-gray-600 font-mono">{topic.verses}</p>
-                                  }
+                                  return (
+                                    <div className="flex flex-wrap gap-2">
+                                      {versesLinks.map((link, idx) => (
+                                        <a
+                                          key={idx}
+                                          href={link.url}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors"
+                                          title={`Open ${link.book} on JW.org`}
+                                        >
+                                          {link.text}
+                                          <ExternalLink className="inline w-3 h-3 ml-1" />
+                                        </a>
+                                      ))}
+                                    </div>
+                                  )
                                 })()}
                               </div>
                             )}

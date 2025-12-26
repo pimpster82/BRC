@@ -55,7 +55,7 @@ export default function PersonalReadingPage() {
   const [isSelectMode, setIsSelectMode] = useState(false) // Chapter selection mode
   const [selectedChapters, setSelectedChapters] = useState(new Set()) // Selected chapters for batch operations
 
-  // Find the category ID of the last-read chapter
+  // Find the category ID of the last-read chapter (for Free plan)
   const getLastReadCategoryId = () => {
     if (!personalData || !personalData.chaptersRead || personalData.chaptersRead.length === 0) {
       return null
@@ -79,6 +79,29 @@ export default function PersonalReadingPage() {
     return null
   }
 
+  // Find the last-read thematic topic ID (for Thematic plan)
+  const getLastReadThematicTopicId = () => {
+    if (!personalData || !personalData.thematicTopicsRead || personalData.thematicTopicsRead.length === 0) {
+      return null
+    }
+
+    // Find the most recently read topic (thematicTopicsRead is an array of topic IDs)
+    // Since we need timestamp, we'll check thematicTopicsRead structure
+    // If it's just IDs, use the last one in the array
+    // If it's objects with timestamps, find the most recent
+    const lastItem = personalData.thematicTopicsRead[personalData.thematicTopicsRead.length - 1]
+
+    if (typeof lastItem === 'number') {
+      // It's just a topic ID
+      return lastItem
+    } else if (typeof lastItem === 'object' && lastItem.topicId) {
+      // It's an object with topicId property
+      return lastItem.topicId
+    }
+
+    return null
+  }
+
   // Load data on mount
   useEffect(() => {
     const data = getPersonalReadingData()
@@ -91,6 +114,12 @@ export default function PersonalReadingPage() {
     const lastReadCategoryId = getLastReadCategoryId()
     if (lastReadCategoryId) {
       setExpandedCategories({ [lastReadCategoryId]: true })
+    }
+
+    // Initialize expandedTopics to show only the last-read thematic topic
+    const lastReadTopicId = getLastReadThematicTopicId()
+    if (lastReadTopicId) {
+      setExpandedTopics({ [lastReadTopicId]: true })
     }
 
     // Handle query parameters (e.g., ?book=1&chapter=5)

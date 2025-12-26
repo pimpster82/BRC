@@ -154,7 +154,7 @@ export const parseReadingInput = (input, defaultBook = null) => {
 
   const trimmed = input.trim()
   if (!trimmed) {
-    return { chapters: [], error: 'Bitte Eingabe machen' }
+    return { chapters: [], errorKey: ERROR_KEYS.INVALID_INPUT }
   }
 
   try {
@@ -227,8 +227,8 @@ export const parseReadingInput = (input, defaultBook = null) => {
 
       for (const part of parts) {
         const result = parseSingleReference(part.trim(), book)
-        if (result.error) {
-          return { chapters: [], book, error: result.error }
+        if (result.errorKey) {
+          return { chapters: [], book, errorKey: result.errorKey, errorParams: result.errorParams }
         }
         allChapters.push(...result.chapters)
       }
@@ -239,7 +239,7 @@ export const parseReadingInput = (input, defaultBook = null) => {
     // Parse single reference
     return { ...parseSingleReference(cleaned, book), book }
   } catch (error) {
-    return { chapters: [], error: 'Fehler beim Parsen' }
+    return { chapters: [], errorKey: ERROR_KEYS.PARSING_ERROR }
   }
 }
 
@@ -399,7 +399,8 @@ const parseSingleReference = (cleaned, book) => {
                 suggestions.push({
                   type: 'verse',
                   display: `${possibleChapter}:${possibleVerse}`,
-                  description: `Kapitel ${possibleChapter}, Vers ${possibleVerse}`
+                  descriptionKey: 'reading.suggest_chapter_verse',
+                  descriptionParams: { chapter: possibleChapter, verse: possibleVerse }
                 })
               }
             }
@@ -413,7 +414,8 @@ const parseSingleReference = (cleaned, book) => {
                 suggestions.push({
                   type: 'range',
                   display: `${rangeStart}-${rangeEnd}`,
-                  description: `Kapitel ${rangeStart} bis ${rangeEnd}`
+                  descriptionKey: 'reading.suggest_chapter_range',
+                  descriptionParams: { start: rangeStart, end: rangeEnd }
                 })
               }
             }
@@ -485,24 +487,28 @@ const parseVerses = (versePart) => {
 }
 
 /**
- * Format chapter status for display
+ * Format chapter status for display - returns translation key and params
+ * Component must translate using these keys
  */
 export const formatChapterStatus = (chapterData) => {
-  if (!chapterData) return 'Nicht gelesen'
+  if (!chapterData) {
+    return { key: 'reading.status_not_read', params: {} }
+  }
 
   if (chapterData.status === 'complete') {
-    return 'Komplett gelesen'
+    return { key: 'reading.status_complete', params: {} }
   }
 
   if (chapterData.status === 'partial') {
-    return `Bis Vers ${chapterData.verses}`
+    return { key: 'reading.status_partial', params: { verse: chapterData.verses } }
   }
 
-  return 'Nicht gelesen'
+  return { key: 'reading.status_not_read', params: {} }
 }
 
 /**
- * Get next reading suggestion
+ * Get next reading suggestion - returns translation key and params
+ * Component must translate using this key
  */
 export const getNextReading = (chapterData) => {
   if (!chapterData || chapterData.status === 'complete') {
@@ -510,7 +516,7 @@ export const getNextReading = (chapterData) => {
   }
 
   if (chapterData.status === 'partial' && chapterData.continueFrom) {
-    return `Weiter ab Vers ${chapterData.continueFrom}`
+    return { key: 'reading.status_continue', params: { verse: chapterData.continueFrom } }
   }
 
   return null

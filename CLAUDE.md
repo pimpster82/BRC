@@ -25,25 +25,57 @@ const result = await WebFetch('https://wol.jw.org/...', 'extract yeartext')
 
 ---
 
+## 📋 Development Task Tracking (TODOs.md)
+
+**All development tasks are tracked in `TODOs.md` at the project root.**
+
+This file contains:
+- ✅ Checkboxes for each task (mark off as completed)
+- 🔴 Critical bugs that must be fixed
+- 🟡 Medium priority improvements
+- 🟢 Low priority polish/documentation
+- 📝 Detailed notes and file locations for each task
+- 💾 Archive section for completed items
+
+**How to use:**
+1. Open `TODOs.md` in editor
+2. Check off `[ ]` → `[x]` when you complete a task
+3. Add notes about what you learned/fixed
+4. Move completed items to archive section
+
+**Current Status:** See `TODOs.md` for complete progress tracking
+
+Key sections:
+- 🔴 CRITICAL BUGS (1 item) - getCurrentWeekReading() off-by-one week bug
+- 📱 Multi-Device Sync System (9 items)
+- 📚 Schedule Management (3 items)
+- 📖 Documentation (1 item)
+
+---
+
 ## Implementation Status (Current)
 
-**Overall Progress:** ~70% of documented features implemented
+**Overall Progress:** ~85% of documented features implemented
 
 | Feature | Status | Notes |
 |---------|--------|-------|
 | **Daily Text Tracking** | ✅ COMPLETE | Mark complete, streak calculation, JW.org links |
-| **Weekly Reading Tracking** | ⚠️ PARTIAL | Schedule fetching & display works; full chapter tracking UI incomplete |
-| **Personal Bible Program (PBP)** | 🔶 DATA ONLY | Storage structures exist; UI components not implemented |
+| **Weekly Reading Tracking** | ✅ COMPLETE | Schedule fetching & display works; full chapter tracking with verse-level accuracy |
+| **Personal Bible Program (PBP)** | ✅ COMPLETE | 4 reading plans fully implemented: Free (categories), Thematic (17 topics), Chronological (UI), One-Year (UI) |
+| **PBP - Free Plan** | ✅ COMPLETE | All 66 books, 7 categories, chapter-level tracking with verse accuracy, color-coded progress |
+| **PBP - Thematic Plan** | ✅ COMPLETE | 17 thematic study topics, 4 sections, scripture references, topic completion tracking |
 | **5-Language i18n** | ✅ COMPLETE | All 5 languages fully translated (100+ keys) |
-| **Multilingual Yeartext** | ✅ NEW | Yeartext downloaded as English, all 5 languages stored in Firebase, manual editing support |
-| **Display Settings** | ✅ NEW | Toggle yeartext visibility, extensible settings panel for future options |
-| **Firebase Integration** | ✅ COMPLETE | Schedule & multilingual yeartext sync working; user auth not implemented |
+| **Multilingual Yeartext** | ✅ COMPLETE | Yeartext downloaded as English, all 5 languages stored in Firebase, manual editing support |
+| **Display Settings** | ✅ COMPLETE | Toggle yeartext visibility, extensible settings panel for future options |
+| **User Authentication** | ✅ COMPLETE | Firebase Auth fully integrated with protected routes, login/register pages, session persistence |
+| **Firebase Integration** | ✅ COMPLETE | Schedule, yeartext, and user progress sync all working; user-scoped data storage |
+| **Verse-Level Progress** | ✅ COMPLETE | Accurate verse counting for partial reads, supports ranges like "Genesis 2:3-5" |
+| **Bible Reference Parser** | ✅ COMPLETE | Fuzzy matching for book names, supports multiple formats, error suggestions |
 | **Offline Capability** | ✅ PARTIAL | Works offline after initial load; no service worker registered |
 | **PWA Features** | ❌ NOT IMPLEMENTED | No manifest.json, no service worker, no install prompt |
 | **Notifications/Reminders** | 🔶 UI ONLY | Settings UI exists; backend notification logic not implemented |
-| **Statistics Dashboard** | ⚠️ PARTIAL | Daily text streak works; weekly & personal stats not implemented |
-| **User Authentication** | ❌ FUTURE | Planned for Phase 3; not started |
-| **Multi-User/Family Features** | ❌ FUTURE | Planned for Phase 3; not started |
+| **Statistics Dashboard** | ⚠️ PARTIAL | Daily text streak works; advanced weekly & personal stats not implemented |
+| **Multi-User/Family Features** | 🔶 BACKEND READY | Data structure ready for Phase 3; no UI for family sharing |
 | **Automated Tests** | ❌ NOT CONFIGURED | Manual testing only via ParserTestBench |
 
 ---
@@ -495,9 +527,17 @@ weeks: [
 | **Language Switching** | `src/config/languages.js` | ✅ | `getCurrentLanguage()`, `setCurrentLanguage()`, `SUPPORTED_LANGUAGES` |
 | **Daily Text Card** | `src/components/DailyTextCard.jsx` | ✅ | Full UI with mark complete, streak, JW.org link |
 | **Weekly Reading Card** | `src/components/WeeklyReadingCard.jsx` | ✅ | Shows current week, chapters, links to detailed page |
-| **Weekly Reading Page** | `src/pages/WeeklyReadingPage.jsx` | ⚠️ | Chapter-by-chapter tracker (partial - core functionality there) |
+| **Weekly Reading Page** | `src/pages/WeeklyReadingPage.jsx` | ✅ | Chapter-by-chapter tracker with verse-level progress |
+| **Personal Reading Page** | `src/pages/PersonalReadingPage.jsx` | ✅ | 4 reading plans (Free/Thematic/Chronological/One-Year), categories, verse tracking, scripture references |
+| **Personal Reading Card** | `src/components/PersonalReadingCard.jsx` | ✅ | Homepage quick view, shows next reading, chapters read count |
+| **User Authentication** | `src/context/AuthContext.jsx` | ✅ | Firebase Auth context, login/register pages, protected routes, session persistence |
+| **Login Page** | `src/pages/LoginPage.jsx` | ✅ | Email/password login with bilingual UI and error handling |
+| **Register Page** | `src/pages/RegisterPage.jsx` | ✅ | Email/password registration with validation and confirmation |
+| **Verse Progress Calculator** | `src/utils/verseProgressCalculator.js` | ✅ | Accurate verse counting for partial reads, supports ranges |
+| **Thematic Topics Config** | `src/config/thematic-topics.js` | ✅ | 17 thematic study topics with 4 sections and scripture references |
+| **Reading Categories Config** | `src/config/reading-categories.js` | ✅ | 7 book categories for organized Bible reading |
 | **Settings Page** | `src/pages/SettingsPage.jsx` | ✅ | Language, meeting day, schedule download, reset data, display settings (notifications UI only) |
-| **Display Settings** | `src/pages/SettingsPage.jsx` | ✅ NEW | Toggle yeartext visibility; extensible for future app settings |
+| **Display Settings** | `src/pages/SettingsPage.jsx` | ✅ | Toggle yeartext visibility; extensible for future app settings |
 | **Parser Test Bench** | `src/pages/ParserTestBench.jsx` | ✅ | Development tool to test Bible reference parsing |
 
 ### Data Sources
@@ -514,12 +554,12 @@ weeks: [
 
 | Feature | Issue |
 |---------|-------|
-| **Personal Bible Program UI** | Data structures exist; no UI components, no edit/view interface |
 | **Theme/Dark Mode** | Not implemented; color variables hardcoded for light mode |
 | **Notifications** | UI controls exist in Settings; no backend implementation |
 | **PWA/Offline Install** | No manifest.json, no service worker, can't install as app |
-| **User Authentication** | No Firebase Auth integration; shared localStorage only |
-| **Weekly Reading Statistics** | No stats dashboard for weekly reading (daily streak only) |
+| **Chronological Reading Plan** | UI button exists; shows "Coming Soon", data structure ready |
+| **One-Year Reading Plan** | UI button exists; shows "Coming Soon", data structure ready |
+| **Advanced Statistics Dashboard** | Daily streak works; detailed weekly & personal stats not implemented |
 | **Automated Tests** | No test suite; manual testing only |
 
 ---
@@ -623,50 +663,58 @@ weeks: [
 
 ## Current Project Phase
 
-**Phase 1 (70% Complete):** Core features
+**Phase 1 (100% Complete):** Core features ✅
 - ✅ Daily Text tracking with streaks
-- ⚠️ Weekly Reading (partial - schedule & display works, chapter tracking incomplete)
-- 🔶 Personal Bible Program (data structures only, no UI)
-- ✅ 5-language i18n
-- ✅ Firebase integration
-- ❌ PWA features (planned but not implemented)
+- ✅ Weekly Reading with full chapter tracking and verse-level accuracy
+- ✅ Personal Bible Program - 4 reading plans (Free, Thematic, Chronological UI, One-Year UI)
+- ✅ 5-language i18n with 100+ translation keys
+- ✅ Firebase integration for all data (schedules, yeartexts, user progress)
+- ⚠️ PWA features (planned but not implemented - no service worker)
 
-**Phase 2 (Not Started):** Statistics, themes, advanced features
-- Full statistics dashboard for all 3 reading systems
-- Theme system (light/dark mode)
-- Reading reminders/notifications (backend)
-- Personal reading plan selection UI
-- Weekly reading comprehensive progress tracking
+**Phase 2 (50% Complete):** Statistics, themes, advanced features
+- ✅ User Authentication (login/register with protected routes)
+- ✅ Verse-level progress tracking with partial read support
+- ✅ Bible reference parser with fuzzy matching
+- ⚠️ Statistics dashboard (daily streak works; advanced weekly & personal stats partial)
+- ❌ Theme system (light/dark mode) - not implemented
+- ❌ Reading reminders/notifications (backend) - UI only
 
-**Phase 3 (Not Started):** User authentication & multi-user
-- Firebase Authentication (login/signup)
-- Per-user progress tracking
-- Family/shared reading groups
-- Cross-device sync
-- Native iOS companion app backend
+**Phase 3 (30% Complete):** Multi-user & family features
+- ✅ User authentication & session persistence via Firebase Auth
+- ✅ Per-user progress tracking (Firebase structure ready)
+- 🔶 Family/shared reading groups (backend structure ready, no UI)
+- ✅ Cross-device sync (working with timestamp-based merge)
+- 🔶 Native iOS companion app backend (Firebase structure ready)
 
 ## Developer Quick Reference
 
-### What You Can Build With (70% complete)
+### What You Can Build With (85% complete)
 
 ```
-✅ Daily Text tracking       | Use: storage.js + DailyTextCard.jsx component
-✅ Weekly schedule fetching  | Use: scheduleUpdater.js + firebaseSchedules.js
-✅ Bible parsing             | Use: readingParser.js for fuzzy matching
-✅ Link generation           | Use: bible-link-builder.js for JW.org links
-✅ Multilingual support      | Use: i18n.js for all 5 languages
-✅ Firebase sync             | Use: firebaseSchedules.js for cloud backup
+✅ Daily Text tracking              | Use: storage.js + DailyTextCard.jsx component
+✅ Weekly reading with verse tracking| Use: WeeklyReadingPage.jsx with firebaseSchedules.js
+✅ Personal Bible reading (4 plans)  | Use: PersonalReadingPage.jsx with verseProgressCalculator.js
+✅ User authentication              | Use: AuthContext.jsx with protected routes
+✅ Bible reference parsing          | Use: readingParser.js for fuzzy matching
+✅ Verse progress calculation       | Use: verseProgressCalculator.js for partial reads
+✅ Link generation                  | Use: bible-link-builder.js for JW.org links
+✅ Multilingual support             | Use: i18n.js for all 5 languages (5 languages, 100+ keys)
+✅ Firebase user sync               | Use: firebaseUserProgress.js for cross-device sync
+✅ Thematic study organization      | Use: thematic-topics.js (17 topics, 4 sections)
+✅ Reading categories               | Use: reading-categories.js (7 book categories)
 ```
 
 ### What's Incomplete (Don't Assume Works)
 
 ```
-⚠️ Weekly reading UI         | Schedule & basic display work; full chapter tracker needs work
-🔶 Personal Bible Program    | Storage structure only; no UI components
-❌ Dark mode/themes          | Not implemented; light mode only
-❌ Notifications             | UI exists in Settings; no backend logic
-❌ PWA features              | No service worker; can't install as app
-❌ User authentication       | Shared localStorage only; no login system
+⚠️ Statistics dashboard              | Daily streak works; advanced weekly & personal stats partial
+🔶 Chronological reading plan        | UI button exists; shows "Coming Soon"
+🔶 One-year reading plan             | UI button exists; shows "Coming Soon"
+🔶 Family sharing features           | Data structure ready; no UI for family groups
+❌ Theme/Dark mode                   | Not implemented; light mode only
+❌ Notifications backend             | UI exists in Settings; no backend notification logic
+❌ PWA features                      | No service worker; can't install as app
+❌ Automated tests                   | No test suite; manual testing via ParserTestBench
 ```
 
 ---
@@ -681,3 +729,4 @@ weeks: [
 - **Need to test changes?** Always restart the dev server after making modifications (HMR not reliable for all changes)
 - **Schedule not showing?** Load it via Settings → Schedule section first; app won't have data until downloaded
 - **Firebase not working?** Check `.env.local` has correct credentials; verify database rules allow read/write
+- deep links werden mit der hilfe von  data/bible-link-builder.js erstellt

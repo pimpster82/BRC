@@ -8,6 +8,7 @@ import ParserTestBench from './pages/ParserTestBench'
 import SettingsPage from './pages/SettingsPage'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
+import PersonalReadingPage from './pages/PersonalReadingPage'
 
 /**
  * ProtectedRoute - Only allows authenticated users
@@ -41,6 +42,7 @@ function App() {
           {/* Protected Routes */}
           <Route path="/" element={<ProtectedRoute element={<HomePage />} />} />
           <Route path="/weekly" element={<ProtectedRoute element={<WeeklyReadingPage />} />} />
+          <Route path="/personal-reading" element={<ProtectedRoute element={<PersonalReadingPage />} />} />
           <Route path="/test-parser" element={<ProtectedRoute element={<ParserTestBench />} />} />
           <Route path="/settings" element={<ProtectedRoute element={<SettingsPage />} />} />
         </Routes>

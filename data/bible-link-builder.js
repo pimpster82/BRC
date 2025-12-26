@@ -186,7 +186,7 @@ export function buildLanguageSpecificWebLink(bookNumber, chapter, startVerse = 1
 
   // Map language codes to JW.org wtlocale codes for mobile-friendly finder URLs
   const localeCodeMap = {
-    'de': 'D',  // Deutsch
+    'de': 'X',  // Deutsch (X = German on JW.org)
     'en': 'E',  // English
     'es': 'S',  // Español
     'it': 'I',  // Italiano

@@ -171,6 +171,7 @@ export const getPersonalReadingData = () => {
   if (!data) {
     return {
       chaptersRead: [],
+      thematicTopicsRead: [],
       selectedPlan: 'free'
     }
   }
@@ -178,12 +179,14 @@ export const getPersonalReadingData = () => {
     const parsed = JSON.parse(data)
     return {
       chaptersRead: Array.isArray(parsed.chaptersRead) ? parsed.chaptersRead : [],
+      thematicTopicsRead: Array.isArray(parsed.thematicTopicsRead) ? parsed.thematicTopicsRead : [],
       selectedPlan: typeof parsed.selectedPlan === 'string' ? parsed.selectedPlan : 'free'
     }
   } catch (error) {
     console.warn('⚠️ Corrupted personal reading data in localStorage, resetting:', error)
     return {
       chaptersRead: [],
+      thematicTopicsRead: [],
       selectedPlan: 'free'
     }
   }
@@ -191,6 +194,63 @@ export const getPersonalReadingData = () => {
 
 export const savePersonalReadingData = (data) => {
   localStorage.setItem(STORAGE_KEYS.PERSONAL_READING, JSON.stringify(data))
+}
+
+/**
+ * Mark a thematic topic as read
+ * @param {number} topicId - The topic ID from thematic-topics.js
+ * @returns {Object} Updated personal reading data
+ */
+export const markThematicTopicComplete = (topicId) => {
+  const data = getPersonalReadingData()
+
+  if (!data.thematicTopicsRead.includes(topicId)) {
+    data.thematicTopicsRead.push(topicId)
+  }
+
+  savePersonalReadingData(data)
+  return data
+}
+
+/**
+ * Unmark a thematic topic as read
+ * @param {number} topicId - The topic ID from thematic-topics.js
+ * @returns {Object} Updated personal reading data
+ */
+export const unmarkThematicTopicComplete = (topicId) => {
+  const data = getPersonalReadingData()
+
+  data.thematicTopicsRead = data.thematicTopicsRead.filter(id => id !== topicId)
+
+  savePersonalReadingData(data)
+  return data
+}
+
+/**
+ * Check if a thematic topic is marked as read
+ * @param {number} topicId - The topic ID from thematic-topics.js
+ * @returns {boolean} Whether the topic has been marked as read
+ */
+export const isThematicTopicComplete = (topicId) => {
+  const data = getPersonalReadingData()
+  return data.thematicTopicsRead.includes(topicId)
+}
+
+/**
+ * Get progress for thematic plan
+ * @returns {Object} { completed: number, total: number, percentage: number }
+ */
+export const getThematicProgress = () => {
+  const data = getPersonalReadingData()
+  // We'll calculate total from thematicTopics which has 17 total topics
+  const total = 17 // From thematic-topics.js
+  const completed = data.thematicTopicsRead.length
+
+  return {
+    completed,
+    total,
+    percentage: total > 0 ? Math.round((completed / total) * 100) : 0
+  }
 }
 
 // Schedule Storage Functions (Local Cache)

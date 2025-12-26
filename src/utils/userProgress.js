@@ -117,6 +117,32 @@ export const loadAllUserProgress = async (userId) => {
 }
 
 /**
+ * Validate that completedDates array contains only valid YYYY-MM-DD format dates
+ * Filters out any invalid entries to prevent streak calculation corruption
+ *
+ * @param {Array} completedDates - Array of date strings
+ * @returns {Array} Validated array containing only valid YYYY-MM-DD dates
+ */
+const validateCompletedDates = (completedDates) => {
+  if (!Array.isArray(completedDates)) return []
+
+  // Regex pattern for YYYY-MM-DD format
+  const datePattern = /^\d{4}-\d{2}-\d{2}$/
+
+  return completedDates.filter(date => {
+    if (typeof date !== 'string') return false
+    if (!datePattern.test(date)) return false
+
+    // Additional validation: check if it's a valid date
+    const [year, month, day] = date.split('-').map(Number)
+    if (month < 1 || month > 12) return false
+    if (day < 1 || day > 31) return false
+
+    return true
+  })
+}
+
+/**
  * Merge local progress with Firebase progress using timestamp-based logic
  * Last-write-wins: if Firebase version is newer, use it; otherwise use local
  *
@@ -124,6 +150,8 @@ export const loadAllUserProgress = async (userId) => {
  * - If Firebase data is newer: use Firebase version
  * - If local data is newer: use local version (will be uploaded on next save)
  * - If timestamps are equal: use Firebase version (tiebreaker)
+ *
+ * IMPORTANT: Validates completedDates to prevent corruption from invalid date formats
  *
  * @param {Object} localData - Local progress data (from localStorage)
  * @param {Object} firebaseData - Firebase progress data
@@ -137,9 +165,19 @@ export const loadAllUserProgress = async (userId) => {
  * // Returns version with lastUpdated: 2000 (Firebase version won)
  */
 export const mergeProgress = (localData, firebaseData) => {
-  // If one is missing, return the other
-  if (!firebaseData) return localData
-  if (!localData) return firebaseData
+  // If one is missing, return the other (with validation)
+  if (!firebaseData) {
+    if (localData?.completedDates) {
+      localData.completedDates = validateCompletedDates(localData.completedDates)
+    }
+    return localData
+  }
+  if (!localData) {
+    if (firebaseData?.completedDates) {
+      firebaseData.completedDates = validateCompletedDates(firebaseData.completedDates)
+    }
+    return firebaseData
+  }
 
   const localTimestamp = localData.lastUpdated || 0
   const firebaseTimestamp = firebaseData.lastUpdated || 0
@@ -147,13 +185,37 @@ export const mergeProgress = (localData, firebaseData) => {
   // Last-write-wins: newer timestamp overwrites
   if (firebaseTimestamp > localTimestamp) {
     console.log(`ℹ️ Firebase version is newer (${firebaseTimestamp} > ${localTimestamp}), using Firebase data`)
+    // Validate Firebase data before returning
+    if (firebaseData?.completedDates) {
+      const validatedDates = validateCompletedDates(firebaseData.completedDates)
+      if (validatedDates.length !== firebaseData.completedDates.length) {
+        console.warn(`⚠️ Firebase completedDates had ${firebaseData.completedDates.length} entries, filtered to ${validatedDates.length} valid dates`)
+        firebaseData.completedDates = validatedDates
+      }
+    }
     return firebaseData
   } else if (localTimestamp > firebaseTimestamp) {
     console.log(`ℹ️ Local version is newer (${localTimestamp} > ${firebaseTimestamp}), using local data`)
+    // Validate local data
+    if (localData?.completedDates) {
+      const validatedDates = validateCompletedDates(localData.completedDates)
+      if (validatedDates.length !== localData.completedDates.length) {
+        console.warn(`⚠️ Local completedDates had ${localData.completedDates.length} entries, filtered to ${validatedDates.length} valid dates`)
+        localData.completedDates = validatedDates
+      }
+    }
     return localData
   } else {
     // Equal timestamps - use Firebase as tiebreaker
     console.log(`ℹ️ Timestamps equal, using Firebase version as tiebreaker`)
+    // Validate Firebase data
+    if (firebaseData?.completedDates) {
+      const validatedDates = validateCompletedDates(firebaseData.completedDates)
+      if (validatedDates.length !== firebaseData.completedDates.length) {
+        console.warn(`⚠️ Firebase completedDates had ${firebaseData.completedDates.length} entries, filtered to ${validatedDates.length} valid dates`)
+        firebaseData.completedDates = validatedDates
+      }
+    }
     return firebaseData
   }
 }

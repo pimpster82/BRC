@@ -6,7 +6,7 @@ import { fetchScheduleFromWOL, fetchYeartextFromWOL } from '../utils/scheduleUpd
 import { saveScheduleToFirebase, saveYeartextToFirebase } from '../utils/firebaseSchedules'
 import { getOrCreateDeviceId, getDeviceName, setDeviceName, getDeviceInfo } from '../utils/deviceId'
 import { t } from '../config/i18n'
-import { APP_VERSION } from '../config/version'
+import { APP_VERSION, BUILD_INFO } from '../config/version'
 import bibleBooks from '../../data/bible-books-en.json'
 
 const SettingsPage = () => {
@@ -278,7 +278,7 @@ const SettingsPage = () => {
         {/* Header */}
         <div className="mb-6 pt-4">
           <button
-            onClick={() => navigate('/')}
+            onClick={() => navigate(-1)}
             className="flex items-center gap-2 text-gray-700 hover:text-gray-900 mb-4"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -778,7 +778,7 @@ const SettingsPage = () => {
 
         {/* Version Info */}
         <div className="text-center text-xs text-gray-500 mt-6 pb-4">
-          <p>{t('settings.version', null, {version: APP_VERSION})}</p>
+          <p>{t('settings.version', null, {version: BUILD_INFO})}</p>
           <p className="mt-1">{t('settings.made_with')}</p>
         </div>
       </div>

@@ -1084,11 +1084,23 @@ export const translations = {
 }
 
 /**
- * Get current language from localStorage
+ * Get current language from localStorage, browser locale, or default
  * @returns {string} Language code (de, en, es, it, fr)
  */
 export const getCurrentLanguage = () => {
-  return localStorage.getItem('app_language') || 'de'
+  // Check localStorage first
+  const saved = localStorage.getItem('app_language')
+  if (saved) return saved
+
+  // Try to detect browser language on first load
+  const browserLang = navigator.language?.toLowerCase().split('-')[0]
+  const supportedLanguages = ['de', 'en', 'es', 'it', 'fr']
+  if (browserLang && supportedLanguages.includes(browserLang)) {
+    return browserLang
+  }
+
+  // Default to English
+  return 'en'
 }
 
 /**

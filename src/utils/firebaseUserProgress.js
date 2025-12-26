@@ -363,3 +363,119 @@ export const clearDeviceDataFromFirebase = async () => {
     }
   }
 }
+
+/**
+ * Process pending sync queue (FIFO)
+ * Called when device comes online to sync offline changes
+ *
+ * @param {string} userId - Firebase user ID
+ * @returns {Promise<Object>} { success, processed, failed, error? }
+ */
+export const processPendingSyncQueue = async (userId) => {
+  if (!userId) {
+    console.warn('⚠️ No user ID provided for queue processing')
+    return { success: false, processed: 0, failed: 0 }
+  }
+
+  if (!isFirebaseConfigured()) {
+    console.warn('⚠️ Firebase not configured, queue cannot be processed')
+    return { success: false, processed: 0, failed: 0 }
+  }
+
+  try {
+    const {
+      getPendingSyncQueue,
+      savePendingSyncQueue,
+      _updateDailyTextInternal,
+      getDailyTextData,
+      getWeeklyReadingData,
+      saveWeeklyReadingData,
+      getPersonalReadingData,
+      savePersonalReadingData
+    } = await import('./storage.js')
+    const { getNextPendingItem, markItemSynced, incrementRetry, getQueueStats } = await import('./syncQueue.js')
+
+    let queue = getPendingSyncQueue()
+    const stats = { success: true, processed: 0, failed: 0 }
+
+    console.log(`🔄 Processing sync queue... Queue size: ${queue.length}`)
+
+    // Process items FIFO until all synced
+    let item = getNextPendingItem(queue)
+    let attempts = 0
+    const maxAttempts = queue.length * 2 // Prevent infinite loop
+
+    while (item && attempts < maxAttempts) {
+      attempts++
+
+      try {
+        console.log(`   Processing queue item: ${item.id}`)
+
+        // Execute the action locally
+        switch (item.section) {
+          case 'daily':
+            // Note: Call internal function to avoid creating another queue item!
+            if (item.action === 'mark_complete') {
+              _updateDailyTextInternal(item.data.date, true)
+            } else if (item.action === 'unmark_complete') {
+              _updateDailyTextInternal(item.data.date, false)
+            }
+            // Sync to Firebase
+            const dailyData = getDailyTextData()
+            await saveDailyProgressToFirebase(dailyData)
+            break
+
+          case 'weekly':
+            // Similar for weekly (when implemented)
+            const weeklyData = getWeeklyReadingData()
+            await saveWeeklyProgressToFirebase(weeklyData)
+            break
+
+          case 'personal':
+            // Similar for personal (when implemented)
+            const personalData = getPersonalReadingData()
+            await savePersonalProgressToFirebase(personalData)
+            break
+        }
+
+        // Mark item as synced
+        queue = markItemSynced(queue, item.id)
+        savePendingSyncQueue(queue)
+        stats.processed++
+        console.log(`   ✓ Synced: ${item.id}`)
+
+        // Get next item
+        item = getNextPendingItem(queue)
+      } catch (error) {
+        console.error(`   ✗ Failed to process ${item.id}: ${error.message}`)
+
+        // Increment retry counter
+        queue = incrementRetry(queue, item.id)
+        savePendingSyncQueue(queue)
+
+        // Skip this item if retries exceeded
+        if (item.retries >= 3) {
+          console.warn(`   ⚠️ Item ${item.id} exceeded max retries, skipping`)
+          queue = markItemSynced(queue, item.id) // Mark as synced to move on
+          savePendingSyncQueue(queue)
+          stats.failed++
+        }
+
+        item = getNextPendingItem(queue)
+      }
+    }
+
+    const finalStats = getQueueStats(queue)
+    console.log(`✓ Queue processing complete. Stats:`, finalStats)
+
+    return stats
+  } catch (error) {
+    console.error('✗ Failed to process sync queue:', error)
+    return {
+      success: false,
+      processed: 0,
+      failed: 0,
+      error: error.message
+    }
+  }
+}

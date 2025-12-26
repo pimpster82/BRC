@@ -1,11 +1,14 @@
 // LocalStorage utility for Bible Reading Companion
 
+import { createQueueItem, enqueueItem } from './syncQueue.js'
+
 const STORAGE_KEYS = {
   DAILY_TEXT: 'bibleCompanion_dailyText',
   WEEKLY_READING: 'bibleCompanion_weeklyReading',
   PERSONAL_READING: 'bibleCompanion_personalReading',
   SCHEDULE_PREFIX: 'bibleCompanion_schedule_',
-  YEARTEXT_PREFIX: 'bibleCompanion_yeartext_'
+  YEARTEXT_PREFIX: 'bibleCompanion_yeartext_',
+  PENDING_SYNC_QUEUE: 'bibleCompanion_pendingSyncQueue'
 }
 
 // Daily Text Storage Functions
@@ -40,22 +43,47 @@ export const saveDailyTextData = (data) => {
   localStorage.setItem(STORAGE_KEYS.DAILY_TEXT, JSON.stringify(data))
 }
 
+// Internal: Update daily text without queue (for queue replay)
+// Exported for use in queue processing
+export const _updateDailyTextInternal = (date, isComplete) => {
+  const data = getDailyTextData()
+  const dateStr = date || getTodayDateString()
+  const isCurrentlyComplete = data.completedDates.includes(dateStr)
+
+  if (isComplete && !isCurrentlyComplete) {
+    // Mark complete
+    data.completedDates.push(dateStr)
+    data.completedDates.sort()
+  } else if (!isComplete && isCurrentlyComplete) {
+    // Unmark complete
+    data.completedDates = data.completedDates.filter(d => d !== dateStr)
+  } else {
+    // Already in desired state
+    return data
+  }
+
+  // Calculate streak and set timestamp
+  data.currentStreak = calculateStreak(data.completedDates)
+  data.lastUpdated = Date.now()
+  saveDailyTextData(data)
+
+  return data
+}
+
 export const markDailyTextComplete = (date) => {
   const data = getDailyTextData()
   const dateStr = date || getTodayDateString()
 
   // Add date if not already completed
   if (!data.completedDates.includes(dateStr)) {
-    data.completedDates.push(dateStr)
-    data.completedDates.sort()
+    // PHASE 3: Add to sync queue for multi-device offline sync
+    const queue = getPendingSyncQueue()
+    const queueItem = createQueueItem('daily', 'mark_complete', { date: dateStr })
+    const updatedQueue = enqueueItem(queue, queueItem)
+    savePendingSyncQueue(updatedQueue)
 
-    // Calculate streak
-    data.currentStreak = calculateStreak(data.completedDates)
-
-    // SYNC FIX: Set timestamp at action time (not upload time!)
-    data.lastUpdated = Date.now()
-
-    saveDailyTextData(data)
+    // Apply locally
+    return _updateDailyTextInternal(dateStr, true)
   }
 
   return data
@@ -65,16 +93,18 @@ export const unmarkDailyTextComplete = (date) => {
   const data = getDailyTextData()
   const dateStr = date || getTodayDateString()
 
-  // Remove date from completed dates
-  data.completedDates = data.completedDates.filter(d => d !== dateStr)
+  // Only process if date is actually marked
+  if (data.completedDates.includes(dateStr)) {
+    // PHASE 3: Add to sync queue for multi-device offline sync
+    const queue = getPendingSyncQueue()
+    const queueItem = createQueueItem('daily', 'unmark_complete', { date: dateStr })
+    const updatedQueue = enqueueItem(queue, queueItem)
+    savePendingSyncQueue(updatedQueue)
 
-  // Recalculate streak
-  data.currentStreak = calculateStreak(data.completedDates)
+    // Apply locally
+    return _updateDailyTextInternal(dateStr, false)
+  }
 
-  // SYNC FIX: Set timestamp at action time (not upload time!)
-  data.lastUpdated = Date.now()
-
-  saveDailyTextData(data)
   return data
 }
 
@@ -549,4 +579,33 @@ export const loadProgressFromFirebase = async (userId) => {
     // Don't throw - graceful degradation (use local data only)
     return null
   }
+}
+
+// ==================== Sync Queue Functions (Phase 3) ====================
+
+/**
+ * Get pending sync queue from localStorage
+ * @returns {Array} Queue items
+ */
+export const getPendingSyncQueue = () => {
+  const data = localStorage.getItem(STORAGE_KEYS.PENDING_SYNC_QUEUE)
+  if (!data) {
+    return []
+  }
+  try {
+    const parsed = JSON.parse(data)
+    return Array.isArray(parsed) ? parsed : []
+  } catch (error) {
+    console.warn('⚠️ Corrupted sync queue data in localStorage, resetting:', error)
+    return []
+  }
+}
+
+/**
+ * Save sync queue to localStorage
+ * @param {Array} queue - Queue items
+ */
+export const savePendingSyncQueue = (queue) => {
+  if (!Array.isArray(queue)) queue = []
+  localStorage.setItem(STORAGE_KEYS.PENDING_SYNC_QUEUE, JSON.stringify(queue))
 }

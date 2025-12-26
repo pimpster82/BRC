@@ -178,14 +178,14 @@
   - **Status:** ✅ FIXED - Improved UX with actionable guidance
 
 ### Thematic Reading Links
-- [ ] **Thematic reading scripture links always navigate to first verse of section**
-  - **Issue:** Links in `src/pages/PersonalReadingPage.jsx` thematic section don't respect verse range
-  - **Current Behavior:** Click any verse range (e.g., "Psalm 117-119:10") → redirects to Genesis 1:1
-  - **Expected Behavior:** Highlight entire scripture section or individual verses within range
-  - **Implementation:** `buildLanguageSpecificWebLink()` in `data/bible-link-builder.js` needs enhancement
-  - **Files:** `src/pages/PersonalReadingPage.jsx`, `data/bible-link-builder.js`
-  - **Priority:** MEDIUM
-  - **Status:** NEEDS ANALYSIS
+- [x] **Thematic reading scripture links always navigate to first verse of section** ✅ FIXED
+  - **Root Cause:** `buildLanguageSpecificWebLink()` only used start verse in JW.org URL, ignored end verse
+  - **Fix Applied:** Enhanced link builder to support verse ranges (BBCCCVVV-BBCCCVVV format) (Commit 6d15652)
+  - **Changes:**
+    - `buildLanguageSpecificWebLink()`: Now creates verse range URLs when `endVerse` specified
+    - `versesLinksBuilder.js`: Improved verse range handling for thematic topics
+  - **Behavior:** Links now highlight correct verse ranges (e.g., "Psalm 117-119:10" → shows those verses)
+  - **Status:** ✅ FIXED
 
 ### Personal Bible Program Card
 - [ ] **PersonalReadingCard "Next: {chapter}" text should be interactive link**
@@ -356,12 +356,12 @@
 | Category | Total | Completed | Status |
 |----------|-------|-----------|--------|
 | Critical Bugs | 1 | 1 | ✅ COMPLETE |
-| Testing Findings (New) | 6 | 2 | 🔴 HIGH (4 pending) |
+| Testing Findings (New) | 6 | 3 | 🔴 HIGH (3 pending) |
 | Multi-Device Sync | 9 | 0 | 🟡 MEDIUM |
 | Schedule Management | 3 | 0 | 🟡 MEDIUM |
 | UI/UX Bugs | 4 | 4 | ✅ COMPLETE |
 | Documentation | 1 | 0 | 🟢 LOW |
-| **TOTAL** | **24** | **7** | **29% Complete** |
+| **TOTAL** | **24** | **8** | **33% Complete** |
 
 ---
 
@@ -387,9 +387,10 @@
 
 ---
 
-**Last Updated:** 2025-12-26 (Auto-fixing phase: 7/24 completed)
+**Last Updated:** 2025-12-26 (Auto-fixing phase: 8/24 completed)
 **Total Tasks:** 24 (18 original + 6 new from testing)
-**Progress:** 7/24 (29%)
+**Progress:** 8/24 (33%)
 **Recent Fixes:**
 - 0d042f3: Language initialization (browser locale detection)
 - cde7b58: Weekly reading UX (error state with Settings link)
+- 6d15652: Thematic links (verse range support in JW.org URLs)

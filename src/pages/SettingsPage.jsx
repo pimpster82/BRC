@@ -435,8 +435,8 @@ const SettingsPage = () => {
           {expandedSection === 'weekly' && (
             <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
               {/* Meeting Day */}
-              <div>
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   {t('settings.meeting_day')}
                 </label>
                 <select
@@ -450,7 +450,7 @@ const SettingsPage = () => {
                     </option>
                   ))}
                 </select>
-                <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-300 mt-1">
+                <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-300">
                   {t('settings.meeting_day_note')}
                 </p>
               </div>
@@ -569,8 +569,8 @@ const SettingsPage = () => {
 
               {/* Reminder Time */}
               {dailyReminder && (
-                <div>
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     {t('settings.reminder_time')}
                   </label>
                   <input
@@ -582,7 +582,7 @@ const SettingsPage = () => {
                 </div>
               )}
 
-              <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-300 mt-3">
+              <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-300">
                 {t('settings.reminders_coming')}
               </p>
             </div>
@@ -613,8 +613,8 @@ const SettingsPage = () => {
               </p>
 
               {/* Year Input */}
-              <div className="mb-3">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
+              <div className="space-y-2 mb-3">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   {t('settings.schedule_year')}
                 </label>
                 <input
@@ -758,8 +758,8 @@ const SettingsPage = () => {
           {expandedSection === 'device' && (
             <div className="mt-4 pt-4 border-t border-blue-200 dark:border-blue-700 space-y-3">
               {/* Device ID */}
-              <div>
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Device ID</p>
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Device ID</p>
                 <div className="flex gap-2">
                   <code className="flex-1 text-xs bg-gray-100 dark:bg-slate-700 p-2 rounded border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-300 font-mono overflow-auto">
                     {deviceId.substring(0, 12)}...
@@ -776,12 +776,12 @@ const SettingsPage = () => {
                     {copySuccess ? 'Kopiert!' : 'Kopieren'}
                   </button>
                 </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-300 mt-1">Eindeutige Geräte-ID für Cross-Device-Synchronisation</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-300">Eindeutige Geräte-ID für Cross-Device-Synchronisation</p>
               </div>
 
               {/* Device Name */}
-              <div className="pt-3 border-t border-blue-200 dark:border-blue-700">
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Device Name</p>
+              <div className="pt-3 border-t border-blue-200 dark:border-blue-700 space-y-2">
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Device Name</p>
                 {!isEditingDeviceName ? (
                   <div className="flex gap-2">
                     <p className="flex-1 text-sm bg-gray-50 p-2 rounded border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-300">

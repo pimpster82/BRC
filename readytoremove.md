@@ -99,6 +99,14 @@
 | `docs/CLOUD_SYNC.md` | Documentation | ✅ YES | Outdated architecture (28K) |
 | `docs/THEMES.md` | Documentation | ✅ YES | Future feature planning |
 | `CONTEXT.md` | Documentation | ✅ YES | Redundant with CLAUDE.md |
+| `public/icons/bible_tracker_icon_dark.ico` | Icon File | ✅ YES | Converted to PNG |
+| `public/icons/ChatGPT Image Dec 27, 2025, 03_54_41 PM.png` | Icon Source | ✅ YES | Duplicate source |
+| `public/icons/open-bible-icon.svg` | Icon | ✅ YES | Replaced by new design |
+| `public/icons/icon-16x16.png` | Icon (Old) | ✅ YES | Replaced by variants |
+| `public/icons/icon-32x32.png` | Icon (Old) | ✅ YES | Replaced by variants |
+| `public/icons/icon-ios-120x120.png` (+ 4 more) | Icons (Old) | ✅ YES | Replaced by light/dark/tinted |
+| `public/icons/icon-192x192.png` | Icon (Old) | ✅ YES | Replaced by variants |
+| `public/icons/icon-512x512.png` | Icon (Old) | ✅ YES | Replaced by variants |
 
 ---
 

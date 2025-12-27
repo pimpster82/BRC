@@ -10,28 +10,61 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/icons/icon-16x16.png",
-      "sizes": "16x16",
+      "src": "/icons/icon-light-1024.png",
+      "sizes": "1024x1024",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable",
+      "form_factor": "any"
     },
     {
-      "src": "/icons/icon-32x32.png",
-      "sizes": "32x32",
+      "src": "/icons/icon-dark-1024.png",
+      "sizes": "1024x1024",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable",
+      "form_factor": "any"
     },
     {
-      "src": "/icons/icon-192x192.png",
+      "src": "/icons/icon-tinted-1024.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "monochrome",
+      "form_factor": "any"
+    },
+    {
+      "src": "/icons/icon-light-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-dark-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-tinted-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "monochrome"
+    },
+    {
+      "src": "/icons/icon-light-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/icons/icon-512x512.png",
-      "sizes": "512x512",
+      "src": "/icons/icon-dark-192.png",
+      "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-tinted-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "monochrome"
     },
     {
       "src": "/icons/icon-ios-120x120.png",
@@ -56,12 +89,6 @@
       "sizes": "180x180",
       "type": "image/png",
       "purpose": "any"
-    },
-    {
-      "src": "/icons/icon-ios-1024x1024.png",
-      "sizes": "1024x1024",
-      "type": "image/png",
-      "purpose": "any maskable"
     },
     {
       "src": "/icons/open-bible-icon.svg",

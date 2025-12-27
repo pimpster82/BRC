@@ -10,6 +10,7 @@ import SettingsPage from './pages/SettingsPage'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import PersonalReadingPage from './pages/PersonalReadingPage'
+import LoadingSpinner from './components/LoadingSpinner'
 import { processPendingSyncQueue } from './utils/firebaseUserProgress'
 
 /**
@@ -20,13 +21,7 @@ const ProtectedRoute = ({ element }) => {
   const { currentUser, loading } = useAuth()
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50">
-        <div className="text-center">
-          <p className="text-gray-600 mb-2">Wird geladen...</p>
-        </div>
-      </div>
-    )
+    return <LoadingSpinner message="Authentifizierung wird überprüft..." />
   }
 
   return currentUser ? element : <Navigate to="/login" replace />

@@ -786,92 +786,10 @@ const SettingsPage = () => {
           )}
         </div>
 
-        {/* Schedule Update */}
-        <div className="card bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-700 mb-3">
-          <button
-            onClick={() => toggleSection('schedule')}
-            className="w-full flex items-center justify-between"
-          >
-            <div className="flex items-center gap-2">
-              <Download className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-              <h2 className="font-semibold text-gray-800 dark:text-gray-300">{t('settings.schedule_update')}</h2>
-            </div>
-            {expandedSection === 'schedule' ? (
-              <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
-            ) : (
-              <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
-            )}
-          </button>
+        {/* Schedule Update - ADMIN ONLY (moved to Admin Settings Section above) */}
 
-          {expandedSection === 'schedule' && (
-            <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <p className="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-300 mb-3">
-                Lade den wöchentlichen Leseplan <strong>und Jahrestext</strong> für ein neues Jahr von JW.org herunter.
-              </p>
-
-              {/* Year Input */}
-              <div className="space-y-2 mb-3">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {t('settings.schedule_year')}
-                </label>
-                <input
-                  type="number"
-                  value={scheduleYear}
-                  onChange={(e) => setScheduleYear(parseInt(e.target.value))}
-                  min={new Date().getFullYear()}
-                  max={new Date().getFullYear() + 5}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-
-              {/* Fetch Button */}
-              <button
-                onClick={handleFetchSchedule}
-                disabled={scheduleStatus === 'loading'}
-                className={`w-full py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 ${
-                  scheduleStatus === 'loading'
-                    ? 'bg-gray-300 dark:bg-gray-600 text-gray-600 dark:text-gray-300 cursor-not-allowed'
-                    : 'bg-blue-600 dark:bg-blue-500 text-white hover:bg-blue-700 dark:hover:bg-blue-600'
-                }`}
-              >
-                {scheduleStatus === 'loading' ? (
-                  <>
-                    <RefreshCw className="w-4 h-4 animate-spin" />
-                    {t('settings.downloading')}
-                  </>
-                ) : (
-                  <>
-                    <Download className="w-4 h-4" />
-                    {t('settings.download_schedule')}
-                  </>
-                )}
-              </button>
-
-              {/* Status Message */}
-              {scheduleMessage && (
-                <div
-                  className={`mt-3 p-3 rounded-lg text-sm whitespace-pre-line ${
-                    scheduleStatus === 'success'
-                      ? 'bg-green-50 dark:bg-green-900 text-green-800 dark:text-green-100 border border-green-200 dark:border-green-700'
-                      : scheduleStatus === 'error'
-                      ? 'bg-red-50 dark:bg-red-900 text-red-800 dark:text-red-100 border border-red-200 dark:border-red-700'
-                      : 'bg-blue-50 dark:bg-blue-900 text-blue-800 dark:text-blue-100 border border-blue-200 dark:border-blue-700'
-                  }`}
-                >
-                  {scheduleMessage}
-                </div>
-              )}
-
-              <div className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-300 mt-3 space-y-1">
-                <p className="text-gray-600 dark:text-gray-400 dark:text-gray-300">
-                  {t('settings.schedule_loading')}
-                </p>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Reset All */}
+        {/* Reset All - ADMIN ONLY (moved to Admin Settings Section above) */}
+        {isAdminMode && (
         <div className="card bg-white dark:bg-slate-900 border border-red-200 dark:border-red-700 mb-4">
           <button
             onClick={() => toggleSection('reset')}
@@ -934,8 +852,10 @@ const SettingsPage = () => {
             </div>
           )}
         </div>
+        )}
 
-        {/* Device Info */}
+        {/* Device Info - ADMIN ONLY */}
+        {isAdminMode && (
         <div className="card bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-700 mb-4">
           <button
             onClick={() => toggleSection('device')}
@@ -1021,6 +941,7 @@ const SettingsPage = () => {
             </div>
           )}
         </div>
+        )}
 
         {/* Version & Build Info Card */}
         <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 mt-6 mb-4 p-4">

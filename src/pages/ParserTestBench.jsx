@@ -115,8 +115,8 @@ const ParserTestBench = () => {
                   </span>
                   <span className={`text-xs px-2 py-1 rounded ${
                     chapter.status === 'complete'
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-yellow-100 text-yellow-800'
+                      ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100'
+                      : 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-100'
                   }`}>
                     {chapter.status === 'complete' ? 'Komplett' : 'Teilweise'}
                   </span>

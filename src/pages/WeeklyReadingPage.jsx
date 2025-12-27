@@ -569,8 +569,8 @@ const WeeklyReadingPage = () => {
               <div
                 key={chapter}
                 className={`card ${
-                  isRead ? 'border-green-200 bg-green-50' :
-                  isPartial ? 'border-yellow-200 bg-yellow-50' :
+                  isRead ? 'border-green-200 dark:border-green-700 bg-green-50 dark:bg-green-900' :
+                  isPartial ? 'border-yellow-200 dark:border-yellow-700 bg-yellow-50 dark:bg-yellow-900' :
                   'card-blue'
                 }`}
               >
@@ -592,8 +592,8 @@ const WeeklyReadingPage = () => {
 
                     <div className="flex-1">
                       <p className={`font-medium ${
-                        isRead ? 'text-green-900' :
-                        isPartial ? 'text-yellow-900' :
+                        isRead ? 'text-green-900 dark:text-green-100' :
+                        isPartial ? 'text-yellow-900 dark:text-yellow-100' :
                         'text-gray-800 dark:text-gray-300'
                       }`}>
                         {`${getLocalizedBookName(weekReading.reading.book, getCurrentLanguage())} ${chapter}`}
@@ -611,8 +611,8 @@ const WeeklyReadingPage = () => {
                   <button
                     onClick={() => openChapter(chapter)}
                     className={`btn-open flex-shrink-0 ${
-                      isRead ? 'text-green-700 hover:text-green-900' :
-                      isPartial ? 'text-yellow-700 hover:text-yellow-900' :
+                      isRead ? 'text-green-700 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300' :
+                      isPartial ? 'text-yellow-700 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-300' :
                       'btn-open-blue'
                     }`}
                   >

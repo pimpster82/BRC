@@ -835,8 +835,8 @@ export default function PersonalReadingPage() {
                 }}
                 className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 ${
                   progressError
-                    ? 'border-red-300 focus:ring-red-500'
-                    : 'border-gray-300 focus:ring-blue-500'
+                    ? 'border-red-300 dark:border-red-700 focus:ring-red-500 dark:focus:ring-red-400'
+                    : 'border-gray-300 dark:border-gray-600 focus:ring-blue-500 dark:focus:ring-blue-400'
                 }`}
                 placeholder="z.B. 1mo 2-5 oder 1mo 2:5-16 oder Matthäus 24:3-14"
               />

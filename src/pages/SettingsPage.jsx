@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { ArrowLeft, Globe, Calendar, Bell, RotateCcw, ChevronDown, ChevronRight, BookOpen, Download, RefreshCw, Eye, Smartphone, Copy, Moon, Info } from 'lucide-react'
+import { ArrowLeft, Globe, Calendar, Bell, RotateCcw, ChevronDown, ChevronRight, BookOpen, Download, RefreshCw, Eye, Smartphone, Copy, Moon, Info, Lock } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useLoading } from '../context/LoadingContext'
+import { useAdmin } from '../context/AdminContext'
 import { SUPPORTED_LANGUAGES, getCurrentLanguage, setCurrentLanguage } from '../config/languages'
 import { fetchScheduleFromWOL, fetchYeartextFromWOL } from '../utils/scheduleUpdater'
 import { saveScheduleToFirebase, saveYeartextToFirebase } from '../utils/firebaseSchedules'
@@ -14,6 +15,7 @@ import bibleBooks from '../../data/bible-books-en.json'
 const SettingsPage = () => {
   const navigate = useNavigate()
   const { showLoading, hideLoading } = useLoading()
+  const { isAdminMode, exitAdminAccess } = useAdmin()
   const { theme, setThemePreference } = useTheme()
 
   // Expanded sections
@@ -416,6 +418,193 @@ const SettingsPage = () => {
             </div>
           )}
         </div>
+
+        {/* Admin Settings Section (Only visible in Admin Mode) */}
+        {isAdminMode && (
+          <div className="card bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-300 dark:border-indigo-700 mb-3">
+            <button
+              onClick={() => toggleSection('admin')}
+              className="w-full flex items-center justify-between"
+            >
+              <div className="flex items-center gap-2">
+                <Lock className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                <h2 className="font-semibold text-gray-800 dark:text-gray-300">⚙️ ADMIN SETTINGS</h2>
+              </div>
+              {expandedSection === 'admin' ? (
+                <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
+              ) : (
+                <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
+              )}
+            </button>
+
+            {expandedSection === 'admin' && (
+              <div className="mt-4 pt-4 border-t border-indigo-300 dark:border-indigo-700 space-y-4">
+                {/* Exit Admin Access */}
+                <div>
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Admin-Modus</p>
+                  <button
+                    onClick={exitAdminAccess}
+                    className="w-full bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100 py-2 px-4 rounded-lg font-medium hover:bg-red-200 dark:hover:bg-red-800 transition-colors border border-red-300 dark:border-red-700"
+                  >
+                    Admin-Zugang beenden
+                  </button>
+                </div>
+
+                {/* Reset App Settings */}
+                <div className="pt-3 border-t border-indigo-300 dark:border-indigo-700">
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">App-Einstellungen</p>
+                  <button
+                    onClick={handleResetAll}
+                    className="w-full bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-100 py-2 px-4 rounded-lg font-medium hover:bg-yellow-200 dark:hover:bg-yellow-800 transition-colors border border-yellow-300 dark:border-yellow-700 text-sm"
+                  >
+                    Alle Einstellungen zurücksetzen
+                  </button>
+                </div>
+
+                {/* Device ID Info */}
+                <div className="pt-3 border-t border-indigo-300 dark:border-indigo-700 space-y-2">
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Device ID</p>
+                  <div className="flex gap-2">
+                    <code className="flex-1 text-xs bg-indigo-100 dark:bg-indigo-900 p-2 rounded border border-indigo-300 dark:border-indigo-700 dark:text-indigo-100 font-mono overflow-auto">
+                      {deviceId.substring(0, 12)}...
+                    </code>
+                    <button
+                      onClick={handleCopyDeviceId}
+                      className={`px-3 py-2 rounded text-sm font-medium flex items-center gap-1 transition-colors ${
+                        copySuccess
+                          ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 border border-green-300 dark:border-green-700'
+                          : 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-700 hover:bg-indigo-200 dark:hover:bg-indigo-800'
+                      }`}
+                    >
+                      <Copy className="w-4 h-4" />
+                      {copySuccess ? 'Kopiert!' : 'Kopieren'}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Daily Reminders */}
+                <div className="pt-3 border-t border-indigo-300 dark:border-indigo-700 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Tägliche Benachrichtigung</p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 dark:text-gray-300">Für Tagestext</p>
+                    </div>
+                    <button
+                      onClick={handleDailyReminderToggle}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                        dailyReminder ? 'bg-blue-600 dark:bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                          dailyReminder ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
+
+                  {/* Reminder Time */}
+                  {dailyReminder && (
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Uhrzeit
+                      </label>
+                      <input
+                        type="time"
+                        value={reminderTime}
+                        onChange={(e) => handleReminderTimeChange(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Display Theme */}
+                <div className="pt-3 border-t border-indigo-300 dark:border-indigo-700">
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Farbschema</p>
+                  <div className="flex gap-2">
+                    {[
+                      { value: 'light', label: '☀️ Hell' },
+                      { value: 'dark', label: '🌙 Dunkel' },
+                      { value: 'system', label: '💻 System' }
+                    ].map((option) => (
+                      <button
+                        key={option.value}
+                        onClick={() => setThemePreference(option.value)}
+                        className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
+                          theme === option.value
+                            ? 'bg-blue-600 dark:bg-blue-500 text-white'
+                            : 'bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-600'
+                        }`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Update Schedule */}
+                <div className="pt-3 border-t border-indigo-300 dark:border-indigo-700">
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Leseplan aktualisieren</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 dark:text-gray-300 mb-3">
+                    Lade Leseplan & Jahrestext für ein Jahr von JW.org herunter
+                  </p>
+
+                  <div className="space-y-2 mb-3">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Jahr
+                    </label>
+                    <input
+                      type="number"
+                      value={scheduleYear}
+                      onChange={(e) => setScheduleYear(parseInt(e.target.value))}
+                      min={new Date().getFullYear()}
+                      max={new Date().getFullYear() + 5}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+
+                  <button
+                    onClick={handleFetchSchedule}
+                    disabled={scheduleStatus === 'loading'}
+                    className={`w-full py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 text-sm ${
+                      scheduleStatus === 'loading'
+                        ? 'bg-gray-300 dark:bg-gray-600 text-gray-600 dark:text-gray-300 cursor-not-allowed'
+                        : 'bg-indigo-600 dark:bg-indigo-500 text-white hover:bg-indigo-700 dark:hover:bg-indigo-600'
+                    }`}
+                  >
+                    {scheduleStatus === 'loading' ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                        Wird heruntergeladen...
+                      </>
+                    ) : (
+                      <>
+                        <Download className="w-4 h-4" />
+                        Leseplan herunterladen
+                      </>
+                    )}
+                  </button>
+
+                  {/* Status Message */}
+                  {scheduleMessage && (
+                    <div
+                      className={`mt-3 p-3 rounded-lg text-sm whitespace-pre-line ${
+                        scheduleStatus === 'success'
+                          ? 'bg-green-50 dark:bg-green-900 text-green-800 dark:text-green-100 border border-green-200 dark:border-green-700'
+                          : scheduleStatus === 'error'
+                          ? 'bg-red-50 dark:bg-red-900 text-red-800 dark:text-red-100 border border-red-200 dark:border-red-700'
+                          : 'bg-blue-50 dark:bg-blue-900 text-blue-800 dark:text-blue-100 border border-blue-200 dark:border-blue-700'
+                      }`}
+                    >
+                      {scheduleMessage}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Weekly Reading Settings */}
         <div className="card bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-700 mb-3">

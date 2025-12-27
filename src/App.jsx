@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { useAuth } from './context/AuthContext'
+import { AdminProvider } from './context/AdminContext'
 import { ThemeProvider } from './context/ThemeContext'
 import { LoadingProvider } from './context/LoadingContext'
 import LoadingSpinner from './components/LoadingSpinner'
@@ -88,11 +89,13 @@ function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <LoadingProvider>
-          <Router basename="">
-            <AppContent />
-          </Router>
-        </LoadingProvider>
+        <AdminProvider>
+          <LoadingProvider>
+            <Router basename="">
+              <AppContent />
+            </Router>
+          </LoadingProvider>
+        </AdminProvider>
       </AuthProvider>
     </ThemeProvider>
   )

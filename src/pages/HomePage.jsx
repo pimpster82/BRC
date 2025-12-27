@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { Calendar, BookOpen, Lightbulb, ExternalLink, Settings, X, RefreshCw, LogOut, LogIn } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useAdmin } from '../context/AdminContext'
 import { useLoading } from '../context/LoadingContext'
 import { t, getCurrentLanguage } from '../config/i18n'
 import { getYeartextFromCache, loadProgressFromFirebase } from '../utils/storage'
@@ -11,6 +12,7 @@ import DailyTextCard from '../components/DailyTextCard'
 import WeeklyReadingCard from '../components/WeeklyReadingCard'
 import PersonalReadingCard from '../components/PersonalReadingCard'
 import LoadingSpinner from '../components/LoadingSpinner'
+import AdminPINModal from '../components/AdminPINModal'
 
 // Yeartext cache for lazy loading
 const yeartextCache = {}
@@ -55,7 +57,9 @@ const loadYeartext = async (year) => {
 function HomePage() {
   const navigate = useNavigate()
   const { logout, currentUser } = useAuth()
+  const { isAdminMode, verifyPin, error: adminError } = useAdmin()
   const { showLoading, hideLoading } = useLoading()
+  const [showPINModal, setShowPINModal] = useState(false)
   const [showDatePicker, setShowDatePicker] = useState(false)
   const [testDate, setTestDate] = useState(null)
   const [yeartext, setYeartext] = useState(null)
@@ -121,6 +125,25 @@ function HomePage() {
       }
     } else {
       setPullDistance(0)
+    }
+  }
+
+  // Handle calendar button click - PIN modal if not admin, date picker if admin
+  const handleCalendarClick = () => {
+    if (isAdminMode) {
+      // Admin mode - open date picker
+      setShowDatePicker(!showDatePicker)
+    } else {
+      // Public mode - show PIN modal
+      setShowPINModal(true)
+    }
+  }
+
+  // Handle PIN verification
+  const handlePINVerify = (pin) => {
+    if (verifyPin(pin)) {
+      setShowPINModal(false)
+      setShowDatePicker(true) // Automatically open date picker after successful PIN
     }
   }
 
@@ -368,9 +391,9 @@ function HomePage() {
           <div className="flex items-center justify-between">
             <h1 className="text-xl font-bold text-gray-800 dark:text-gray-300 flex items-center gap-2">
               <button
-                onClick={() => setShowDatePicker(!showDatePicker)}
+                onClick={handleCalendarClick}
                 className="p-1 hover:bg-white dark:hover:bg-slate-800 rounded transition-colors"
-                title="Datum ändern (Test)"
+                title={isAdminMode ? "Datum ändern (Admin)" : "PIN eingeben für Testmodus"}
               >
                 <Calendar className={`w-5 h-5 ${testDate ? 'text-orange-600 dark:text-orange-400' : ''}`} />
               </button>
@@ -434,6 +457,14 @@ function HomePage() {
               </p>
             </div>
           )}
+
+          {/* Admin PIN Modal */}
+          <AdminPINModal
+            isOpen={showPINModal}
+            onClose={() => setShowPINModal(false)}
+            onVerify={handlePINVerify}
+            error={adminError}
+          />
 
           {/* Logout Confirmation Modal */}
           {showLogoutConfirm && (

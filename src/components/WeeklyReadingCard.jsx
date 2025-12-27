@@ -93,11 +93,19 @@ const WeeklyReadingCard = () => {
   const openNextChapter = (chapter) => {
     if (!weekReading) return
 
-    // Get the book number from the week's reading
     const bookNumber = weekReading.reading.book
 
-    // Build language-specific JW.org link
-    const links = buildLanguageSpecificWebLink(bookNumber, chapter, 1)
+    // Check if this chapter is partially read
+    const chapterData = chaptersRead.find(c => c.chapter === chapter)
+    let startVerse = 1
+
+    if (chapterData && chapterData.status === 'partial' && chapterData.verses) {
+      // If partially read, continue from the next verse
+      startVerse = chapterData.verses + 1
+    }
+
+    // Build language-specific JW.org link to continue reading
+    const links = buildLanguageSpecificWebLink(bookNumber, chapter, startVerse)
 
     if (links?.web) {
       window.location.href = links.web

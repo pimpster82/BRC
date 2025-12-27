@@ -77,7 +77,9 @@ Cache-Control: public, max-age=0, must-revalidate
 **File:** `index.html` (in `<head>`)
 
 ```javascript
-// Checks manifest version every 5 minutes
+const CHECK_INTERVAL = 24 * 60 * 60 * 1000 // 24 hours - adjust as needed
+
+// Checks manifest version periodically
 // Also checks when user returns to tab
 // Logs update detection to console
 // Users can manually refresh when prompted
@@ -85,10 +87,24 @@ Cache-Control: public, max-age=0, must-revalidate
 
 **Behavior:**
 - Runs on page load
-- Checks every 5 minutes
-- Checks when tab becomes visible
+- Checks every 24 hours (configurable via `CHECK_INTERVAL`)
+- Checks when tab becomes visible (user returns to app)
 - Stores version in `localStorage` (key: `brc_manifest_version`)
 - Logs updates to browser console
+
+**Why 24 hours?**
+- Batty-efficient (minimal power drain)
+- Vercel manifest cache already 1 hour
+- Frequent checks provide no additional benefit
+- Adjustable via `CHECK_INTERVAL` constant if needed
+
+**To Change Interval:**
+```javascript
+// Examples:
+const CHECK_INTERVAL = 1 * 60 * 60 * 1000  // 1 hour
+const CHECK_INTERVAL = 6 * 60 * 60 * 1000  // 6 hours
+const CHECK_INTERVAL = 24 * 60 * 60 * 1000 // 24 hours (default)
+```
 
 ---
 
@@ -148,9 +164,12 @@ Cache-Control: public, max-age=0, must-revalidate
 | Time | Action | User Sees |
 |------|--------|-----------|
 | T+0 | Deploy v1.2.1 | Old icons (cached) |
-| T+5 min | JavaScript check runs | Console update notification |
-| T+1 hour | Manifest cache expires | New icons appear |
+| T+0 | Vercel serves new manifest | Still old (manifest cached 1h) |
+| T+1 hour | Manifest cache expires | New icons appear automatically |
 | T+1 hour | PWA reinstalls | Updated home screen icon |
+| T+next visit | JavaScript check runs* | Detects version change in console |
+
+*JavaScript check runs every 24 hours OR when user returns to tab after absence
 
 ---
 
@@ -278,3 +297,4 @@ Use Semantic Versioning: **MAJOR.MINOR.PATCH**
 **Last Updated:** 2025-12-27
 **Current Version:** 1.2.0
 **Manifest Version:** 2.0.0
+**Check Interval:** 24 hours (battery-optimized)

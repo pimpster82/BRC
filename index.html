@@ -60,6 +60,7 @@
       (function() {
         const MANIFEST_VERSION = '1.2.0'
         const STORAGE_KEY = 'brc_manifest_version'
+        const CHECK_INTERVAL = 24 * 60 * 60 * 1000 // 24 hours - adjust as needed
 
         // Check for manifest updates periodically
         function checkForUpdates() {
@@ -81,8 +82,9 @@
         // Run check on page load
         checkForUpdates()
 
-        // Periodically check for updates (every 5 minutes)
-        setInterval(checkForUpdates, 5 * 60 * 1000)
+        // Periodically check for updates (default: every 24 hours)
+        // Adjust CHECK_INTERVAL constant above to change frequency
+        setInterval(checkForUpdates, CHECK_INTERVAL)
 
         // Also check when user returns to tab after being away
         document.addEventListener('visibilitychange', function() {

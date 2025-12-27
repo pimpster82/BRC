@@ -8,7 +8,7 @@
  * - PATCH: Bug fixes
  */
 
-export const APP_VERSION = '0.1.2'
+export const APP_VERSION = '1.0.0'
 
 /**
  * Build Information
@@ -19,6 +19,19 @@ export const BUILD_INFO = `v${APP_VERSION} (${BUILD_DATE})`
 
 /**
  * Version History
+ *
+ * 1.0.0 (Stable Release - Production Ready)
+ * - Comprehensive dark mode support across all UI elements
+ * - Dynamic daily text links with date parameter (mobile-friendly JW.org finder URLs)
+ * - Fixed thematic topics background colors in dark mode
+ * - Fixed external link opening to prevent extra browser window on iOS
+ * - Stable foundation for parallel 2.0 development
+ * - All 3 reading systems fully functional: Daily Text, Weekly Reading, Personal Programs
+ * - 5 languages fully supported (German, English, Spanish, Italian, French)
+ * - Multi-device sync with timestamp-based conflict resolution
+ * - Firebase authentication and real-time data synchronization
+ * - Verse-level progress tracking with partial chapter support
+ * - Recommended for production use and as fallback for 2.0 development
  *
  * 0.1.2 (Dark Mode Complete - Form Fields Fix)
  * - Converted SettingsPage form fields to PBP pattern (space-y-2)

@@ -6,8 +6,8 @@
     <meta name="description" content="Bible Reading Companion - Track your daily Bible reading" />
     <meta name="theme-color" content="#1E40AF" />
 
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="/manifest.json" />
+    <!-- PWA Manifest (cache busted with version) -->
+    <link rel="manifest" href="/manifest.json?v=1.2.0" />
 
     <!-- Favicon & App Icons (Browser) -->
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-light-192.png" />
@@ -51,6 +51,45 @@
           // Silently fail if localStorage unavailable
           // Theme will be applied by React/ThemeContext
         }
+      })()
+    </script>
+
+    <!-- PWA Manifest Version Check for Icon Updates -->
+    <!-- Automatically detects app updates and prompts user to refresh -->
+    <script>
+      (function() {
+        const MANIFEST_VERSION = '1.2.0'
+        const STORAGE_KEY = 'brc_manifest_version'
+
+        // Check for manifest updates periodically
+        function checkForUpdates() {
+          // Store current version
+          const lastVersion = localStorage.getItem(STORAGE_KEY) || '0.0.0'
+
+          if (lastVersion !== MANIFEST_VERSION) {
+            // Version changed - store new version
+            localStorage.setItem(STORAGE_KEY, MANIFEST_VERSION)
+
+            // Log update for debugging
+            if (lastVersion !== '0.0.0') {
+              console.log(`[BRC] App updated: ${lastVersion} → ${MANIFEST_VERSION}`)
+              console.log('[BRC] New icons and features available. Refresh the page for updates.')
+            }
+          }
+        }
+
+        // Run check on page load
+        checkForUpdates()
+
+        // Periodically check for updates (every 5 minutes)
+        setInterval(checkForUpdates, 5 * 60 * 1000)
+
+        // Also check when user returns to tab after being away
+        document.addEventListener('visibilitychange', function() {
+          if (!document.hidden) {
+            checkForUpdates()
+          }
+        })
       })()
     </script>
 

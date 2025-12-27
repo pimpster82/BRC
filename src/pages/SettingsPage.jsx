@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { ArrowLeft, Globe, Calendar, Bell, RotateCcw, ChevronDown, ChevronRight, BookOpen, Download, RefreshCw, Eye, Smartphone, Copy, Moon } from 'lucide-react'
+import { ArrowLeft, Globe, Calendar, Bell, RotateCcw, ChevronDown, ChevronRight, BookOpen, Download, RefreshCw, Eye, Smartphone, Copy, Moon, Info } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useLoading } from '../context/LoadingContext'
 import { SUPPORTED_LANGUAGES, getCurrentLanguage, setCurrentLanguage } from '../config/languages'
@@ -7,7 +7,7 @@ import { fetchScheduleFromWOL, fetchYeartextFromWOL } from '../utils/scheduleUpd
 import { saveScheduleToFirebase, saveYeartextToFirebase } from '../utils/firebaseSchedules'
 import { getOrCreateDeviceId, getDeviceName, setDeviceName, getDeviceInfo } from '../utils/deviceId'
 import { t } from '../config/i18n'
-import { APP_VERSION, BUILD_INFO } from '../config/version'
+import { APP_VERSION, BUILD_INFO, LINKED_PRODUCTION_VERSION } from '../config/version'
 import { useTheme } from '../context/ThemeContext'
 import bibleBooks from '../../data/bible-books-en.json'
 
@@ -830,10 +830,48 @@ const SettingsPage = () => {
           )}
         </div>
 
-        {/* Version Info */}
-        <div className="text-center text-xs text-gray-500 dark:text-gray-400 dark:text-gray-300 mt-6 pb-4">
-          <p>{t('settings.version', null, {version: BUILD_INFO})}</p>
-          <p className="mt-1">{t('settings.made_with')}</p>
+        {/* Version & Build Info Card */}
+        <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 mt-6 mb-4 p-4">
+          <div className="flex items-start gap-3">
+            <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-1" />
+            <div className="flex-1 space-y-3">
+              {/* App Version */}
+              <div>
+                <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">APP VERSION</p>
+                <p className="text-sm font-mono text-gray-900 dark:text-gray-200 mt-1">{APP_VERSION}</p>
+              </div>
+
+              {/* Build Code - With Copy Button */}
+              <div>
+                <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">BUILD CODE</p>
+                <div className="flex items-center gap-2 mt-1">
+                  <p className="text-sm font-mono text-gray-900 dark:text-gray-200 flex-1 break-all">{BUILD_INFO}</p>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(BUILD_INFO)
+                      alert('Build code copied to clipboard!')
+                    }}
+                    className="flex-shrink-0 p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded transition-colors"
+                    title="Copy build code"
+                  >
+                    <Copy className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Production Version Link */}
+              <div>
+                <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">LINKED PRODUCTION</p>
+                <p className="text-sm font-mono text-gray-900 dark:text-gray-200 mt-1">v{LINKED_PRODUCTION_VERSION}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Current production version in use</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="text-center text-xs text-gray-500 dark:text-gray-400 mt-4 pb-4">
+          <p>{t('settings.made_with')}</p>
         </div>
       </div>
     </div>

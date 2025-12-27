@@ -77,7 +77,7 @@ const ParserTestBench = () => {
                 {parseResult.suggestion.suggestions.map((sug, idx) => (
                   <span key={idx} className="bg-white dark:bg-slate-800 px-3 py-2 rounded text-yellow-900 dark:text-yellow-100 text-sm">
                     <strong>{sug.display}</strong>
-                    <span className="text-xs text-gray-600 dark:text-gray-100 ml-2">({sug.description})</span>
+                    <span className="text-xs text-gray-600 dark:text-gray-300 ml-2">({sug.description})</span>
                   </span>
                 ))}
               </div>
@@ -97,7 +97,7 @@ const ParserTestBench = () => {
 
           {parseResult.book && (
             <div className="mb-3 p-2 bg-white dark:bg-slate-800 rounded">
-              <p className="text-sm text-gray-700 dark:text-gray-100">
+              <p className="text-sm text-gray-700 dark:text-gray-300">
                 <strong>Buch:</strong> {parseResult.book.name} (#{parseResult.book.number})
               </p>
             </div>
@@ -122,7 +122,7 @@ const ParserTestBench = () => {
                   </span>
                 </div>
                 {chapter.status === 'partial' && (
-                  <p className="text-xs text-gray-600 dark:text-gray-100 mt-1">
+                  <p className="text-xs text-gray-600 dark:text-gray-300 mt-1">
                     {chapter.verses === 999
                       ? `Ab Vers ${chapter.continueFrom} bis Ende`
                       : `Bis Vers ${chapter.verses}${chapter.continueFrom && chapter.continueFrom > 1 && chapter.verses !== 999 ? ` · Weiter ab Vers ${chapter.continueFrom}` : ''}`
@@ -138,7 +138,7 @@ const ParserTestBench = () => {
 
     return (
       <div className="p-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-lg">
-        <p className="text-sm text-gray-600 dark:text-gray-100">Kein Ergebnis</p>
+        <p className="text-sm text-gray-600 dark:text-gray-300">Kein Ergebnis</p>
       </div>
     )
   }
@@ -150,16 +150,16 @@ const ParserTestBench = () => {
         <div className="mb-6 pt-4">
           <button
             onClick={() => navigate('/')}
-            className="flex items-center gap-2 text-gray-700 dark:text-gray-100 hover:text-gray-900 mb-4"
+            className="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 mb-4"
           >
             <ArrowLeft className="w-5 h-5" />
             Zurück
           </button>
 
-          <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-300 mb-2">
             Parser Test Bench
           </h1>
-          <p className="text-sm text-gray-600 dark:text-gray-100">
+          <p className="text-sm text-gray-600 dark:text-gray-300">
             Teste und validiere Bibel-Referenz Eingaben
           </p>
         </div>
@@ -194,7 +194,7 @@ const ParserTestBench = () => {
         {/* Current Result */}
         {result && (
           <div className="mb-6">
-            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-100 mb-2">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
               Aktuelles Ergebnis: "{result.input}"
             </h3>
             {renderResult(result)}
@@ -204,7 +204,7 @@ const ParserTestBench = () => {
         {/* Test History */}
         {testHistory.length > 0 && (
           <div>
-            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-100 mb-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
               Test Historie ({testHistory.length})
             </h3>
             <div className="space-y-3">
@@ -214,7 +214,7 @@ const ParserTestBench = () => {
                     <code className="text-sm font-mono text-blue-900">
                       {test.input}
                     </code>
-                    <span className="text-xs text-gray-500 dark:text-gray-100">
+                    <span className="text-xs text-gray-500 dark:text-gray-300">
                       {test.timestamp}
                     </span>
                   </div>
@@ -225,7 +225,7 @@ const ParserTestBench = () => {
 
             <button
               onClick={() => setTestHistory([])}
-              className="mt-4 text-sm text-gray-600 dark:text-gray-100 hover:text-gray-800 dark:text-gray-100"
+              className="mt-4 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:text-gray-300"
             >
               Historie löschen
             </button>
@@ -234,7 +234,7 @@ const ParserTestBench = () => {
 
         {/* Quick Test Examples */}
         <div className="mt-8 card bg-white border border-gray-200 dark:border-gray-700">
-          <h3 className="font-semibold text-gray-800 dark:text-gray-100 mb-3">Quick Tests</h3>
+          <h3 className="font-semibold text-gray-800 dark:text-gray-300 mb-3">Quick Tests</h3>
           <div className="grid grid-cols-2 gap-2">
             {[
               '3',
@@ -254,7 +254,7 @@ const ParserTestBench = () => {
                   setInput(example)
                   setTimeout(() => handleTest(), 100)
                 }}
-                className="text-left text-sm bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 px-3 py-2 rounded text-gray-700 dark:text-gray-100"
+                className="text-left text-sm bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 px-3 py-2 rounded text-gray-700 dark:text-gray-300"
               >
                 <code>{example}</code>
               </button>

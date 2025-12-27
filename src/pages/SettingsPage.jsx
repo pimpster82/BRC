@@ -283,16 +283,16 @@ const SettingsPage = () => {
         <div className="mb-6 pt-4">
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-gray-700 dark:text-gray-100 hover:text-gray-900 mb-4"
+            className="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 mb-4"
           >
             <ArrowLeft className="w-5 h-5" />
             {t('nav.back')}
           </button>
 
-          <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-300 mb-2">
             {t('settings.title')}
           </h1>
-          <p className="text-sm text-gray-600 dark:text-gray-100">
+          <p className="text-sm text-gray-600 dark:text-gray-300">
             {t('settings.subtitle')}
           </p>
         </div>
@@ -305,10 +305,10 @@ const SettingsPage = () => {
           >
             <div className="flex items-center gap-2">
               <Globe className="w-5 h-5 text-blue-600" />
-              <h2 className="font-semibold text-gray-800 dark:text-gray-100">{t('settings.language')}</h2>
+              <h2 className="font-semibold text-gray-800 dark:text-gray-300">{t('settings.language')}</h2>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600 dark:text-gray-100">{getLanguageName()}</span>
+              <span className="text-sm text-gray-600 dark:text-gray-300">{getLanguageName()}</span>
               {expandedSection === 'language' ? (
                 <ChevronDown className="w-5 h-5 text-gray-400" />
               ) : (
@@ -327,7 +327,7 @@ const SettingsPage = () => {
                     className={`p-3 rounded-lg border-2 transition-all ${
                       language === lang.code
                         ? 'border-blue-500 bg-blue-50 dark:bg-blue-900 text-blue-900 dark:text-blue-100'
-                        : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-slate-900 hover:border-gray-300 text-gray-700 dark:text-gray-100'
+                        : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-slate-900 hover:border-gray-300 text-gray-700 dark:text-gray-300'
                     }`}
                   >
                     <div className="flex items-center gap-2">
@@ -338,7 +338,7 @@ const SettingsPage = () => {
                 ))}
               </div>
 
-              <p className="text-xs text-gray-500 dark:text-gray-100 mt-3">
+              <p className="text-xs text-gray-500 dark:text-gray-300 mt-3">
                 {t('settings.language_note')}
               </p>
             </div>
@@ -353,7 +353,7 @@ const SettingsPage = () => {
           >
             <div className="flex items-center gap-2">
               <Eye className="w-5 h-5 text-blue-600" />
-              <h2 className="font-semibold text-gray-800 dark:text-gray-100">{t('settings.display')}</h2>
+              <h2 className="font-semibold text-gray-800 dark:text-gray-300">{t('settings.display')}</h2>
             </div>
             {expandedSection === 'display' ? (
               <ChevronDown className="w-5 h-5 text-gray-400" />
@@ -367,8 +367,8 @@ const SettingsPage = () => {
               {/* Show Yeartext Toggle */}
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-700 dark:text-gray-100">{t('settings.show_yeartext')}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-100">{t('settings.show_yeartext_note')}</p>
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('settings.show_yeartext')}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-300">{t('settings.show_yeartext_note')}</p>
                 </div>
                 <button
                   onClick={handleShowYeartext}
@@ -386,7 +386,7 @@ const SettingsPage = () => {
 
               {/* Theme Preference */}
               <div>
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-100 mb-2">Farbschema</p>
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Farbschema</p>
                 <div className="flex gap-2">
                   {[
                     { value: 'light', label: '☀️ Hell' },
@@ -399,14 +399,14 @@ const SettingsPage = () => {
                       className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
                         theme === option.value
                           ? 'bg-blue-600 text-white'
-                          : 'bg-gray-100 text-gray-700 dark:text-gray-100 hover:bg-gray-200'
+                          : 'bg-gray-100 text-gray-700 dark:text-gray-300 hover:bg-gray-200'
                       }`}
                     >
                       {option.label}
                     </button>
                   ))}
                 </div>
-                <p className="text-xs text-gray-500 dark:text-gray-100 mt-1">Wähle dein bevorzugtes Farbschema</p>
+                <p className="text-xs text-gray-500 dark:text-gray-300 mt-1">Wähle dein bevorzugtes Farbschema</p>
               </div>
             </div>
           )}
@@ -420,10 +420,10 @@ const SettingsPage = () => {
           >
             <div className="flex items-center gap-2">
               <Calendar className="w-5 h-5 text-blue-600" />
-              <h2 className="font-semibold text-gray-800 dark:text-gray-100">{t('settings.weekly_reading')}</h2>
+              <h2 className="font-semibold text-gray-800 dark:text-gray-300">{t('settings.weekly_reading')}</h2>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600 dark:text-gray-100">{getMeetingDayName()}</span>
+              <span className="text-sm text-gray-600 dark:text-gray-300">{getMeetingDayName()}</span>
               {expandedSection === 'weekly' ? (
                 <ChevronDown className="w-5 h-5 text-gray-400" />
               ) : (
@@ -436,13 +436,13 @@ const SettingsPage = () => {
             <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
               {/* Meeting Day */}
               <div>
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-100 block mb-2">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
                   {t('settings.meeting_day')}
                 </label>
                 <select
                   value={meetingDay}
                   onChange={(e) => handleMeetingDayChange(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   {weekDays.map((day) => (
                     <option key={day.value} value={day.value}>
@@ -450,7 +450,7 @@ const SettingsPage = () => {
                     </option>
                   ))}
                 </select>
-                <p className="text-xs text-gray-500 dark:text-gray-100 mt-1">
+                <p className="text-xs text-gray-500 dark:text-gray-300 mt-1">
                   {t('settings.meeting_day_note')}
                 </p>
               </div>
@@ -466,10 +466,10 @@ const SettingsPage = () => {
           >
             <div className="flex items-center gap-2">
               <BookOpen className="w-5 h-5 text-blue-600" />
-              <h2 className="font-semibold text-gray-800 dark:text-gray-100">{t('settings.personal_plan')}</h2>
+              <h2 className="font-semibold text-gray-800 dark:text-gray-300">{t('settings.personal_plan')}</h2>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600 dark:text-gray-100">{getReadingPlanName()}</span>
+              <span className="text-sm text-gray-600 dark:text-gray-300">{getReadingPlanName()}</span>
               {expandedSection === 'personal' ? (
                 <ChevronDown className="w-5 h-5 text-gray-400" />
               ) : (
@@ -481,22 +481,22 @@ const SettingsPage = () => {
           {expandedSection === 'personal' && (
             <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
               <div className="relative">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-100 block mb-2">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
                   {t('settings.reading_plan')}
                 </label>
 
                 {/* Dropdown Trigger */}
                 <button
                   onClick={() => setExpandedReadingPlanDropdown(!expandedReadingPlanDropdown)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-100 rounded-lg text-left text-gray-700 dark:text-gray-100 font-medium flex items-center justify-between hover:border-gray-400 transition-colors"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-300 rounded-lg text-left text-gray-700 dark:text-gray-300 font-medium flex items-center justify-between hover:border-gray-400 transition-colors"
                 >
                   {readingPlans.find(p => p.value === readingPlan)?.label || t('reading.plan_free')}
-                  <ChevronDown className={`w-4 h-4 text-gray-600 dark:text-gray-100 transition-transform ${expandedReadingPlanDropdown ? 'rotate-180' : ''}`} />
+                  <ChevronDown className={`w-4 h-4 text-gray-600 dark:text-gray-300 transition-transform ${expandedReadingPlanDropdown ? 'rotate-180' : ''}`} />
                 </button>
 
                 {/* Dropdown Menu */}
                 {expandedReadingPlanDropdown && (
-                  <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-100 rounded-lg shadow-lg z-50">
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-300 rounded-lg shadow-lg z-50">
                     <div className="py-2">
                       {readingPlans.map((plan) => (
                         <button
@@ -505,7 +505,7 @@ const SettingsPage = () => {
                           className={`w-full text-left px-3 py-2 transition-all ${
                             readingPlan === plan.value
                               ? 'bg-blue-100 text-blue-900 font-medium'
-                              : 'text-gray-700 dark:text-gray-100 hover:bg-gray-50'
+                              : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50'
                           }`}
                         >
                           {plan.label}
@@ -515,7 +515,7 @@ const SettingsPage = () => {
                   </div>
                 )}
 
-                <p className="text-xs text-gray-500 dark:text-gray-100 mt-3">
+                <p className="text-xs text-gray-500 dark:text-gray-300 mt-3">
                   {t('settings.reading_plan_note')}
                 </p>
               </div>
@@ -531,10 +531,10 @@ const SettingsPage = () => {
           >
             <div className="flex items-center gap-2">
               <Bell className="w-5 h-5 text-blue-600" />
-              <h2 className="font-semibold text-gray-800 dark:text-gray-100">{t('settings.notifications')}</h2>
+              <h2 className="font-semibold text-gray-800 dark:text-gray-300">{t('settings.notifications')}</h2>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600 dark:text-gray-100">
+              <span className="text-sm text-gray-600 dark:text-gray-300">
                 {dailyReminder ? `An (${reminderTime})` : 'Aus'}
               </span>
               {expandedSection === 'notifications' ? (
@@ -550,8 +550,8 @@ const SettingsPage = () => {
               {/* Daily Reminder Toggle */}
               <div className="flex items-center justify-between mb-3">
                 <div>
-                  <p className="text-sm font-medium text-gray-700 dark:text-gray-100">{t('settings.daily_reminder')}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-100">{t('settings.for_daily_text')}</p>
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('settings.daily_reminder')}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-300">{t('settings.for_daily_text')}</p>
                 </div>
                 <button
                   onClick={handleDailyReminderToggle}
@@ -570,19 +570,19 @@ const SettingsPage = () => {
               {/* Reminder Time */}
               {dailyReminder && (
                 <div>
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-100 block mb-2">
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
                     {t('settings.reminder_time')}
                   </label>
                   <input
                     type="time"
                     value={reminderTime}
                     onChange={(e) => handleReminderTimeChange(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               )}
 
-              <p className="text-xs text-gray-500 dark:text-gray-100 mt-3">
+              <p className="text-xs text-gray-500 dark:text-gray-300 mt-3">
                 {t('settings.reminders_coming')}
               </p>
             </div>
@@ -597,7 +597,7 @@ const SettingsPage = () => {
           >
             <div className="flex items-center gap-2">
               <Download className="w-5 h-5 text-blue-600" />
-              <h2 className="font-semibold text-gray-800 dark:text-gray-100">{t('settings.schedule_update')}</h2>
+              <h2 className="font-semibold text-gray-800 dark:text-gray-300">{t('settings.schedule_update')}</h2>
             </div>
             {expandedSection === 'schedule' ? (
               <ChevronDown className="w-5 h-5 text-gray-400" />
@@ -608,13 +608,13 @@ const SettingsPage = () => {
 
           {expandedSection === 'schedule' && (
             <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <p className="text-sm text-gray-600 dark:text-gray-100 mb-3">
+              <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
                 Lade den wöchentlichen Leseplan <strong>und Jahrestext</strong> für ein neues Jahr von JW.org herunter.
               </p>
 
               {/* Year Input */}
               <div className="mb-3">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-100 block mb-2">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
                   {t('settings.schedule_year')}
                 </label>
                 <input
@@ -623,7 +623,7 @@ const SettingsPage = () => {
                   onChange={(e) => setScheduleYear(parseInt(e.target.value))}
                   min={new Date().getFullYear()}
                   max={new Date().getFullYear() + 5}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
@@ -633,7 +633,7 @@ const SettingsPage = () => {
                 disabled={scheduleStatus === 'loading'}
                 className={`w-full py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 ${
                   scheduleStatus === 'loading'
-                    ? 'bg-gray-300 text-gray-600 dark:text-gray-100 cursor-not-allowed'
+                    ? 'bg-gray-300 text-gray-600 dark:text-gray-300 cursor-not-allowed'
                     : 'bg-blue-600 text-white hover:bg-blue-700'
                 }`}
               >
@@ -665,8 +665,8 @@ const SettingsPage = () => {
                 </div>
               )}
 
-              <div className="text-xs text-gray-500 dark:text-gray-100 mt-3 space-y-1">
-                <p className="text-gray-600 dark:text-gray-100">
+              <div className="text-xs text-gray-500 dark:text-gray-300 mt-3 space-y-1">
+                <p className="text-gray-600 dark:text-gray-300">
                   {t('settings.schedule_loading')}
                 </p>
               </div>
@@ -682,7 +682,7 @@ const SettingsPage = () => {
           >
             <div className="flex items-center gap-2">
               <RotateCcw className="w-5 h-5 text-red-600" />
-              <h2 className="font-semibold text-gray-800 dark:text-gray-100">{t('settings.reset')}</h2>
+              <h2 className="font-semibold text-gray-800 dark:text-gray-300">{t('settings.reset')}</h2>
             </div>
             {expandedSection === 'reset' ? (
               <ChevronDown className="w-5 h-5 text-gray-400" />
@@ -695,8 +695,8 @@ const SettingsPage = () => {
             <div className="mt-4 pt-4 border-t border-red-200 space-y-3">
               {/* Reset Settings */}
               <div>
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-100 mb-2">{t('settings.reset_settings')}</p>
-                <p className="text-xs text-gray-600 dark:text-gray-100 mb-2">
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('settings.reset_settings')}</p>
+                <p className="text-xs text-gray-600 dark:text-gray-300 mb-2">
                   {t('settings.reset_settings_note')}
                 </p>
                 <button
@@ -709,8 +709,8 @@ const SettingsPage = () => {
 
               {/* Clear Cache */}
               <div className="pt-3 border-t border-red-200">
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-100 mb-2">Cache löschen</p>
-                <p className="text-xs text-gray-600 dark:text-gray-100 mb-2">
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Cache löschen</p>
+                <p className="text-xs text-gray-600 dark:text-gray-300 mb-2">
                   Löscht gecachte Schedules und Yeartexts. Diese werden beim nächsten Laden neu von Firebase geladen.
                 </p>
                 <button
@@ -723,8 +723,8 @@ const SettingsPage = () => {
 
               {/* Reset Progress */}
               <div className="pt-3 border-t border-red-200">
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-100 mb-2">{t('settings.reset_progress')}</p>
-                <p className="text-xs text-gray-600 dark:text-gray-100 mb-2">
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('settings.reset_progress')}</p>
+                <p className="text-xs text-gray-600 dark:text-gray-300 mb-2">
                   {t('settings.reset_progress_note')}
                 </p>
                 <button
@@ -746,7 +746,7 @@ const SettingsPage = () => {
           >
             <div className="flex items-center gap-2">
               <Smartphone className="w-5 h-5 text-blue-600" />
-              <h2 className="font-semibold text-gray-800 dark:text-gray-100">Device Info</h2>
+              <h2 className="font-semibold text-gray-800 dark:text-gray-300">Device Info</h2>
             </div>
             {expandedSection === 'device' ? (
               <ChevronDown className="w-5 h-5 text-gray-400" />
@@ -759,9 +759,9 @@ const SettingsPage = () => {
             <div className="mt-4 pt-4 border-t border-blue-200 space-y-3">
               {/* Device ID */}
               <div>
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-100 mb-2">Device ID</p>
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Device ID</p>
                 <div className="flex gap-2">
-                  <code className="flex-1 text-xs bg-gray-100 p-2 rounded border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-100 font-mono overflow-auto">
+                  <code className="flex-1 text-xs bg-gray-100 p-2 rounded border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-300 font-mono overflow-auto">
                     {deviceId.substring(0, 12)}...
                   </code>
                   <button
@@ -776,15 +776,15 @@ const SettingsPage = () => {
                     {copySuccess ? 'Kopiert!' : 'Kopieren'}
                   </button>
                 </div>
-                <p className="text-xs text-gray-500 dark:text-gray-100 mt-1">Eindeutige Geräte-ID für Cross-Device-Synchronisation</p>
+                <p className="text-xs text-gray-500 dark:text-gray-300 mt-1">Eindeutige Geräte-ID für Cross-Device-Synchronisation</p>
               </div>
 
               {/* Device Name */}
               <div className="pt-3 border-t border-blue-200">
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-100 mb-2">Device Name</p>
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Device Name</p>
                 {!isEditingDeviceName ? (
                   <div className="flex gap-2">
-                    <p className="flex-1 text-sm bg-gray-50 p-2 rounded border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-100">
+                    <p className="flex-1 text-sm bg-gray-50 p-2 rounded border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-300">
                       {deviceName}
                     </p>
                     <button
@@ -812,21 +812,21 @@ const SettingsPage = () => {
                       </button>
                       <button
                         onClick={handleCancelEditDeviceName}
-                        className="flex-1 px-3 py-2 rounded text-sm font-medium bg-gray-100 text-gray-700 dark:text-gray-100 border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-100 hover:bg-gray-200 transition-colors"
+                        className="flex-1 px-3 py-2 rounded text-sm font-medium bg-gray-100 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-300 hover:bg-gray-200 transition-colors"
                       >
                         Abbrechen
                       </button>
                     </div>
                   </div>
                 )}
-                <p className="text-xs text-gray-500 dark:text-gray-100 mt-1">Hilfreicher Name zur Unterscheidung mehrerer Geräte</p>
+                <p className="text-xs text-gray-500 dark:text-gray-300 mt-1">Hilfreicher Name zur Unterscheidung mehrerer Geräte</p>
               </div>
             </div>
           )}
         </div>
 
         {/* Version Info */}
-        <div className="text-center text-xs text-gray-500 dark:text-gray-100 mt-6 pb-4">
+        <div className="text-center text-xs text-gray-500 dark:text-gray-300 mt-6 pb-4">
           <p>{t('settings.version', null, {version: BUILD_INFO})}</p>
           <p className="mt-1">{t('settings.made_with')}</p>
         </div>

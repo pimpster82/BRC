@@ -48,7 +48,7 @@ const LoginPage = () => {
         <h1 className="text-3xl font-bold text-center text-indigo-900 mb-2">
           Anmelden
         </h1>
-        <p className="text-center text-gray-600 dark:text-gray-100 mb-8">
+        <p className="text-center text-gray-600 dark:text-gray-300 mb-8">
           Melden Sie sich an, um Ihren Fortschritt zu synchronisieren
         </p>
 
@@ -69,7 +69,7 @@ const LoginPage = () => {
         <form onSubmit={handleLogin} className="space-y-4">
           {/* Email */}
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-100 mb-2">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               E-Mail Adresse
             </label>
             <input
@@ -78,14 +78,14 @@ const LoginPage = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="beispiel@example.com"
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
               disabled={loading}
             />
           </div>
 
           {/* Password */}
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-100 mb-2">
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Passwort
             </label>
             <input
@@ -94,7 +94,7 @@ const LoginPage = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
               disabled={loading}
             />
           </div>
@@ -111,7 +111,7 @@ const LoginPage = () => {
 
         {/* Register Link */}
         <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700 text-center">
-          <p className="text-gray-600 dark:text-gray-100 text-sm">
+          <p className="text-gray-600 dark:text-gray-300 text-sm">
             Noch kein Konto?{' '}
             <Link to="/register" className="text-indigo-600 hover:text-indigo-700 font-medium">
               Registrieren

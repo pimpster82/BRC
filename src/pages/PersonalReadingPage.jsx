@@ -427,7 +427,7 @@ export default function PersonalReadingPage() {
 
         {/* Total Progress Bar (Verse-Based) */}
         <div className="px-4 pb-4">
-          <div className="flex justify-between text-xs text-gray-600 dark:text-gray-100 mb-2">
+          <div className="flex justify-between text-xs text-gray-600 dark:text-gray-300 mb-2">
             <span>{totalProgress.versesRead} / {totalProgress.totalVerses} {t('reading.verses')}</span>
             <span>{totalProgress.percentage}%</span>
           </div>
@@ -466,7 +466,7 @@ export default function PersonalReadingPage() {
                         className={`text-blue-600 transition-transform ${isExpanded ? 'rotate-0' : '-rotate-90'}`}
                       />
                       <div className="text-left">
-                        <h3 className="font-bold text-gray-800 dark:text-gray-100">{t(category.translationKey)}</h3>
+                        <h3 className="font-bold text-gray-800 dark:text-gray-300">{t(category.translationKey)}</h3>
                       </div>
                     </div>
                   </button>
@@ -506,15 +506,15 @@ export default function PersonalReadingPage() {
 
         {selectedPlan === 'chronological' && (
           <div className="text-center py-12">
-            <p className="text-gray-600 dark:text-gray-100 mb-2">{t('reading.plan_chronological')}</p>
-            <p className="text-sm text-gray-500 dark:text-gray-100">{t('reading.coming_soon')}</p>
+            <p className="text-gray-600 dark:text-gray-300 mb-2">{t('reading.plan_chronological')}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-300">{t('reading.coming_soon')}</p>
           </div>
         )}
 
         {selectedPlan === 'oneyear' && (
           <div className="text-center py-12">
-            <p className="text-gray-600 dark:text-gray-100 mb-2">{t('reading.plan_oneyear')}</p>
-            <p className="text-sm text-gray-500 dark:text-gray-100">{t('reading.coming_soon')}</p>
+            <p className="text-gray-600 dark:text-gray-300 mb-2">{t('reading.plan_oneyear')}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-300">{t('reading.coming_soon')}</p>
           </div>
         )}
 
@@ -525,7 +525,7 @@ export default function PersonalReadingPage() {
               const progress = getThematicProgress()
               return (
                 <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-4 border border-purple-100">
-                  <div className="flex justify-between text-sm text-gray-700 dark:text-gray-100 mb-2">
+                  <div className="flex justify-between text-sm text-gray-700 dark:text-gray-300 mb-2">
                     <span className="font-medium">{t('reading.plan_thematic')}</span>
                     <span className="font-semibold">{progress.completed}/{progress.total} {t('reading.topics_completed')}</span>
                   </div>
@@ -535,7 +535,7 @@ export default function PersonalReadingPage() {
                       style={{ width: `${progress.percentage}%` }}
                     />
                   </div>
-                  <div className="text-xs text-gray-600 dark:text-gray-100 mt-2">{progress.percentage}% {t('reading.complete')}</div>
+                  <div className="text-xs text-gray-600 dark:text-gray-300 mt-2">{progress.percentage}% {t('reading.complete')}</div>
                 </div>
               )
             })()}
@@ -562,7 +562,7 @@ export default function PersonalReadingPage() {
                         size={20}
                         className={`text-purple-600 transition-transform ${isExpanded ? 'rotate-0' : '-rotate-90'}`}
                       />
-                      <h3 className="font-bold text-gray-800 dark:text-gray-100">{t(section.titleKey)}</h3>
+                      <h3 className="font-bold text-gray-800 dark:text-gray-300">{t(section.titleKey)}</h3>
                     </div>
                   </button>
 
@@ -607,9 +607,9 @@ export default function PersonalReadingPage() {
                               >
                                 <ChevronRight
                                   size={18}
-                                  className={`text-gray-600 dark:text-gray-100 transition-transform flex-shrink-0 ${isTopicExpanded ? 'rotate-90' : 'rotate-0'}`}
+                                  className={`text-gray-600 dark:text-gray-300 transition-transform flex-shrink-0 ${isTopicExpanded ? 'rotate-90' : 'rotate-0'}`}
                                 />
-                                <span className={`font-medium text-sm text-left flex-1 ${isCompleted ? 'text-purple-700 line-through' : 'text-gray-700 dark:text-gray-100'}`}>
+                                <span className={`font-medium text-sm text-left flex-1 ${isCompleted ? 'text-purple-700 line-through' : 'text-gray-700 dark:text-gray-300'}`}>
                                   {t(topic.titleKey)}
                                 </span>
                               </button>
@@ -660,7 +660,7 @@ export default function PersonalReadingPage() {
             <div className="sticky top-0 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-gray-700 p-4 flex justify-between items-center">
               <div className="flex-1">
                 <h3 className="text-lg font-bold">{bibleBooks.books[selectedBook - 1]?.name}</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-100">{bibleBooks.books[selectedBook - 1]?.chapters} {t('common.chapters')}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-300">{bibleBooks.books[selectedBook - 1]?.chapters} {t('common.chapters')}</p>
               </div>
               <button
                 onClick={() => {
@@ -668,7 +668,7 @@ export default function PersonalReadingPage() {
                   setIsSelectMode(false)
                   setSelectedChapters(new Set())
                 }}
-                className="text-gray-500 dark:text-gray-100 hover:text-gray-700 dark:text-gray-100 text-2xl"
+                className="text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:text-gray-300 text-2xl"
               >
                 ✕
               </button>
@@ -693,7 +693,7 @@ export default function PersonalReadingPage() {
                       setIsSelectMode(false)
                       setSelectedChapters(new Set())
                     }}
-                    className="flex-1 py-2 px-3 bg-gray-200 text-gray-700 dark:text-gray-100 rounded font-medium hover:bg-gray-300 text-sm"
+                    className="flex-1 py-2 px-3 bg-gray-200 text-gray-700 dark:text-gray-300 rounded font-medium hover:bg-gray-300 text-sm"
                   >
                     {t('common.cancel')}
                   </button>
@@ -747,7 +747,7 @@ export default function PersonalReadingPage() {
                       ? 'bg-yellow-500'
                       : 'bg-gray-100'
 
-                    const baseText = status ? 'text-white' : 'text-gray-700 dark:text-gray-100'
+                    const baseText = status ? 'text-white' : 'text-gray-700 dark:text-gray-300'
 
                     return (
                       <div key={chapter} className="relative">
@@ -792,7 +792,7 @@ export default function PersonalReadingPage() {
                           {chapter}
                         </button>
                         {status === 'partial' && (
-                          <div className={`text-xs text-center mt-1 ${isSelectMode && isSelected ? 'text-blue-600 font-medium' : 'text-gray-600 dark:text-gray-100'}`}>
+                          <div className={`text-xs text-center mt-1 ${isSelectMode && isSelected ? 'text-blue-600 font-medium' : 'text-gray-600 dark:text-gray-300'}`}>
                             {readVersesCount}/{totalVerses}v
                           </div>
                         )}
@@ -819,7 +819,7 @@ export default function PersonalReadingPage() {
           <div className="space-y-3">
             {/* Unified Book + Chapter Input */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-100">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 {t('reading.chapter')}
               </label>
               <input
@@ -840,7 +840,7 @@ export default function PersonalReadingPage() {
                 }`}
                 placeholder="z.B. 1mo 2-5 oder 1mo 2:5-16 oder Matthäus 24:3-14"
               />
-              <p className="text-xs text-gray-500 dark:text-gray-100">
+              <p className="text-xs text-gray-500 dark:text-gray-300">
                 Format: Buchname oder Abkürzung, dann Kapitel/Verse. Z.B. "1mo 3", "Jes 41:10", "Mt 5-7"
               </p>
             </div>
@@ -890,7 +890,7 @@ export default function PersonalReadingPage() {
                   setProgressError(null)
                   setProgressSuggestion(null)
                 }}
-                className="flex-1 py-2 bg-gray-300 text-gray-800 dark:text-gray-100 rounded font-semibold hover:bg-gray-400"
+                className="flex-1 py-2 bg-gray-300 text-gray-800 dark:text-gray-300 rounded font-semibold hover:bg-gray-400"
               >
                 {t('common.cancel')}
               </button>

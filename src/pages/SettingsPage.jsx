@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { ArrowLeft, Globe, Calendar, Bell, RotateCcw, ChevronDown, ChevronRight, BookOpen, Download, RefreshCw, Eye, Smartphone, Copy, Moon } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { useLoading } from '../context/LoadingContext'
 import { SUPPORTED_LANGUAGES, getCurrentLanguage, setCurrentLanguage } from '../config/languages'
 import { fetchScheduleFromWOL, fetchYeartextFromWOL } from '../utils/scheduleUpdater'
 import { saveScheduleToFirebase, saveYeartextToFirebase } from '../utils/firebaseSchedules'
@@ -12,6 +13,7 @@ import bibleBooks from '../../data/bible-books-en.json'
 
 const SettingsPage = () => {
   const navigate = useNavigate()
+  const { showLoading, hideLoading } = useLoading()
   const { theme, setThemePreference } = useTheme()
 
   // Expanded sections
@@ -105,6 +107,7 @@ const SettingsPage = () => {
   const handleFetchSchedule = async () => {
     setScheduleStatus('loading')
     setScheduleMessage('')
+    showLoading(t('settings.fetching_schedule'))
 
     try {
       // Fetch both schedule and yeartext from JW.org
@@ -166,6 +169,8 @@ const SettingsPage = () => {
       console.error('Schedule fetch error:', error)
       setScheduleStatus('error')
       setScheduleMessage(`❌ Fehler beim Abrufen des Leseplans: ${error.message}`)
+    } finally {
+      hideLoading()
     }
   }
 

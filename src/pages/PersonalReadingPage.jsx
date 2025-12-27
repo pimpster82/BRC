@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { ChevronLeft, ExternalLink, Check, Edit2, ChevronDown, ChevronRight, Settings } from 'lucide-react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useLoading } from '../context/LoadingContext'
+import LoadingSpinner from '../components/LoadingSpinner'
 import { t, getCurrentLanguage } from '../config/i18n'
 import { getBibleBooks } from '../config/languages'
 import { readingCategories, getBooksInCategory } from '../config/reading-categories'
@@ -36,11 +38,13 @@ import {
 export default function PersonalReadingPage() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
+  const { showLoading, hideLoading } = useLoading()
   const language = getCurrentLanguage()
   const bibleBooks = getBibleBooks(language)
 
   // State
   const [personalData, setPersonalData] = useState(null)
+  const [isLoadingInitial, setIsLoadingInitial] = useState(true)
   const [selectedBook, setSelectedBook] = useState(null)
   const [showChapterModal, setShowChapterModal] = useState(false)
   const [showProgressForm, setShowProgressForm] = useState(false)
@@ -133,6 +137,9 @@ export default function PersonalReadingPage() {
         setShowChapterModal(true)
       }
     }
+
+    // Mark initial load as complete
+    setIsLoadingInitial(false)
   }, [searchParams])
 
   // Helper: Save to localStorage and sync to Firebase if authenticated
@@ -403,6 +410,11 @@ export default function PersonalReadingPage() {
   const totalProgress = calculateTotalProgress()
   const hebrewBooks = bibleBooks.books.slice(0, 39)
   const greekBooks = bibleBooks.books.slice(39, 66)
+
+  // Show loading spinner on initial load
+  if (isLoadingInitial) {
+    return <LoadingSpinner variant="full" message={t('common.loading')} />
+  }
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950 pb-20">

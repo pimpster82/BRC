@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { ArrowLeft, ExternalLink, Check, Circle, Edit3, RotateCcw, Trash2 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { useLoading } from '../context/LoadingContext'
+import LoadingSpinner from '../components/LoadingSpinner'
 import { getCurrentWeekReading, formatWeekRange, loadScheduleForYear } from '../../data/weekly-reading-schedule'
 import { parseReadingInput, formatChapterStatus, getNextReading } from '../utils/readingParser'
 import { buildLanguageSpecificWebLink, getLocalizedBookName } from '../../data/bible-link-builder'
@@ -11,6 +13,7 @@ import { calculateVerseProgress, formatProgressText } from '../utils/verseProgre
 
 const WeeklyReadingPage = () => {
   const navigate = useNavigate()
+  const { showLoading, hideLoading } = useLoading()
   const [weekReading, setWeekReading] = useState(null)
   const [chaptersRead, setChaptersRead] = useState([])
   const [readingInput, setReadingInput] = useState('')
@@ -19,40 +22,46 @@ const WeeklyReadingPage = () => {
   const [showInput, setShowInput] = useState(false)
   const [showClearConfirm, setShowClearConfirm] = useState(false)
   const [lastAction, setLastAction] = useState(null) // Track last action for undo
+  const [isLoadingInitial, setIsLoadingInitial] = useState(true)
 
   useEffect(() => {
     const loadReading = async () => {
-      // Get test date from localStorage if set
-      const savedTestDate = localStorage.getItem('testDate')
-      const testDate = savedTestDate ? new Date(savedTestDate) : null
+      setIsLoadingInitial(true)
+      try {
+        // Get test date from localStorage if set
+        const savedTestDate = localStorage.getItem('testDate')
+        const testDate = savedTestDate ? new Date(savedTestDate) : null
 
-      // Get meeting day from settings
-      const meetingDay = parseInt(localStorage.getItem('settings_meetingDay') || '1')
+        // Get meeting day from settings
+        const meetingDay = parseInt(localStorage.getItem('settings_meetingDay') || '1')
 
-      // Determine which year we need
-      const checkDate = testDate ? new Date(testDate) : new Date()
-      const year = checkDate.getFullYear()
+        // Determine which year we need
+        const checkDate = testDate ? new Date(testDate) : new Date()
+        const year = checkDate.getFullYear()
 
-      // Load the schedule for this year if needed
-      const schedule = await loadScheduleForYear(year)
+        // Load the schedule for this year if needed
+        const schedule = await loadScheduleForYear(year)
 
-      if (!schedule) {
-        console.warn(`No schedule available for ${year}. User needs to import via Settings.`)
-        setWeekReading(null)
-        return
-      }
+        if (!schedule) {
+          console.warn(`No schedule available for ${year}. User needs to import via Settings.`)
+          setWeekReading(null)
+          return
+        }
 
-      const reading = getCurrentWeekReading(meetingDay, testDate)
-      setWeekReading(reading)
+        const reading = getCurrentWeekReading(meetingDay, testDate)
+        setWeekReading(reading)
 
-      if (reading) {
-        const saved = localStorage.getItem('weeklyReading_current')
-        if (saved) {
-          const data = JSON.parse(saved)
-          if (data.weekStart === reading.weekStart) {
-            setChaptersRead(data.chaptersRead || [])
+        if (reading) {
+          const saved = localStorage.getItem('weeklyReading_current')
+          if (saved) {
+            const data = JSON.parse(saved)
+            if (data.weekStart === reading.weekStart) {
+              setChaptersRead(data.chaptersRead || [])
+            }
           }
         }
+      } finally {
+        setIsLoadingInitial(false)
       }
     }
 
@@ -289,6 +298,11 @@ const WeeklyReadingPage = () => {
     }
   }
 
+
+  // Show loading spinner on initial load
+  if (isLoadingInitial) {
+    return <LoadingSpinner variant="full" message={t('common.loading')} />
+  }
 
   if (!weekReading) {
     return (

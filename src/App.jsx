@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from './context/AuthContext'
 import { useAuth } from './context/AuthContext'
 import { ThemeProvider } from './context/ThemeContext'
+import { LoadingProvider } from './context/LoadingContext'
+import LoadingSpinner from './components/LoadingSpinner'
 import HomePage from './pages/HomePage'
 import WeeklyReadingPage from './pages/WeeklyReadingPage'
 import ParserTestBench from './pages/ParserTestBench'
@@ -21,7 +23,7 @@ const ProtectedRoute = ({ element }) => {
   const { currentUser, loading } = useAuth()
 
   if (loading) {
-    return <LoadingSpinner message="Authentifizierung wird überprüft..." />
+    return <LoadingSpinner variant="full" message="Authentifizierung wird überprüft..." />
   }
 
   return currentUser ? element : <Navigate to="/login" replace />
@@ -87,9 +89,11 @@ function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <Router basename="">
-          <AppContent />
-        </Router>
+        <LoadingProvider>
+          <Router basename="">
+            <AppContent />
+          </Router>
+        </LoadingProvider>
       </AuthProvider>
     </ThemeProvider>
   )

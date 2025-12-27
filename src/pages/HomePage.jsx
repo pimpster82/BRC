@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { Calendar, BookOpen, Lightbulb, ExternalLink, Settings, X, RefreshCw, LogOut, LogIn } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useLoading } from '../context/LoadingContext'
 import { t, getCurrentLanguage } from '../config/i18n'
 import { getYeartextFromCache, loadProgressFromFirebase } from '../utils/storage'
 import { loadYeartextFromFirebase } from '../utils/firebaseSchedules'
@@ -9,6 +10,7 @@ import { fetchYeartextFromWol, saveYeartextToCache, getYeartextFromCache as getC
 import DailyTextCard from '../components/DailyTextCard'
 import WeeklyReadingCard from '../components/WeeklyReadingCard'
 import PersonalReadingCard from '../components/PersonalReadingCard'
+import LoadingSpinner from '../components/LoadingSpinner'
 
 // Yeartext cache for lazy loading
 const yeartextCache = {}
@@ -53,6 +55,7 @@ const loadYeartext = async (year) => {
 function HomePage() {
   const navigate = useNavigate()
   const { logout, currentUser } = useAuth()
+  const { showLoading, hideLoading } = useLoading()
   const [showDatePicker, setShowDatePicker] = useState(false)
   const [testDate, setTestDate] = useState(null)
   const [yeartext, setYeartext] = useState(null)
@@ -62,6 +65,7 @@ function HomePage() {
   const [showYeartext, setShowYeartext] = useState(true)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
+  const [isLoadingInitial, setIsLoadingInitial] = useState(true)
 
   // Pull-to-Refresh state
   const [isPulling, setIsPulling] = useState(false)
@@ -172,6 +176,7 @@ function HomePage() {
   // Load yeartext for current year and language from Firebase with fallback to legacy data
   useEffect(() => {
     const loadYeartextAsync = async () => {
+      setIsLoadingInitial(true)
       const currentYear = getCurrentDate().getFullYear()
       const language = getCurrentLanguage()
 
@@ -198,6 +203,7 @@ function HomePage() {
           }
         }
       }
+      setIsLoadingInitial(false)
     }
     loadYeartextAsync()
   }, [testDate, currentLanguage])
@@ -282,6 +288,11 @@ function HomePage() {
   const getInputDate = () => {
     const date = getCurrentDate()
     return date.toISOString().split('T')[0]
+  }
+
+  // Show loading spinner on initial load
+  if (isLoadingInitial) {
+    return <LoadingSpinner variant="full" message={t('common.loading')} />
   }
 
   return (

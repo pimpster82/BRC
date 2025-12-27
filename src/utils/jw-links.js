@@ -12,14 +12,37 @@ const jwLanguageCodes = {
   fr: 'r30/lp-f'       // French: lp-f (Français)
 }
 
+// Mapping from app language codes to JW.org wtlocale codes for finder URLs
+const wtLocaleMap = {
+  de: 'X',   // German
+  en: 'E',   // English
+  es: 'S',   // Spanish
+  it: 'I',   // Italian
+  fr: 'F'    // French
+}
+
 /**
- * Get the JW.org Daily Text URL for the current language
+ * Get the JW.org Daily Text URL for the current language with current date
+ * Uses mobile-friendly finder URL format with dynamic date parameter
  * @param {string} language - Language code (de, en, es, it, fr)
- * @returns {string} Full URL to JW.org Daily Text
+ * @param {Date} date - Date for the daily text (optional, defaults to today)
+ * @returns {string} Full URL to JW.org Daily Text with date
  */
-export const getDailyTextUrl = (language = 'en') => {
-  const jwCode = jwLanguageCodes[language] || jwLanguageCodes['en']
-  return `https://wol.jw.org/${language}/wol/dt/${jwCode}`
+export const getDailyTextUrl = (language = 'en', date = null) => {
+  // Get current date or use provided date
+  const dateObj = date || new Date()
+
+  // Format date as YYYYMMDD
+  const year = dateObj.getFullYear()
+  const month = String(dateObj.getMonth() + 1).padStart(2, '0')
+  const day = String(dateObj.getDate()).padStart(2, '0')
+  const dateStr = `${year}${month}${day}`
+
+  // Get wtlocale code for language
+  const wtlocale = wtLocaleMap[language] || wtLocaleMap['en']
+
+  // Use mobile-friendly finder URL format
+  return `https://www.jw.org/finder?srcid=jwlshare&wtlocale=${wtlocale}&prefer=lang&alias=daily-text&date=${dateStr}`
 }
 
 /**

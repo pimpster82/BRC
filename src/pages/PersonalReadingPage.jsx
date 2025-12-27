@@ -586,7 +586,7 @@ export default function PersonalReadingPage() {
                         const isCompleted = isThematicTopicComplete(topic.id)
 
                         return (
-                          <div key={topic.id} className={`border rounded-lg overflow-hidden transition-colors ${isCompleted ? 'border-purple-300 bg-purple-50' : 'border-gray-100 dark:border-gray-800'}`}>
+                          <div key={topic.id} className={`border rounded-lg overflow-hidden transition-colors ${isCompleted ? 'border-purple-300 bg-purple-50 dark:bg-purple-900 dark:border-purple-700' : 'border-gray-100 dark:border-gray-800'}`}>
                             {/* Topic Header (Clickable) */}
                             <div className="flex items-center gap-2">
                               <button
@@ -615,7 +615,7 @@ export default function PersonalReadingPage() {
                                     [topic.id]: !prev[topic.id]
                                   }))
                                 }}
-                                className={`w-full text-left bg-gray-50 dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-800 px-3 py-2 flex items-center gap-2 transition-colors ${isCompleted ? 'bg-purple-100 hover:bg-purple-150' : ''}`}
+                                className={`w-full text-left bg-gray-50 dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700 px-3 py-2 flex items-center gap-2 transition-colors ${isCompleted ? 'bg-purple-100 dark:bg-purple-800 hover:bg-purple-150 dark:hover:bg-purple-700' : ''}`}
                               >
                                 <ChevronRight
                                   size={18}
@@ -629,7 +629,7 @@ export default function PersonalReadingPage() {
 
                             {/* Topic Content - Scripture References */}
                             {isTopicExpanded && (
-                              <div className={`border-t p-3 ${isCompleted ? 'border-purple-200 dark:border-purple-900 bg-white dark:bg-slate-800' : 'border-gray-100 dark:border-gray-800 bg-white dark:bg-slate-800'}`}>
+                              <div className={`border-t p-3 ${isCompleted ? 'border-purple-200 dark:border-purple-600 bg-purple-50 dark:bg-purple-900' : 'border-gray-100 dark:border-gray-800 bg-white dark:bg-slate-800'}`}>
                                 {(() => {
                                   const versesLinks = parseMultipleVerses(topic.verses, language)
                                   return (

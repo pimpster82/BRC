@@ -1,14 +1,92 @@
 // LocalStorage utility for Bible Reading Companion
 
 import { createQueueItem, enqueueItem } from './syncQueue.js'
+import { APP_VERSION } from '../config/version.js'
+
+/**
+ * STORAGE KEY PREFIX SYSTEM
+ * ========================
+ *
+ * Prod (1.0.x): No prefix - uses standard keys
+ *   bibleCompanion_dailyText, bibleCompanion_weeklyReading, etc.
+ *   Shared Firebase DB: prod_completedDates, prod_weeklyReading, etc.
+ *
+ * Dev (dev0.x): "dev_" prefix - completely isolated
+ *   dev_bibleCompanion_dailyText, dev_bibleCompanion_weeklyReading, etc.
+ *   Shared Firebase DB: dev_completedDates, dev_weeklyReading, etc.
+ *
+ * Benefits:
+ *   ✓ No code changes needed (handled automatically here)
+ *   ✓ Prod unaffected (no modifications)
+ *   ✓ Dev completely isolated (different localStorage keys)
+ *   ✓ Can share Firebase DB without conflicts
+ *   ✓ Easy switching between versions (just use different URLs)
+ */
+
+// Determine if running in dev mode
+const isDevelopmentMode = APP_VERSION.startsWith('dev')
+const STORAGE_PREFIX = isDevelopmentMode ? 'dev_' : ''
+
+if (isDevelopmentMode) {
+  console.log('🔧 [DEV MODE] Using storage prefix: dev_')
+}
+
+/**
+ * Internal helper to get storage key with dev prefix if needed
+ * @param {string} baseKey - The base key name (without prefix)
+ * @returns {string} - The key with dev prefix if in dev mode
+ */
+const getStorageKey = (baseKey) => `${STORAGE_PREFIX}${baseKey}`
+
+/**
+ * Wrapper functions for localStorage with automatic dev prefix
+ * These handle ALL localStorage access for this app
+ * Ensures dev and prod never collide in localStorage
+ */
+const storage = {
+  /**
+   * Get item from localStorage with automatic dev prefix
+   * @param {string} key - The base key name (without dev_ prefix)
+   * @returns {string|null} - The stored value or null
+   */
+  getItem: (key) => {
+    const prefixedKey = getStorageKey(key)
+    return localStorage.getItem(prefixedKey)
+  },
+
+  /**
+   * Set item in localStorage with automatic dev prefix
+   * @param {string} key - The base key name (without dev_ prefix)
+   * @param {string} value - The value to store
+   */
+  setItem: (key, value) => {
+    const prefixedKey = getStorageKey(key)
+    localStorage.setItem(prefixedKey, value)
+  },
+
+  /**
+   * Remove item from localStorage with automatic dev prefix
+   * @param {string} key - The base key name (without dev_ prefix)
+   */
+  removeItem: (key) => {
+    const prefixedKey = getStorageKey(key)
+    localStorage.removeItem(prefixedKey)
+  }
+}
+
+/**
+ * Export wrapper as module-level function for backwards compatibility
+ * Allows: localStorage.getItem → storage.getItem
+ */
+export { storage as wrappedStorage }
 
 const STORAGE_KEYS = {
-  DAILY_TEXT: 'bibleCompanion_dailyText',
-  WEEKLY_READING: 'bibleCompanion_weeklyReading',
-  PERSONAL_READING: 'bibleCompanion_personalReading',
-  SCHEDULE_PREFIX: 'bibleCompanion_schedule_',
-  YEARTEXT_PREFIX: 'bibleCompanion_yeartext_',
-  PENDING_SYNC_QUEUE: 'bibleCompanion_pendingSyncQueue'
+  DAILY_TEXT: getStorageKey('bibleCompanion_dailyText'),
+  WEEKLY_READING: getStorageKey('bibleCompanion_weeklyReading'),
+  PERSONAL_READING: getStorageKey('bibleCompanion_personalReading'),
+  SCHEDULE_PREFIX: getStorageKey('bibleCompanion_schedule_'),
+  YEARTEXT_PREFIX: getStorageKey('bibleCompanion_yeartext_'),
+  PENDING_SYNC_QUEUE: getStorageKey('bibleCompanion_pendingSyncQueue')
 }
 
 // Daily Text Storage Functions

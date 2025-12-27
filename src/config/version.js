@@ -11,13 +11,21 @@
 export const APP_VERSION = 'dev0.2.0'
 
 /**
+ * Production Version Tracking
+ * Links this dev version to the production version currently deployed
+ * Updated when features merge from dev to production
+ * Used for rollback tracking and dependency management
+ */
+export const LINKED_PRODUCTION_VERSION = '1.0.0'  // Current prod version live at https://brc-liard.vercel.app
+
+/**
  * Build Information
  * Updated automatically with each build
  */
 export const BUILD_DATE = new Date().toISOString().split('T')[0] // YYYY-MM-DD format
 export const BUILD_TIMESTAMP = new Date().toISOString().split(':').slice(0, 2).join(':') // HH:MM format
 export const BUILD_CODE = `${BUILD_DATE.replace(/-/g, '')}-${Math.random().toString(16).substr(2, 8).toUpperCase()}` // YYYYMMDD-RANDOMHEX
-export const BUILD_INFO = `v${APP_VERSION} (${BUILD_CODE})`
+export const BUILD_INFO = `v${APP_VERSION} (${BUILD_CODE}) → prod ${LINKED_PRODUCTION_VERSION}`
 
 /**
  * VERSIONING STRATEGY
@@ -33,24 +41,55 @@ export const BUILD_INFO = `v${APP_VERSION} (${BUILD_CODE})`
  *
  * DEVELOPMENT (development branch)
  *   - dev0.2.0, dev0.2.1, dev0.2.2, etc.
- *   - Format: dev0.MINOR.PATCH-[buildcode]
- *   - [buildcode] = YYYYMMDD-RANDOMHEX (auto-generated)
- *   - Example: dev0.2.3-20251228-A3F9C2E1
+ *   - Format: dev0.MINOR.PATCH
+ *   - BUILD_CODE (auto-generated): YYYYMMDD-RANDOMHEX
+ *   - Example: v dev0.2.3 (20251228-A3F9C2E1)
  *   - For developers and internal testing
+ *   - LINKED_PRODUCTION_VERSION tracks which prod is currently live
+ *
+ * LINKED_PRODUCTION_VERSION TRACKING
+ * ==================================
+ * Each dev0.x version documents which production version is currently deployed.
+ * This enables:
+ *   1. Rollback safety: Know exactly what features are in each prod version
+ *   2. Dependency tracking: See what dev work is based on which prod version
+ *   3. Feature status: Trace which dev features merged to which prod release
+ *
+ * Example Timeline:
+ *   dev0.2.0 → prod 1.0.0 (baseline)
+ *   dev0.2.1 → prod 1.0.0 (working on new features)
+ *   dev0.2.2 → prod 1.0.0 (continuing development)
+ *   [Feature X complete and tested]
+ *   → Merge dev to master, bump prod to 1.0.1
+ *   dev0.2.3 → prod 1.0.1 (updated baseline)
+ *   [Feature Y complete]
+ *   → Merge dev to master, bump prod to 1.1.0
+ *   dev0.2.4 → prod 1.1.0 (new baseline)
  *
  * WORKFLOW
  * ========
  * 1. Work on development branch with dev0.2.x versions
  * 2. When feature is complete and tested:
- *    - Switch to master
- *    - Bump version (1.0.1 for bugfix, 1.1.0 for feature)
- *    - Merge development changes
- *    - Tag and release (v1.0.1, v1.1.0)
- * 3. Continue dev work on development branch
+ *    a. Switch to master: git checkout master
+ *    b. Bump version (1.0.1 for bugfix, 1.1.0 for feature)
+ *    c. Merge development changes
+ *    d. Tag and release (v1.0.1, v1.1.0)
+ *    e. Update LINKED_PRODUCTION_VERSION in dev/version.js to new prod version
+ *    f. git checkout development && git merge master (to sync production fixes)
+ * 3. Continue dev work on development branch with dev0.2.X incremented
  *
  * Version History
  *
- * dev0.2.0 (Development - Started v2.0 Roadmap)
+ * dev0.2.0 (Development - Started v2.0 Roadmap) [LINKED TO PROD 1.0.0]
+ * - Foundation for v2.0 development
+ * - Linked to production version 1.0.0 as baseline
+ * - Tracking rollback safety and feature dependency management
+ * - Parallel development with stable production fallback
+ * - Ready for new experimental features
+ *
+ * PRODUCTION RELEASE NOTES:
+ *
+ * 1.0.0 (Stable Release - Production Ready) [BASELINE]
  * - Comprehensive dark mode support across all UI elements
  * - Dynamic daily text links with date parameter (mobile-friendly JW.org finder URLs)
  * - Fixed thematic topics background colors in dark mode
@@ -61,7 +100,8 @@ export const BUILD_INFO = `v${APP_VERSION} (${BUILD_CODE})`
  * - Multi-device sync with timestamp-based conflict resolution
  * - Firebase authentication and real-time data synchronization
  * - Verse-level progress tracking with partial chapter support
- * - Recommended for production use and as fallback for 2.0 development
+ * - Live at: https://brc-liard.vercel.app
+ * - Serves as fallback and baseline for v2.0 development
  *
  * 0.1.2 (Dark Mode Complete - Form Fields Fix)
  * - Converted SettingsPage form fields to PBP pattern (space-y-2)

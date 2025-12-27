@@ -373,7 +373,7 @@ const SettingsPage = () => {
                 <button
                   onClick={handleShowYeartext}
                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    showYeartext ? 'bg-blue-600' : 'bg-gray-300'
+                    showYeartext ? 'bg-blue-600 dark:bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
                   }`}
                 >
                   <span
@@ -398,8 +398,8 @@ const SettingsPage = () => {
                       onClick={() => setThemePreference(option.value)}
                       className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
                         theme === option.value
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-100 text-gray-700 dark:text-gray-300 hover:bg-gray-200'
+                          ? 'bg-blue-600 dark:bg-blue-500 text-white'
+                          : 'bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-600'
                       }`}
                     >
                       {option.label}
@@ -556,7 +556,7 @@ const SettingsPage = () => {
                 <button
                   onClick={handleDailyReminderToggle}
                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    dailyReminder ? 'bg-blue-600' : 'bg-gray-300'
+                    dailyReminder ? 'bg-blue-600 dark:bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
                   }`}
                 >
                   <span
@@ -633,8 +633,8 @@ const SettingsPage = () => {
                 disabled={scheduleStatus === 'loading'}
                 className={`w-full py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 ${
                   scheduleStatus === 'loading'
-                    ? 'bg-gray-300 text-gray-600 dark:text-gray-300 cursor-not-allowed'
-                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                    ? 'bg-gray-300 dark:bg-gray-600 text-gray-600 dark:text-gray-300 cursor-not-allowed'
+                    : 'bg-blue-600 dark:bg-blue-500 text-white hover:bg-blue-700 dark:hover:bg-blue-600'
                 }`}
               >
                 {scheduleStatus === 'loading' ? (
@@ -655,10 +655,10 @@ const SettingsPage = () => {
                 <div
                   className={`mt-3 p-3 rounded-lg text-sm whitespace-pre-line ${
                     scheduleStatus === 'success'
-                      ? 'bg-green-50 text-green-800 border border-green-200'
+                      ? 'bg-green-50 dark:bg-green-900 text-green-800 dark:text-green-100 border border-green-200 dark:border-green-700'
                       : scheduleStatus === 'error'
-                      ? 'bg-red-50 text-red-800 border border-red-200'
-                      : 'bg-blue-50 text-blue-800 border border-blue-200'
+                      ? 'bg-red-50 dark:bg-red-900 text-red-800 dark:text-red-100 border border-red-200 dark:border-red-700'
+                      : 'bg-blue-50 dark:bg-blue-900 text-blue-800 dark:text-blue-100 border border-blue-200 dark:border-blue-700'
                   }`}
                 >
                   {scheduleMessage}
@@ -768,8 +768,8 @@ const SettingsPage = () => {
                     onClick={handleCopyDeviceId}
                     className={`px-3 py-2 rounded text-sm font-medium flex items-center gap-1 transition-colors ${
                       copySuccess
-                        ? 'bg-green-100 text-green-700 border border-green-300'
-                        : 'bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100'
+                        ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 border border-green-300 dark:border-green-700'
+                        : 'bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-700 hover:bg-blue-100 dark:hover:bg-blue-800'
                     }`}
                   >
                     <Copy className="w-4 h-4" />

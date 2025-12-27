@@ -62,32 +62,32 @@ const RegisterPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 dark:from-slate-800 to-indigo-50 dark:to-slate-700 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center p-4">
       <div className="bg-white dark:bg-slate-900 rounded-lg shadow-lg p-8 max-w-md w-full">
         {/* Header */}
         <div className="flex justify-center mb-6">
           <div className="bg-indigo-100 rounded-full p-3">
-            <UserPlus className="w-6 h-6 text-indigo-600" />
+            <UserPlus className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
           </div>
         </div>
 
-        <h1 className="text-3xl font-bold text-center text-indigo-900 mb-2">
+        <h1 className="text-3xl font-bold text-center text-indigo-900 dark:text-indigo-100 mb-2">
           Registrieren
         </h1>
-        <p className="text-center text-gray-600 dark:text-gray-300 mb-8">
+        <p className="text-center text-gray-600 dark:text-gray-400 dark:text-gray-300 mb-8">
           Erstellen Sie ein Konto um Ihren Fortschritt zu synchronisieren
         </p>
 
         {/* Errors */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-            <p className="text-red-700 text-sm">{error}</p>
+          <div className="bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-lg p-4 mb-6">
+            <p className="text-red-700 dark:text-red-100 text-sm">{error}</p>
           </div>
         )}
 
         {authError && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-            <p className="text-red-700 text-sm">{authError}</p>
+          <div className="bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-lg p-4 mb-6">
+            <p className="text-red-700 dark:text-red-100 text-sm">{authError}</p>
           </div>
         )}
 
@@ -153,17 +153,17 @@ const RegisterPage = () => {
 
         {/* Login Link */}
         <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700 text-center">
-          <p className="text-gray-600 dark:text-gray-300 text-sm">
+          <p className="text-gray-600 dark:text-gray-400 dark:text-gray-300 text-sm">
             Haben Sie bereits ein Konto?{' '}
-            <Link to="/login" className="text-indigo-600 hover:text-indigo-700 font-medium">
+            <Link to="/login" className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium">
               Anmelden
             </Link>
           </p>
         </div>
 
         {/* Info */}
-        <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <p className="text-blue-800 text-xs">
+        <div className="mt-6 bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
+          <p className="text-blue-800 dark:text-blue-100 text-xs">
             <strong>Hinweis:</strong> Ihre Daten werden sicher auf Firebase gespeichert.
           </p>
         </div>

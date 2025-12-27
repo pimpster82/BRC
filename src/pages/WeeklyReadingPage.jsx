@@ -292,7 +292,7 @@ const WeeklyReadingPage = () => {
 
   if (!weekReading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-slate-900 dark:to-slate-800 p-4">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 dark:from-slate-800 to-indigo-50 dark:to-slate-700 dark:from-slate-900 dark:to-slate-800 p-4">
         <div className="max-w-md mx-auto">
           <button
             onClick={() => navigate('/')}
@@ -302,7 +302,7 @@ const WeeklyReadingPage = () => {
             {t('nav.back')}
           </button>
           <div className="card card-blue">
-            <p className="text-gray-600 dark:text-gray-300">{t('weekly.no_reading')}</p>
+            <p className="text-gray-600 dark:text-gray-400 dark:text-gray-300">{t('weekly.no_reading')}</p>
           </div>
         </div>
       </div>
@@ -322,7 +322,7 @@ const WeeklyReadingPage = () => {
   const progressPercent = verseProgress.percentage
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-slate-900 dark:to-slate-800 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 dark:from-slate-800 to-indigo-50 dark:to-slate-700 dark:from-slate-900 dark:to-slate-800 p-4">
       <div className="max-w-md mx-auto">
         {/* Header */}
         <div className="mb-4 pt-4">
@@ -337,14 +337,14 @@ const WeeklyReadingPage = () => {
           <h1 className="text-xl font-bold text-gray-800 dark:text-gray-300 mb-2">
             {t('weekly.page_title')}
           </h1>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
+          <p className="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-300">
             {formatWeekRange(weekReading.weekStart, weekReading.weekEnd)}
           </p>
         </div>
 
         {/* Reading Title Card */}
         <div className="card card-blue mb-4">
-          <h2 className="text-2xl font-bold text-blue-900 mb-3">
+          <h2 className="text-2xl font-bold text-blue-900 dark:text-blue-100 mb-3">
             {parseReadingText(weekReading.reading, getCurrentLanguage())}
           </h2>
 
@@ -352,7 +352,7 @@ const WeeklyReadingPage = () => {
           <div className="mb-4">
             <div className="w-full bg-blue-200 rounded-full h-3 mb-2">
               <div
-                className="bg-blue-600 h-3 rounded-full transition-all duration-300"
+                className="bg-blue-600 dark:bg-blue-500 h-3 rounded-full transition-all duration-300"
                 style={{ width: `${progressPercent}%` }}
               ></div>
             </div>
@@ -365,10 +365,10 @@ const WeeklyReadingPage = () => {
         {/* Smart Reading Input */}
         <div className="card card-blue mb-4">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="font-semibold text-blue-900">{t('weekly.input_title')}</h3>
+            <h3 className="font-semibold text-blue-900 dark:text-blue-100">{t('weekly.input_title')}</h3>
             <button
               onClick={() => setShowInput(!showInput)}
-              className="text-sm text-blue-700 hover:text-blue-900 flex items-center gap-1"
+              className="text-sm text-blue-700 dark:text-blue-100 hover:text-blue-900 flex items-center gap-1"
             >
               <Edit3 className="w-4 h-4" />
               {showInput ? t('weekly.close') : t('weekly.submit_input')}
@@ -391,17 +391,17 @@ const WeeklyReadingPage = () => {
                     }
                   }}
                   placeholder={t('weekly.input_placeholder')}
-                  className="w-full px-3 py-2 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-blue-300 dark:border-blue-600 dark:border-blue-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 {inputError && (
-                  <p className="text-xs text-red-600 mt-1">{inputError}</p>
+                  <p className="text-xs text-red-600 dark:text-red-400 mt-1">{inputError}</p>
                 )}
 
                 {suggestion && (
-                  <div className="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <div className="mt-2 p-3 bg-yellow-50 dark:bg-yellow-900 border border-yellow-200 dark:border-yellow-700 rounded-lg">
                     {suggestion.type === 'did_you_mean' && (
                       <>
-                        <p className="text-sm font-medium text-yellow-900 mb-2">
+                        <p className="text-sm font-medium text-yellow-900 dark:text-yellow-100 mb-2">
                           {t('weekly.suggest_did_you_mean')}
                         </p>
                         <div className="flex flex-wrap gap-2">
@@ -409,7 +409,7 @@ const WeeklyReadingPage = () => {
                             <button
                               key={book.number}
                               onClick={() => handleAcceptSuggestion(book)}
-                              className="text-sm bg-white dark:bg-slate-800 border border-yellow-300 dark:border-yellow-600 px-3 py-1 rounded hover:bg-yellow-100 dark:hover:bg-slate-700 text-yellow-900 dark:text-yellow-100"
+                              className="text-sm bg-white dark:bg-slate-800 border border-yellow-300 dark:border-yellow-600 px-3 py-1 rounded hover:bg-yellow-100 dark:hover:bg-slate-600 dark:hover:bg-slate-700 text-yellow-900 dark:text-yellow-100"
                             >
                               {book.name}
                             </button>
@@ -417,7 +417,7 @@ const WeeklyReadingPage = () => {
                         </div>
                         <button
                           onClick={() => setSuggestion(null)}
-                          className="text-xs text-gray-600 dark:text-gray-300 mt-2 hover:text-gray-800 dark:text-gray-300"
+                          className="text-xs text-gray-600 dark:text-gray-400 dark:text-gray-300 mt-2 hover:text-gray-800 dark:hover:text-gray-300 dark:text-gray-300"
                         >
                           {t('weekly.suggest_cancel')}
                         </button>
@@ -425,7 +425,7 @@ const WeeklyReadingPage = () => {
                     )}
                     {suggestion.type === 'unclear' && (
                       <>
-                        <p className="text-sm font-medium text-yellow-900 mb-2">
+                        <p className="text-sm font-medium text-yellow-900 dark:text-yellow-100 mb-2">
                           {t('weekly.suggest_which_book')}
                         </p>
                         <div className="flex flex-wrap gap-2">
@@ -433,7 +433,7 @@ const WeeklyReadingPage = () => {
                             <button
                               key={book.number}
                               onClick={() => handleAcceptSuggestion(book)}
-                              className="text-sm bg-white dark:bg-slate-800 border border-yellow-300 dark:border-yellow-600 px-3 py-1 rounded hover:bg-yellow-100 dark:hover:bg-slate-700 text-yellow-900 dark:text-yellow-100"
+                              className="text-sm bg-white dark:bg-slate-800 border border-yellow-300 dark:border-yellow-600 px-3 py-1 rounded hover:bg-yellow-100 dark:hover:bg-slate-600 dark:hover:bg-slate-700 text-yellow-900 dark:text-yellow-100"
                             >
                               {book.name}
                             </button>
@@ -441,7 +441,7 @@ const WeeklyReadingPage = () => {
                         </div>
                         <button
                           onClick={() => setSuggestion(null)}
-                          className="text-xs text-gray-600 dark:text-gray-300 mt-2 hover:text-gray-800 dark:text-gray-300"
+                          className="text-xs text-gray-600 dark:text-gray-400 dark:text-gray-300 mt-2 hover:text-gray-800 dark:hover:text-gray-300 dark:text-gray-300"
                         >
                           {t('weekly.suggest_cancel_new_input')}
                         </button>
@@ -449,12 +449,12 @@ const WeeklyReadingPage = () => {
                     )}
                     {suggestion.type === 'not_found' && (
                       <>
-                        <p className="text-sm text-yellow-900">
+                        <p className="text-sm text-yellow-900 dark:text-yellow-100">
                           {t('weekly.suggest_not_found', null, {input: suggestion.input})}
                         </p>
                         <button
                           onClick={() => setSuggestion(null)}
-                          className="text-xs text-gray-600 dark:text-gray-300 mt-2 hover:text-gray-800 dark:text-gray-300"
+                          className="text-xs text-gray-600 dark:text-gray-400 dark:text-gray-300 mt-2 hover:text-gray-800 dark:hover:text-gray-300 dark:text-gray-300"
                         >
                           {t('weekly.suggest_ok')}
                         </button>
@@ -462,10 +462,10 @@ const WeeklyReadingPage = () => {
                     )}
                     {suggestion.type === 'invalid_chapter' && (
                       <>
-                        <p className="text-sm text-yellow-900 mb-2">
+                        <p className="text-sm text-yellow-900 dark:text-yellow-100 mb-2">
                           {t('weekly.suggest_invalid_chapter', null, {book: suggestion.bookName, max: suggestion.maxChapters})}
                         </p>
-                        <p className="text-sm font-medium text-yellow-900 mb-2">
+                        <p className="text-sm font-medium text-yellow-900 dark:text-yellow-100 mb-2">
                           {t('weekly.suggest_did_you_mean_this')}
                         </p>
                         <div className="flex flex-wrap gap-2">
@@ -476,16 +476,16 @@ const WeeklyReadingPage = () => {
                                 setReadingInput(`${suggestion.bookName} ${sug.display}`)
                                 setSuggestion(null)
                               }}
-                              className="text-sm bg-white dark:bg-slate-800 border border-yellow-300 dark:border-yellow-600 px-3 py-1 rounded hover:bg-yellow-100 dark:hover:bg-slate-700 text-yellow-900 dark:text-yellow-100"
+                              className="text-sm bg-white dark:bg-slate-800 border border-yellow-300 dark:border-yellow-600 px-3 py-1 rounded hover:bg-yellow-100 dark:hover:bg-slate-600 dark:hover:bg-slate-700 text-yellow-900 dark:text-yellow-100"
                             >
                               <strong>{sug.display}</strong>
-                              <span className="text-xs text-gray-600 dark:text-gray-300 ml-1">({sug.description})</span>
+                              <span className="text-xs text-gray-600 dark:text-gray-400 dark:text-gray-300 ml-1">({sug.description})</span>
                             </button>
                           ))}
                         </div>
                         <button
                           onClick={() => setSuggestion(null)}
-                          className="text-xs text-gray-600 dark:text-gray-300 mt-2 hover:text-gray-800 dark:text-gray-300"
+                          className="text-xs text-gray-600 dark:text-gray-400 dark:text-gray-300 mt-2 hover:text-gray-800 dark:hover:text-gray-300 dark:text-gray-300"
                         >
                           {t('weekly.suggest_cancel_new_input')}
                         </button>
@@ -494,14 +494,14 @@ const WeeklyReadingPage = () => {
                   </div>
                 )}
 
-                <p className="text-xs text-gray-500 dark:text-gray-300 mt-2">
-                  Beispiele: <code className="bg-gray-100 px-1">9</code> · <code className="bg-gray-100 px-1">9-10</code> · <code className="bg-gray-100 px-1">9:5-10</code>
+                <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-300 mt-2">
+                  Beispiele: <code className="bg-gray-100 dark:bg-slate-700 px-1">9</code> · <code className="bg-gray-100 dark:bg-slate-700 px-1">9-10</code> · <code className="bg-gray-100 dark:bg-slate-700 px-1">9:5-10</code>
                 </p>
               </div>
 
               <button
                 onClick={handleSubmitReading}
-                className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                className="w-full bg-blue-600 dark:bg-blue-500 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
               >
                 {t('weekly.submit')}
               </button>
@@ -518,7 +518,7 @@ const WeeklyReadingPage = () => {
                 <button
                   onClick={handleUndo}
                   title={t('weekly.undo')}
-                  className="text-xs text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1"
+                  className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 dark:text-blue-100 hover:underline flex items-center gap-1"
                 >
                   <RotateCcw className="w-3 h-3" />
                   {t('weekly.undo')}
@@ -528,7 +528,7 @@ const WeeklyReadingPage = () => {
                 <button
                   onClick={() => setShowClearConfirm(true)}
                   title={t('weekly.clear_all')}
-                  className="text-xs text-red-600 hover:text-red-800 hover:underline flex items-center gap-1"
+                  className="text-xs text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 dark:text-red-100 hover:underline flex items-center gap-1"
                 >
                   <Trash2 className="w-3 h-3" />
                   {t('weekly.clear_all')}
@@ -539,20 +539,20 @@ const WeeklyReadingPage = () => {
 
           {/* Clear Confirmation Modal */}
           {showClearConfirm && (
-            <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-sm text-red-900 mb-2">
+            <div className="mb-3 p-3 bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-lg">
+              <p className="text-sm text-red-900 dark:text-red-100 mb-2">
                 {t('weekly.clear_confirm')}
               </p>
               <div className="flex gap-2">
                 <button
                   onClick={handleClearAll}
-                  className="text-xs bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
+                  className="text-xs bg-red-600 dark:bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700 dark:hover:bg-red-600"
                 >
                   {t('weekly.clear_yes')}
                 </button>
                 <button
                   onClick={() => setShowClearConfirm(false)}
-                  className="text-xs bg-gray-300 text-gray-800 dark:text-gray-300 px-3 py-1 rounded hover:bg-gray-400"
+                  className="text-xs bg-gray-300 dark:bg-slate-600 text-gray-800 dark:text-gray-300 px-3 py-1 rounded hover:bg-gray-400"
                 >
                   {t('weekly.clear_cancel')}
                 </button>
@@ -582,11 +582,11 @@ const WeeklyReadingPage = () => {
                       className="flex-shrink-0"
                     >
                       {isRead ? (
-                        <Check className="w-6 h-6 text-green-600" />
+                        <Check className="w-6 h-6 text-green-600 dark:text-green-400" />
                       ) : isPartial ? (
-                        <div className="w-6 h-6 rounded-full border-4 border-yellow-500 border-t-transparent" />
+                        <div className="w-6 h-6 rounded-full border-4 border-yellow-500 dark:border-yellow-600 border-t-transparent" />
                       ) : (
-                        <Circle className="w-6 h-6 text-gray-400" />
+                        <Circle className="w-6 h-6 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
                       )}
                     </button>
 
@@ -599,7 +599,7 @@ const WeeklyReadingPage = () => {
                         {`${getLocalizedBookName(weekReading.reading.book, getCurrentLanguage())} ${chapter}`}
                       </p>
                       {isPartial && chapterData.verses && (
-                        <p className="text-xs text-yellow-700">
+                        <p className="text-xs text-yellow-700 dark:text-yellow-300">
                           {t('weekly.verse_read_until', null, {verse: chapterData.verses})}
                           {chapterData.continueFrom && ` · ${t('weekly.verse_continue_from', null, {verse: chapterData.continueFrom})}`}
                         </p>
@@ -627,8 +627,8 @@ const WeeklyReadingPage = () => {
 
         {/* Stats Footer */}
         {verseProgress.percentage === 100 && totalChapters > 0 && (
-          <div className="mt-6 card bg-green-50 border-green-200">
-            <p className="text-center text-green-800 font-medium">
+          <div className="mt-6 card bg-green-50 dark:bg-green-900 border-green-200 dark:border-green-700">
+            <p className="text-center text-green-800 dark:text-green-100 font-medium">
               {t('weekly.week_complete')}
             </p>
           </div>

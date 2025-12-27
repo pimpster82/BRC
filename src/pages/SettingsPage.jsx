@@ -277,7 +277,7 @@ const SettingsPage = () => {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-slate-900 dark:to-slate-800 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 dark:from-slate-800 to-indigo-50 dark:to-slate-700 dark:from-slate-900 dark:to-slate-800 p-4">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="mb-6 pt-4">
@@ -292,7 +292,7 @@ const SettingsPage = () => {
           <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-300 mb-2">
             {t('settings.title')}
           </h1>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
+          <p className="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-300">
             {t('settings.subtitle')}
           </p>
         </div>
@@ -304,15 +304,15 @@ const SettingsPage = () => {
             className="w-full flex items-center justify-between"
           >
             <div className="flex items-center gap-2">
-              <Globe className="w-5 h-5 text-blue-600" />
+              <Globe className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               <h2 className="font-semibold text-gray-800 dark:text-gray-300">{t('settings.language')}</h2>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600 dark:text-gray-300">{getLanguageName()}</span>
+              <span className="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-300">{getLanguageName()}</span>
               {expandedSection === 'language' ? (
-                <ChevronDown className="w-5 h-5 text-gray-400" />
+                <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
               ) : (
-                <ChevronRight className="w-5 h-5 text-gray-400" />
+                <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
               )}
             </div>
           </button>
@@ -338,7 +338,7 @@ const SettingsPage = () => {
                 ))}
               </div>
 
-              <p className="text-xs text-gray-500 dark:text-gray-300 mt-3">
+              <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-300 mt-3">
                 {t('settings.language_note')}
               </p>
             </div>
@@ -352,13 +352,13 @@ const SettingsPage = () => {
             className="w-full flex items-center justify-between"
           >
             <div className="flex items-center gap-2">
-              <Eye className="w-5 h-5 text-blue-600" />
+              <Eye className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               <h2 className="font-semibold text-gray-800 dark:text-gray-300">{t('settings.display')}</h2>
             </div>
             {expandedSection === 'display' ? (
-              <ChevronDown className="w-5 h-5 text-gray-400" />
+              <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
             ) : (
-              <ChevronRight className="w-5 h-5 text-gray-400" />
+              <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
             )}
           </button>
 
@@ -368,7 +368,7 @@ const SettingsPage = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('settings.show_yeartext')}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-300">{t('settings.show_yeartext_note')}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-300">{t('settings.show_yeartext_note')}</p>
                 </div>
                 <button
                   onClick={handleShowYeartext}
@@ -406,7 +406,7 @@ const SettingsPage = () => {
                     </button>
                   ))}
                 </div>
-                <p className="text-xs text-gray-500 dark:text-gray-300 mt-1">Wähle dein bevorzugtes Farbschema</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-300 mt-1">Wähle dein bevorzugtes Farbschema</p>
               </div>
             </div>
           )}
@@ -419,15 +419,15 @@ const SettingsPage = () => {
             className="w-full flex items-center justify-between"
           >
             <div className="flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-blue-600" />
+              <Calendar className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               <h2 className="font-semibold text-gray-800 dark:text-gray-300">{t('settings.weekly_reading')}</h2>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600 dark:text-gray-300">{getMeetingDayName()}</span>
+              <span className="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-300">{getMeetingDayName()}</span>
               {expandedSection === 'weekly' ? (
-                <ChevronDown className="w-5 h-5 text-gray-400" />
+                <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
               ) : (
-                <ChevronRight className="w-5 h-5 text-gray-400" />
+                <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
               )}
             </div>
           </button>
@@ -450,7 +450,7 @@ const SettingsPage = () => {
                     </option>
                   ))}
                 </select>
-                <p className="text-xs text-gray-500 dark:text-gray-300 mt-1">
+                <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-300 mt-1">
                   {t('settings.meeting_day_note')}
                 </p>
               </div>
@@ -465,15 +465,15 @@ const SettingsPage = () => {
             className="w-full flex items-center justify-between"
           >
             <div className="flex items-center gap-2">
-              <BookOpen className="w-5 h-5 text-blue-600" />
+              <BookOpen className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               <h2 className="font-semibold text-gray-800 dark:text-gray-300">{t('settings.personal_plan')}</h2>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600 dark:text-gray-300">{getReadingPlanName()}</span>
+              <span className="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-300">{getReadingPlanName()}</span>
               {expandedSection === 'personal' ? (
-                <ChevronDown className="w-5 h-5 text-gray-400" />
+                <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
               ) : (
-                <ChevronRight className="w-5 h-5 text-gray-400" />
+                <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
               )}
             </div>
           </button>
@@ -515,7 +515,7 @@ const SettingsPage = () => {
                   </div>
                 )}
 
-                <p className="text-xs text-gray-500 dark:text-gray-300 mt-3">
+                <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-300 mt-3">
                   {t('settings.reading_plan_note')}
                 </p>
               </div>
@@ -530,17 +530,17 @@ const SettingsPage = () => {
             className="w-full flex items-center justify-between"
           >
             <div className="flex items-center gap-2">
-              <Bell className="w-5 h-5 text-blue-600" />
+              <Bell className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               <h2 className="font-semibold text-gray-800 dark:text-gray-300">{t('settings.notifications')}</h2>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600 dark:text-gray-300">
+              <span className="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-300">
                 {dailyReminder ? `An (${reminderTime})` : 'Aus'}
               </span>
               {expandedSection === 'notifications' ? (
-                <ChevronDown className="w-5 h-5 text-gray-400" />
+                <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
               ) : (
-                <ChevronRight className="w-5 h-5 text-gray-400" />
+                <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
               )}
             </div>
           </button>
@@ -551,7 +551,7 @@ const SettingsPage = () => {
               <div className="flex items-center justify-between mb-3">
                 <div>
                   <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('settings.daily_reminder')}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-300">{t('settings.for_daily_text')}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-300">{t('settings.for_daily_text')}</p>
                 </div>
                 <button
                   onClick={handleDailyReminderToggle}
@@ -582,7 +582,7 @@ const SettingsPage = () => {
                 </div>
               )}
 
-              <p className="text-xs text-gray-500 dark:text-gray-300 mt-3">
+              <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-300 mt-3">
                 {t('settings.reminders_coming')}
               </p>
             </div>
@@ -596,19 +596,19 @@ const SettingsPage = () => {
             className="w-full flex items-center justify-between"
           >
             <div className="flex items-center gap-2">
-              <Download className="w-5 h-5 text-blue-600" />
+              <Download className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               <h2 className="font-semibold text-gray-800 dark:text-gray-300">{t('settings.schedule_update')}</h2>
             </div>
             {expandedSection === 'schedule' ? (
-              <ChevronDown className="w-5 h-5 text-gray-400" />
+              <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
             ) : (
-              <ChevronRight className="w-5 h-5 text-gray-400" />
+              <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
             )}
           </button>
 
           {expandedSection === 'schedule' && (
             <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
+              <p className="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-300 mb-3">
                 Lade den wöchentlichen Leseplan <strong>und Jahrestext</strong> für ein neues Jahr von JW.org herunter.
               </p>
 
@@ -665,8 +665,8 @@ const SettingsPage = () => {
                 </div>
               )}
 
-              <div className="text-xs text-gray-500 dark:text-gray-300 mt-3 space-y-1">
-                <p className="text-gray-600 dark:text-gray-300">
+              <div className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-300 mt-3 space-y-1">
+                <p className="text-gray-600 dark:text-gray-400 dark:text-gray-300">
                   {t('settings.schedule_loading')}
                 </p>
               </div>
@@ -675,61 +675,61 @@ const SettingsPage = () => {
         </div>
 
         {/* Reset All */}
-        <div className="card bg-white border border-red-200 mb-4">
+        <div className="card bg-white border border-red-200 dark:border-red-700 mb-4">
           <button
             onClick={() => toggleSection('reset')}
             className="w-full flex items-center justify-between"
           >
             <div className="flex items-center gap-2">
-              <RotateCcw className="w-5 h-5 text-red-600" />
+              <RotateCcw className="w-5 h-5 text-red-600 dark:text-red-400" />
               <h2 className="font-semibold text-gray-800 dark:text-gray-300">{t('settings.reset')}</h2>
             </div>
             {expandedSection === 'reset' ? (
-              <ChevronDown className="w-5 h-5 text-gray-400" />
+              <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
             ) : (
-              <ChevronRight className="w-5 h-5 text-gray-400" />
+              <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
             )}
           </button>
 
           {expandedSection === 'reset' && (
-            <div className="mt-4 pt-4 border-t border-red-200 space-y-3">
+            <div className="mt-4 pt-4 border-t border-red-200 dark:border-red-700 space-y-3">
               {/* Reset Settings */}
               <div>
                 <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('settings.reset_settings')}</p>
-                <p className="text-xs text-gray-600 dark:text-gray-300 mb-2">
+                <p className="text-xs text-gray-600 dark:text-gray-400 dark:text-gray-300 mb-2">
                   {t('settings.reset_settings_note')}
                 </p>
                 <button
                   onClick={handleResetAll}
-                  className="w-full bg-red-50 text-red-700 py-2 px-4 rounded-lg font-medium hover:bg-red-100 transition-colors border border-red-200"
+                  className="w-full bg-red-50 dark:bg-red-900 text-red-700 dark:text-red-100 py-2 px-4 rounded-lg font-medium hover:bg-red-100 dark:hover:bg-red-800 transition-colors border border-red-200 dark:border-red-700"
                 >
                   {t('settings.reset_settings_button')}
                 </button>
               </div>
 
               {/* Clear Cache */}
-              <div className="pt-3 border-t border-red-200">
+              <div className="pt-3 border-t border-red-200 dark:border-red-700">
                 <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Cache löschen</p>
-                <p className="text-xs text-gray-600 dark:text-gray-300 mb-2">
+                <p className="text-xs text-gray-600 dark:text-gray-400 dark:text-gray-300 mb-2">
                   Löscht gecachte Schedules und Yeartexts. Diese werden beim nächsten Laden neu von Firebase geladen.
                 </p>
                 <button
                   onClick={handleClearCache}
-                  className="w-full bg-orange-50 text-orange-700 py-2 px-4 rounded-lg font-medium hover:bg-orange-100 transition-colors border border-orange-200"
+                  className="w-full bg-orange-50 dark:bg-orange-900 text-orange-700 dark:text-orange-100 py-2 px-4 rounded-lg font-medium hover:bg-orange-100 dark:hover:bg-orange-800 transition-colors border border-orange-200"
                 >
                   Cache löschen
                 </button>
               </div>
 
               {/* Reset Progress */}
-              <div className="pt-3 border-t border-red-200">
+              <div className="pt-3 border-t border-red-200 dark:border-red-700">
                 <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('settings.reset_progress')}</p>
-                <p className="text-xs text-gray-600 dark:text-gray-300 mb-2">
+                <p className="text-xs text-gray-600 dark:text-gray-400 dark:text-gray-300 mb-2">
                   {t('settings.reset_progress_note')}
                 </p>
                 <button
                   onClick={handleResetProgress}
-                  className="w-full bg-red-100 text-red-800 py-2 px-4 rounded-lg font-medium hover:bg-red-200 transition-colors border border-red-300"
+                  className="w-full bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100 py-2 px-4 rounded-lg font-medium hover:bg-red-200 dark:hover:bg-red-800 transition-colors border border-red-300 dark:border-red-600"
                 >
                   {t('settings.reset_progress_button')}
                 </button>
@@ -739,29 +739,29 @@ const SettingsPage = () => {
         </div>
 
         {/* Device Info */}
-        <div className="card bg-white border border-blue-200 mb-4">
+        <div className="card bg-white border border-blue-200 dark:border-blue-700 mb-4">
           <button
             onClick={() => toggleSection('device')}
             className="w-full flex items-center justify-between"
           >
             <div className="flex items-center gap-2">
-              <Smartphone className="w-5 h-5 text-blue-600" />
+              <Smartphone className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               <h2 className="font-semibold text-gray-800 dark:text-gray-300">Device Info</h2>
             </div>
             {expandedSection === 'device' ? (
-              <ChevronDown className="w-5 h-5 text-gray-400" />
+              <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
             ) : (
-              <ChevronRight className="w-5 h-5 text-gray-400" />
+              <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
             )}
           </button>
 
           {expandedSection === 'device' && (
-            <div className="mt-4 pt-4 border-t border-blue-200 space-y-3">
+            <div className="mt-4 pt-4 border-t border-blue-200 dark:border-blue-700 space-y-3">
               {/* Device ID */}
               <div>
                 <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Device ID</p>
                 <div className="flex gap-2">
-                  <code className="flex-1 text-xs bg-gray-100 p-2 rounded border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-300 font-mono overflow-auto">
+                  <code className="flex-1 text-xs bg-gray-100 dark:bg-slate-700 p-2 rounded border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-300 font-mono overflow-auto">
                     {deviceId.substring(0, 12)}...
                   </code>
                   <button
@@ -776,11 +776,11 @@ const SettingsPage = () => {
                     {copySuccess ? 'Kopiert!' : 'Kopieren'}
                   </button>
                 </div>
-                <p className="text-xs text-gray-500 dark:text-gray-300 mt-1">Eindeutige Geräte-ID für Cross-Device-Synchronisation</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-300 mt-1">Eindeutige Geräte-ID für Cross-Device-Synchronisation</p>
               </div>
 
               {/* Device Name */}
-              <div className="pt-3 border-t border-blue-200">
+              <div className="pt-3 border-t border-blue-200 dark:border-blue-700">
                 <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Device Name</p>
                 {!isEditingDeviceName ? (
                   <div className="flex gap-2">
@@ -789,7 +789,7 @@ const SettingsPage = () => {
                     </p>
                     <button
                       onClick={() => setIsEditingDeviceName(true)}
-                      className="px-3 py-2 rounded text-sm font-medium bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 transition-colors"
+                      className="px-3 py-2 rounded text-sm font-medium bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-100 border border-blue-200 dark:border-blue-700 hover:bg-blue-100 dark:hover:bg-blue-800 transition-colors"
                     >
                       Bearbeiten
                     </button>
@@ -800,33 +800,33 @@ const SettingsPage = () => {
                       type="text"
                       value={tempDeviceName}
                       onChange={(e) => setTempDeviceName(e.target.value)}
-                      className="w-full text-sm px-3 py-2 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full text-sm px-3 py-2 border border-blue-300 dark:border-blue-600 dark:border-blue-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="z.B. Mein Handy"
                     />
                     <div className="flex gap-2">
                       <button
                         onClick={handleSaveDeviceName}
-                        className="flex-1 px-3 py-2 rounded text-sm font-medium bg-green-100 text-green-700 border border-green-300 hover:bg-green-200 transition-colors"
+                        className="flex-1 px-3 py-2 rounded text-sm font-medium bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 border border-green-300 dark:border-green-700 hover:bg-green-200 dark:hover:bg-green-800 transition-colors"
                       >
                         Speichern
                       </button>
                       <button
                         onClick={handleCancelEditDeviceName}
-                        className="flex-1 px-3 py-2 rounded text-sm font-medium bg-gray-100 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-300 hover:bg-gray-200 transition-colors"
+                        className="flex-1 px-3 py-2 rounded text-sm font-medium bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
                       >
                         Abbrechen
                       </button>
                     </div>
                   </div>
                 )}
-                <p className="text-xs text-gray-500 dark:text-gray-300 mt-1">Hilfreicher Name zur Unterscheidung mehrerer Geräte</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-300 mt-1">Hilfreicher Name zur Unterscheidung mehrerer Geräte</p>
               </div>
             </div>
           )}
         </div>
 
         {/* Version Info */}
-        <div className="text-center text-xs text-gray-500 dark:text-gray-300 mt-6 pb-4">
+        <div className="text-center text-xs text-gray-500 dark:text-gray-400 dark:text-gray-300 mt-6 pb-4">
           <p>{t('settings.version', null, {version: BUILD_INFO})}</p>
           <p className="mt-1">{t('settings.made_with')}</p>
         </div>

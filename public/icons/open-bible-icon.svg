@@ -1,53 +1,116 @@
 <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-  <!-- Open Bible Icon - Minimalist outline style with 3D perspective
-       Clean, simple design with thick strokes
+  <!-- Open Bible Icon - 3D Perspective View
+       Book lying flat on table, viewed from above at angle (isometric view)
+       Professional, dimensional, modern design
   -->
 
-  <!-- Left page (visible outline) -->
-  <path d="M 45 50 L 85 40 L 85 150 L 45 160 Z"
-        fill="none"
+  <defs>
+    <linearGradient id="leftPageGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:white;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f0f0f0;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="rightPageGradient" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:white;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e8e8e8;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="2" dy="3" stdDeviation="2" flood-opacity="0.3" />
+    </filter>
+  </defs>
+
+  <!-- Book shadow (subtle depth) -->
+  <ellipse cx="100" cy="155" rx="65" ry="12" fill="black" opacity="0.08" />
+
+  <!-- SPINE/BINDING - Dark center where pages meet -->
+  <path d="M 90 50 L 100 40 L 100 150 L 90 160 Z"
+        fill="#2a2a2a"
+        stroke="none" />
+
+  <!-- LEFT PAGE (front, angled view) -->
+  <path d="M 30 55 L 90 50 L 100 150 L 40 160 Z"
+        fill="url(#leftPageGradient)"
         stroke="white"
-        stroke-width="5"
+        stroke-width="3.5"
         stroke-linejoin="round"
-        stroke-linecap="round"/>
+        filter="url(#shadow)" />
 
-  <!-- Right page (visible outline) -->
-  <path d="M 115 40 L 155 50 L 155 160 L 115 150 Z"
-        fill="none"
+  <!-- LEFT PAGE edge detail (3D effect) -->
+  <path d="M 30 55 L 35 52 L 95 47 L 90 50 Z"
+        fill="#f5f5f5"
+        opacity="0.6" />
+
+  <!-- RIGHT PAGE (front, angled view) -->
+  <path d="M 100 150 L 110 150 L 160 45 L 170 50 Z"
+        fill="url(#rightPageGradient)"
         stroke="white"
-        stroke-width="5"
+        stroke-width="3.5"
         stroke-linejoin="round"
-        stroke-linecap="round"/>
+        filter="url(#shadow)" />
 
-  <!-- Center spine/binding (where pages meet) -->
-  <line x1="85" y1="40" x2="115" y2="40"
-        stroke="white"
-        stroke-width="5"
-        stroke-linecap="round"/>
-  <line x1="85" y1="150" x2="115" y2="150"
-        stroke="white"
-        stroke-width="5"
-        stroke-linecap="round"/>
+  <!-- RIGHT PAGE edge detail (3D effect) -->
+  <path d="M 110 150 L 115 153 L 165 48 L 160 45 Z"
+        fill="#e0e0e0"
+        opacity="0.5" />
 
-  <!-- Subtle page lines for text effect (left page) -->
-  <line x1="55" y1="65" x2="75" y2="62"
-        stroke="white"
-        stroke-width="3"
-        opacity="0.5"
-        stroke-linecap="round"/>
-  <line x1="55" y1="85" x2="75" y2="82"
-        stroke="white"
-        stroke-width="3"
-        opacity="0.5"
-        stroke-linecap="round"/>
-  <line x1="55" y1="105" x2="75" y2="102"
-        stroke="white"
-        stroke-width="3"
-        opacity="0.5"
-        stroke-linecap="round"/>
-  <line x1="55" y1="125" x2="75" y2="122"
-        stroke="white"
-        stroke-width="3"
-        opacity="0.5"
-        stroke-linecap="round"/>
+  <!-- TEXT LINES on LEFT PAGE (angled perspective) -->
+  <line x1="45" y1="70" x2="75" y2="68"
+        stroke="#cccccc"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        opacity="0.8"/>
+  <line x1="42" y1="85" x2="80" y2="83"
+        stroke="#cccccc"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        opacity="0.8"/>
+  <line x1="40" y1="100" x2="78" y2="98"
+        stroke="#cccccc"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        opacity="0.8"/>
+  <line x1="43" y1="115" x2="82" y2="113"
+        stroke="#cccccc"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        opacity="0.8"/>
+  <line x1="45" y1="130" x2="76" y2="128"
+        stroke="#cccccc"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        opacity="0.8"/>
+
+  <!-- TEXT LINES on RIGHT PAGE (angled perspective, opposite angle) -->
+  <line x1="120" y1="105" x2="150" y2="103"
+        stroke="#cccccc"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        opacity="0.8"/>
+  <line x1="118" y1="120" x2="155" y2="118"
+        stroke="#cccccc"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        opacity="0.8"/>
+  <line x1="120" y1="135" x2="152" y2="133"
+        stroke="#cccccc"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        opacity="0.8"/>
+
+  <!-- CROSS/PLUS symbol (book with faith content) -->
+  <g opacity="0.7">
+    <line x1="100" y1="75" x2="100" y2="110"
+          stroke="white"
+          stroke-width="2"
+          stroke-linecap="round"/>
+    <line x1="85" y1="92.5" x2="115" y2="92.5"
+          stroke="white"
+          stroke-width="2"
+          stroke-linecap="round"/>
+  </g>
+
+  <!-- Highlight on left page corner (shine/polish) -->
+  <ellipse cx="50" cy="65" rx="8" ry="12"
+           fill="white"
+           opacity="0.4" />
+
 </svg>

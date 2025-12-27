@@ -411,14 +411,14 @@ export default function PersonalReadingPage() {
         <div className="flex items-center gap-4 p-4">
           <button
             onClick={() => navigate('/')}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg"
+            className="p-2 hover:bg-gray-100 dark:hover:bg-slate-700 dark:bg-slate-700 dark:hover:bg-slate-800 rounded-lg"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
           <h1 className="text-xl font-bold flex-1">{t('home.personal_reading')}</h1>
           <button
             onClick={() => navigate('/settings')}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg"
+            className="p-2 hover:bg-gray-100 dark:hover:bg-slate-700 dark:bg-slate-700 dark:hover:bg-slate-800 rounded-lg"
             title={t('nav.settings')}
           >
             <Settings className="w-5 h-5" />
@@ -427,13 +427,13 @@ export default function PersonalReadingPage() {
 
         {/* Total Progress Bar (Verse-Based) */}
         <div className="px-4 pb-4">
-          <div className="flex justify-between text-xs text-gray-600 dark:text-gray-300 mb-2">
+          <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400 dark:text-gray-300 mb-2">
             <span>{totalProgress.versesRead} / {totalProgress.totalVerses} {t('reading.verses')}</span>
             <span>{totalProgress.percentage}%</span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+          <div className="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-2 overflow-hidden">
             <div
-              className="bg-blue-600 h-full transition-all"
+              className="bg-blue-600 dark:bg-blue-500 h-full transition-all"
               style={{ width: `${totalProgress.percentage}%` }}
             />
           </div>
@@ -458,7 +458,7 @@ export default function PersonalReadingPage() {
                         [category.id]: !prev[category.id]
                       }))
                     }}
-                    className="w-full bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 px-4 py-3 flex items-center justify-between border-b border-gray-200 dark:border-gray-700"
+                    className="w-full bg-gradient-to-r from-blue-50 dark:from-slate-800 to-indigo-50 dark:to-slate-700 hover:from-blue-100 dark:hover:from-slate-700 hover:to-indigo-100 dark:hover:to-slate-600 px-4 py-3 flex items-center justify-between border-b border-gray-200 dark:border-gray-700"
                   >
                     <div className="flex items-center gap-3 flex-1">
                       <ChevronDown
@@ -506,15 +506,15 @@ export default function PersonalReadingPage() {
 
         {selectedPlan === 'chronological' && (
           <div className="text-center py-12">
-            <p className="text-gray-600 dark:text-gray-300 mb-2">{t('reading.plan_chronological')}</p>
-            <p className="text-sm text-gray-500 dark:text-gray-300">{t('reading.coming_soon')}</p>
+            <p className="text-gray-600 dark:text-gray-400 dark:text-gray-300 mb-2">{t('reading.plan_chronological')}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-300">{t('reading.coming_soon')}</p>
           </div>
         )}
 
         {selectedPlan === 'oneyear' && (
           <div className="text-center py-12">
-            <p className="text-gray-600 dark:text-gray-300 mb-2">{t('reading.plan_oneyear')}</p>
-            <p className="text-sm text-gray-500 dark:text-gray-300">{t('reading.coming_soon')}</p>
+            <p className="text-gray-600 dark:text-gray-400 dark:text-gray-300 mb-2">{t('reading.plan_oneyear')}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-300">{t('reading.coming_soon')}</p>
           </div>
         )}
 
@@ -524,18 +524,18 @@ export default function PersonalReadingPage() {
             {(() => {
               const progress = getThematicProgress()
               return (
-                <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-4 border border-purple-100">
+                <div className="bg-gradient-to-r from-purple-50 dark:from-purple-900 to-pink-50 dark:to-pink-900 rounded-lg p-4 border border-purple-100 dark:border-purple-800">
                   <div className="flex justify-between text-sm text-gray-700 dark:text-gray-300 mb-2">
                     <span className="font-medium">{t('reading.plan_thematic')}</span>
                     <span className="font-semibold">{progress.completed}/{progress.total} {t('reading.topics_completed')}</span>
                   </div>
-                  <div className="w-full bg-purple-200 rounded-full h-2 overflow-hidden">
+                  <div className="w-full bg-purple-200 dark:bg-purple-700 rounded-full h-2 overflow-hidden">
                     <div
-                      className="bg-purple-600 h-full transition-all"
+                      className="bg-purple-600 dark:bg-purple-500 h-full transition-all"
                       style={{ width: `${progress.percentage}%` }}
                     />
                   </div>
-                  <div className="text-xs text-gray-600 dark:text-gray-300 mt-2">{progress.percentage}% {t('reading.complete')}</div>
+                  <div className="text-xs text-gray-600 dark:text-gray-400 dark:text-gray-300 mt-2">{progress.percentage}% {t('reading.complete')}</div>
                 </div>
               )
             })()}
@@ -555,7 +555,7 @@ export default function PersonalReadingPage() {
                         [section.key]: !prev[section.key]
                       }))
                     }}
-                    className="w-full bg-gradient-to-r from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 px-4 py-3 flex items-center justify-between border-b border-gray-200 dark:border-gray-700"
+                    className="w-full bg-gradient-to-r from-purple-50 dark:from-purple-900 to-pink-50 dark:to-pink-900 hover:from-purple-100 dark:hover:from-purple-800 hover:to-pink-100 dark:hover:to-pink-800 px-4 py-3 flex items-center justify-between border-b border-gray-200 dark:border-gray-700"
                   >
                     <div className="flex items-center gap-3 flex-1">
                       <ChevronDown
@@ -628,7 +628,7 @@ export default function PersonalReadingPage() {
                                           href={link.url}
                                           target="_blank"
                                           rel="noopener noreferrer"
-                                          className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors"
+                                          className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 dark:text-blue-100 hover:underline font-medium transition-colors"
                                           title={`Open ${link.book} on JW.org`}
                                         >
                                           {link.text}
@@ -660,7 +660,7 @@ export default function PersonalReadingPage() {
             <div className="sticky top-0 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-gray-700 p-4 flex justify-between items-center">
               <div className="flex-1">
                 <h3 className="text-lg font-bold">{bibleBooks.books[selectedBook - 1]?.name}</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300">{bibleBooks.books[selectedBook - 1]?.chapters} {t('common.chapters')}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-300">{bibleBooks.books[selectedBook - 1]?.chapters} {t('common.chapters')}</p>
               </div>
               <button
                 onClick={() => {
@@ -668,7 +668,7 @@ export default function PersonalReadingPage() {
                   setIsSelectMode(false)
                   setSelectedChapters(new Set())
                 }}
-                className="text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:text-gray-300 text-2xl"
+                className="text-gray-500 dark:text-gray-400 dark:text-gray-300 hover:text-gray-700 dark:text-gray-300 text-2xl"
               >
                 ✕
               </button>
@@ -682,7 +682,7 @@ export default function PersonalReadingPage() {
                     setIsSelectMode(true)
                     setSelectedChapters(new Set())
                   }}
-                  className="flex-1 py-2 px-3 bg-blue-100 text-blue-700 rounded font-medium hover:bg-blue-200 text-sm"
+                  className="flex-1 py-2 px-3 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-100 rounded font-medium hover:bg-blue-200 text-sm"
                 >
                   ☑ {t('common.select')}
                 </button>
@@ -693,7 +693,7 @@ export default function PersonalReadingPage() {
                       setIsSelectMode(false)
                       setSelectedChapters(new Set())
                     }}
-                    className="flex-1 py-2 px-3 bg-gray-200 text-gray-700 dark:text-gray-300 rounded font-medium hover:bg-gray-300 text-sm"
+                    className="flex-1 py-2 px-3 bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded font-medium hover:bg-gray-300 dark:hover:bg-slate-600 dark:bg-slate-600 text-sm"
                   >
                     {t('common.cancel')}
                   </button>
@@ -706,7 +706,7 @@ export default function PersonalReadingPage() {
                       setIsSelectMode(false)
                     }}
                     disabled={selectedChapters.size === 0}
-                    className="flex-1 py-2 px-3 bg-green-100 text-green-700 rounded font-medium hover:bg-green-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                    className="flex-1 py-2 px-3 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded font-medium hover:bg-green-200 dark:hover:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                   >
                     ✓ {t('common.mark_done')}
                   </button>
@@ -721,7 +721,7 @@ export default function PersonalReadingPage() {
                       window.dispatchEvent(new Event('personalReadingUpdated'))
                     }}
                     disabled={selectedChapters.size === 0}
-                    className="flex-1 py-2 px-3 bg-red-100 text-red-700 rounded font-medium hover:bg-red-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                    className="flex-1 py-2 px-3 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-100 rounded font-medium hover:bg-red-200 dark:hover:bg-red-800 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                   >
                     ✕ {t('common.mark_undone')}
                   </button>
@@ -811,7 +811,7 @@ export default function PersonalReadingPage() {
         {!showProgressForm ? (
           <button
             onClick={() => setShowProgressForm(true)}
-            className="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700"
+            className="w-full py-3 bg-blue-600 dark:bg-blue-500 text-white rounded-lg font-semibold hover:bg-blue-700 dark:hover:bg-blue-600"
           >
             {t('reading.add_progress')}
           </button>
@@ -840,22 +840,22 @@ export default function PersonalReadingPage() {
                 }`}
                 placeholder="z.B. 1mo 2-5 oder 1mo 2:5-16 oder Matthäus 24:3-14"
               />
-              <p className="text-xs text-gray-500 dark:text-gray-300">
+              <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-300">
                 Format: Buchname oder Abkürzung, dann Kapitel/Verse. Z.B. "1mo 3", "Jes 41:10", "Mt 5-7"
               </p>
             </div>
 
             {/* Error Message */}
             {progressError && (
-              <div className="bg-red-50 border border-red-200 rounded p-3">
-                <p className="text-sm text-red-700 font-medium">{progressError}</p>
+              <div className="bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded p-3">
+                <p className="text-sm text-red-700 dark:text-red-100 font-medium">{progressError}</p>
               </div>
             )}
 
             {/* Suggestions */}
             {progressSuggestion && (
-              <div className="bg-yellow-50 border border-yellow-200 rounded p-3 space-y-2">
-                <p className="text-sm font-medium text-yellow-800">
+              <div className="bg-yellow-50 dark:bg-yellow-900 border border-yellow-200 dark:border-yellow-700 rounded p-3 space-y-2">
+                <p className="text-sm font-medium text-yellow-800 dark:text-yellow-100">
                   {progressSuggestion.type === 'did_you_mean' && 'Did you mean one of these books?'}
                   {progressSuggestion.type === 'unclear' && `"${progressSuggestion.input}" is unclear. Which book did you mean?`}
                   {progressSuggestion.type === 'not_found' && `"${progressSuggestion.input}" not found. Did you mean one of these?`}
@@ -867,7 +867,7 @@ export default function PersonalReadingPage() {
                       onClick={() => {
                         handleAcceptSuggestion(progressSuggestion, book)
                       }}
-                      className="px-3 py-1 bg-yellow-200 text-yellow-900 rounded text-sm font-medium hover:bg-yellow-300"
+                      className="px-3 py-1 bg-yellow-200 dark:bg-yellow-700 text-yellow-900 dark:text-yellow-100 rounded text-sm font-medium hover:bg-yellow-300 dark:hover:bg-yellow-600"
                     >
                       {book.abbreviation || book.name}
                     </button>
@@ -879,7 +879,7 @@ export default function PersonalReadingPage() {
             <div className="flex gap-2">
               <button
                 onClick={handleSubmitProgress}
-                className="flex-1 py-2 bg-green-600 text-white rounded font-semibold hover:bg-green-700"
+                className="flex-1 py-2 bg-green-600 dark:bg-green-500 text-white rounded font-semibold hover:bg-green-700 dark:hover:bg-green-600"
               >
                 {t('common.save')}
               </button>
@@ -890,7 +890,7 @@ export default function PersonalReadingPage() {
                   setProgressError(null)
                   setProgressSuggestion(null)
                 }}
-                className="flex-1 py-2 bg-gray-300 text-gray-800 dark:text-gray-300 rounded font-semibold hover:bg-gray-400"
+                className="flex-1 py-2 bg-gray-300 dark:bg-slate-600 text-gray-800 dark:text-gray-300 rounded font-semibold hover:bg-gray-400"
               >
                 {t('common.cancel')}
               </button>

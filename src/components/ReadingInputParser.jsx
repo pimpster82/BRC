@@ -86,20 +86,20 @@ const ReadingInputParser = ({
             }
           }}
           placeholder={placeholder}
-          className="w-full px-3 py-2 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-3 py-2 border border-blue-300 dark:border-blue-600 dark:border-blue-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
 
         {/* Error Message */}
         {error && (
-          <p className="text-xs text-red-600 mt-1">{error}</p>
+          <p className="text-xs text-red-600 dark:text-red-400 mt-1">{error}</p>
         )}
 
         {/* Suggestions */}
         {suggestion && (
-          <div className="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <div className="mt-2 p-3 bg-yellow-50 dark:bg-yellow-900 border border-yellow-200 dark:border-yellow-700 rounded-lg">
             {suggestion.type === 'did_you_mean' && (
               <>
-                <p className="text-sm font-medium text-yellow-900 mb-2">
+                <p className="text-sm font-medium text-yellow-900 dark:text-yellow-100 mb-2">
                   Meintest du...?
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -107,7 +107,7 @@ const ReadingInputParser = ({
                     <button
                       key={book.number}
                       onClick={() => handleAcceptSuggestion(book)}
-                      className="text-sm bg-white dark:bg-slate-900 border border-yellow-300 px-3 py-1 rounded hover:bg-yellow-100 text-yellow-900"
+                      className="text-sm bg-white dark:bg-slate-900 border border-yellow-300 dark:border-yellow-600 px-3 py-1 rounded hover:bg-yellow-100 dark:hover:bg-slate-600 text-yellow-900 dark:text-yellow-100"
                     >
                       {book.name}
                     </button>
@@ -115,7 +115,7 @@ const ReadingInputParser = ({
                 </div>
                 <button
                   onClick={() => setSuggestion(null)}
-                  className="text-xs text-gray-600 mt-2 hover:text-gray-800"
+                  className="text-xs text-gray-600 dark:text-gray-400 mt-2 hover:text-gray-800 dark:hover:text-gray-300"
                 >
                   Abbrechen
                 </button>
@@ -123,7 +123,7 @@ const ReadingInputParser = ({
             )}
             {suggestion.type === 'unclear' && (
               <>
-                <p className="text-sm font-medium text-yellow-900 mb-2">
+                <p className="text-sm font-medium text-yellow-900 dark:text-yellow-100 mb-2">
                   Welches Buch meinst du?
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -131,7 +131,7 @@ const ReadingInputParser = ({
                     <button
                       key={book.number}
                       onClick={() => handleAcceptSuggestion(book)}
-                      className="text-sm bg-white dark:bg-slate-900 border border-yellow-300 px-3 py-1 rounded hover:bg-yellow-100 text-yellow-900"
+                      className="text-sm bg-white dark:bg-slate-900 border border-yellow-300 dark:border-yellow-600 px-3 py-1 rounded hover:bg-yellow-100 dark:hover:bg-slate-600 text-yellow-900 dark:text-yellow-100"
                     >
                       {book.name}
                     </button>
@@ -139,7 +139,7 @@ const ReadingInputParser = ({
                 </div>
                 <button
                   onClick={() => setSuggestion(null)}
-                  className="text-xs text-gray-600 mt-2 hover:text-gray-800"
+                  className="text-xs text-gray-600 dark:text-gray-400 mt-2 hover:text-gray-800 dark:hover:text-gray-300"
                 >
                   Neu eingeben
                 </button>
@@ -147,12 +147,12 @@ const ReadingInputParser = ({
             )}
             {suggestion.type === 'not_found' && (
               <>
-                <p className="text-sm text-yellow-900">
+                <p className="text-sm text-yellow-900 dark:text-yellow-100">
                   Buch "{suggestion.input}" nicht gefunden. Bitte erneut versuchen.
                 </p>
                 <button
                   onClick={() => setSuggestion(null)}
-                  className="text-xs text-gray-600 mt-2 hover:text-gray-800"
+                  className="text-xs text-gray-600 dark:text-gray-400 mt-2 hover:text-gray-800 dark:hover:text-gray-300"
                 >
                   OK
                 </button>
@@ -160,11 +160,11 @@ const ReadingInputParser = ({
             )}
             {suggestion.type === 'invalid_chapter' && (
               <>
-                <p className="text-sm text-yellow-900 mb-2">
+                <p className="text-sm text-yellow-900 dark:text-yellow-100 mb-2">
                   <strong>{suggestion.bookName}</strong> hat nur{' '}
                   <strong>{suggestion.maxChapters}</strong> Kapitel.
                 </p>
-                <p className="text-sm font-medium text-yellow-900 mb-2">
+                <p className="text-sm font-medium text-yellow-900 dark:text-yellow-100 mb-2">
                   Meintest du:
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -175,16 +175,16 @@ const ReadingInputParser = ({
                         setInput(`${suggestion.bookName} ${sug.display}`)
                         setSuggestion(null)
                       }}
-                      className="text-sm bg-white dark:bg-slate-900 border border-yellow-300 px-3 py-1 rounded hover:bg-yellow-100 text-yellow-900"
+                      className="text-sm bg-white dark:bg-slate-900 border border-yellow-300 dark:border-yellow-600 px-3 py-1 rounded hover:bg-yellow-100 dark:hover:bg-slate-600 text-yellow-900 dark:text-yellow-100"
                     >
                       <strong>{sug.display}</strong>
-                      <span className="text-xs text-gray-600 ml-1">({sug.description})</span>
+                      <span className="text-xs text-gray-600 dark:text-gray-400 ml-1">({sug.description})</span>
                     </button>
                   ))}
                 </div>
                 <button
                   onClick={() => setSuggestion(null)}
-                  className="text-xs text-gray-600 mt-2 hover:text-gray-800"
+                  className="text-xs text-gray-600 dark:text-gray-400 mt-2 hover:text-gray-800 dark:hover:text-gray-300"
                 >
                   Neu eingeben
                 </button>
@@ -195,14 +195,14 @@ const ReadingInputParser = ({
 
         {/* Examples */}
         {showExamples && (
-          <div className="mt-2 text-xs text-gray-600">
+          <div className="mt-2 text-xs text-gray-600 dark:text-gray-400">
             <p className="font-medium mb-1">Beispiele:</p>
-            <p>• <code className="bg-gray-100 dark:bg-slate-800 px-1 rounded">3</code> → Kapitel 3 komplett</p>
-            <p>• <code className="bg-gray-100 dark:bg-slate-800 px-1 rounded">3-5</code> → Kapitel 3 bis 5</p>
-            <p>• <code className="bg-gray-100 dark:bg-slate-800 px-1 rounded">3-4:15</code> → Kap 3 komplett, 4 bis Vers 15</p>
-            <p>• <code className="bg-gray-100 dark:bg-slate-800 px-1 rounded">3:1,2</code> → Kap 3 Verse 1 und 2</p>
-            <p>• <code className="bg-gray-100 dark:bg-slate-800 px-1 rounded">3:1,2; 4:15</code> → Kap 3 V. 1-2 und Kap 4 V. 15</p>
-            <p className="mt-1 text-gray-500">
+            <p>• <code className="bg-gray-100 dark:bg-slate-700 dark:bg-slate-800 px-1 rounded">3</code> → Kapitel 3 komplett</p>
+            <p>• <code className="bg-gray-100 dark:bg-slate-700 dark:bg-slate-800 px-1 rounded">3-5</code> → Kapitel 3 bis 5</p>
+            <p>• <code className="bg-gray-100 dark:bg-slate-700 dark:bg-slate-800 px-1 rounded">3-4:15</code> → Kap 3 komplett, 4 bis Vers 15</p>
+            <p>• <code className="bg-gray-100 dark:bg-slate-700 dark:bg-slate-800 px-1 rounded">3:1,2</code> → Kap 3 Verse 1 und 2</p>
+            <p>• <code className="bg-gray-100 dark:bg-slate-700 dark:bg-slate-800 px-1 rounded">3:1,2; 4:15</code> → Kap 3 V. 1-2 und Kap 4 V. 15</p>
+            <p className="mt-1 text-gray-500 dark:text-gray-400">
               <strong>Trenner:</strong> <code>,</code> = und · <code>;</code> = weiterer Text · <code>-</code> = bis
             </p>
           </div>
@@ -213,14 +213,14 @@ const ReadingInputParser = ({
       <div className="flex gap-2">
         <button
           onClick={handleSubmit}
-          className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+          className="flex-1 bg-blue-600 dark:bg-blue-500 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
         >
           Speichern
         </button>
         {onCancel && (
           <button
             onClick={onCancel}
-            className="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium"
+            className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-300 font-medium"
           >
             Abbrechen
           </button>

@@ -286,7 +286,7 @@ function HomePage() {
 
   return (
     <div
-      className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-slate-900 dark:to-slate-800 p-4 overflow-y-auto"
+      className="min-h-screen bg-gradient-to-br from-blue-50 dark:from-slate-800 to-indigo-50 dark:to-slate-700 dark:from-slate-900 dark:to-slate-800 p-4 overflow-y-auto"
       ref={contentRef}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
@@ -341,7 +341,7 @@ function HomePage() {
                   <button
                     onClick={handleUpdateYeartext}
                     disabled={isUpdatingYeartext}
-                    className="text-xs px-3 py-1 bg-yellow-400 dark:bg-yellow-700 text-yellow-900 dark:text-yellow-100 rounded hover:bg-yellow-500 dark:hover:bg-yellow-600 disabled:opacity-50 transition-colors flex items-center gap-1 mx-auto"
+                    className="text-xs px-3 py-1 bg-yellow-400 dark:bg-yellow-700 text-yellow-900 dark:text-yellow-100 rounded hover:bg-yellow-50 dark:bg-yellow-9000 dark:hover:bg-yellow-600 disabled:opacity-50 transition-colors flex items-center gap-1 mx-auto"
                   >
                     <RefreshCw className={`w-3 h-3 ${isUpdatingYeartext ? 'animate-spin' : ''}`} />
                     {isUpdatingYeartext ? t('common.updating') : t('home.update_yeartext')}
@@ -368,7 +368,7 @@ function HomePage() {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => navigate('/settings')}
-                className="p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 hover:bg-white dark:hover:bg-slate-800 rounded-lg transition-colors"
+                className="p-2 text-gray-600 dark:text-gray-400 dark:text-gray-300 hover:text-gray-900 hover:bg-white dark:hover:bg-slate-800 rounded-lg transition-colors"
                 aria-label="Einstellungen"
               >
                 <Settings className="w-5 h-5" />
@@ -396,7 +396,7 @@ function HomePage() {
                 <h3 className="font-semibold text-gray-800 dark:text-gray-300">{t('datepicker.title')}</h3>
                 <button
                   onClick={() => setShowDatePicker(false)}
-                  className="text-gray-400 hover:text-gray-600 dark:text-gray-300"
+                  className="text-gray-400 dark:text-gray-500 dark:text-gray-400 hover:text-gray-600 dark:hover:text-gray-400 dark:text-gray-300"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -412,13 +412,13 @@ function HomePage() {
               {testDate && (
                 <button
                   onClick={handleResetDate}
-                  className="w-full bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg font-medium hover:bg-gray-200 transition-colors text-sm"
+                  className="w-full bg-gray-100 dark:bg-slate-700 dark:bg-slate-800 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg font-medium hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors text-sm"
                 >
                   {t('datepicker.reset')}
                 </button>
               )}
 
-              <p className="text-xs text-gray-500 dark:text-gray-300 mt-2">
+              <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-300 mt-2">
                 {t('datepicker.warning')}
               </p>
             </div>
@@ -431,27 +431,27 @@ function HomePage() {
                 <h2 className="text-lg font-bold text-gray-800 dark:text-gray-300 mb-4">Abmelden?</h2>
 
                 <div className="bg-gray-50 dark:bg-slate-800 rounded-lg p-4 mb-6">
-                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">Angemeldet als:</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-300 mb-2">Angemeldet als:</p>
                   <p className="text-base font-medium text-gray-800 dark:text-gray-300 break-all">
                     {currentUser?.email}
                   </p>
                 </div>
 
-                <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">
+                <p className="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-300 mb-6">
                   Dein Fortschritt wird automatisch synchronisiert.
                 </p>
 
                 <div className="flex gap-3">
                   <button
                     onClick={handleLogoutCancel}
-                    className="flex-1 bg-gray-200 text-gray-800 dark:text-gray-300 py-2 px-4 rounded-lg font-medium hover:bg-gray-300 transition-colors"
+                    className="flex-1 bg-gray-200 dark:bg-slate-700 text-gray-800 dark:text-gray-300 py-2 px-4 rounded-lg font-medium hover:bg-gray-300 dark:hover:bg-slate-600 dark:bg-slate-600 transition-colors"
                   >
                     Abbrechen
                   </button>
                   <button
                     onClick={handleLogoutConfirmed}
                     disabled={isLoggingOut}
-                    className="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-red-700 transition-colors disabled:opacity-50"
+                    className="flex-1 bg-red-600 dark:bg-red-500 text-white py-2 px-4 rounded-lg font-medium hover:bg-red-700 dark:hover:bg-red-600 transition-colors disabled:opacity-50"
                   >
                     {isLoggingOut ? 'Abmelden...' : 'Abmelden'}
                   </button>

@@ -3,7 +3,7 @@ import { ExternalLink, Calendar } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { t, getCurrentLanguage } from '../config/i18n'
 import { getCurrentWeekReading, loadScheduleForYear } from '../../data/weekly-reading-schedule'
-import { getLocalizedBookName } from '../../data/bible-link-builder'
+import { getLocalizedBookName, buildLanguageSpecificWebLink } from '../../data/bible-link-builder'
 import { parseReadingText } from '../utils/scheduleParser'
 import { calculateVerseProgress } from '../utils/verseProgressCalculator'
 
@@ -90,6 +90,20 @@ const WeeklyReadingCard = () => {
     navigate('/weekly')
   }
 
+  const openNextChapter = (chapter) => {
+    if (!weekReading) return
+
+    // Get the book number from the week's reading
+    const bookNumber = weekReading.reading.book
+
+    // Build language-specific JW.org link
+    const links = buildLanguageSpecificWebLink(bookNumber, chapter, 1)
+
+    if (links?.web) {
+      window.location.href = links.web
+    }
+  }
+
   if (!weekReading) {
     return (
       <div className="card card-blue">
@@ -128,18 +142,14 @@ const WeeklyReadingCard = () => {
       </h2>
 
       <p className="card-description">
-        {t('weekly.week_of')}{' '}
         {nextChapter ? (
-          <>
-            <button
-              onClick={() => navigate(`/weekly?chapter=${nextChapter}`)}
-              className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors"
-              title="Continue reading"
-            >
-              {t('weekly.title')}
-            </button>
-            {' '} • {parseReadingText(weekReading.reading, getCurrentLanguage())}
-          </>
+          <button
+            onClick={() => openNextChapter(nextChapter)}
+            className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors"
+            title="Open in JW Library"
+          >
+            {parseReadingText(weekReading.reading, getCurrentLanguage())}
+          </button>
         ) : (
           parseReadingText(weekReading.reading, getCurrentLanguage())
         )}

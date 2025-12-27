@@ -8,7 +8,7 @@
  * - PATCH: Bug fixes
  */
 
-export const APP_VERSION = '0.1.1'
+export const APP_VERSION = '0.1.2'
 
 /**
  * Build Information
@@ -19,6 +19,15 @@ export const BUILD_INFO = `v${APP_VERSION} (${BUILD_DATE})`
 
 /**
  * Version History
+ *
+ * 0.1.2 (Dark Mode Complete - Form Fields Fix)
+ * - Converted SettingsPage form fields to PBP pattern (space-y-2)
+ * - Added 298+ missing dark: variants across all pages
+ * - Fixed toggle switches, chevrons, buttons in dark mode
+ * - Fixed status indicator colors (complete/partial/unread)
+ * - Fixed input validation borders and focus rings
+ * - All UI elements now properly themed in dark mode
+ * - Standardized form field spacing across pages
  *
  * 0.1.1 (Dark Mode Bug Fix Release)
  * - Fixed theme toggle buttons to properly override system preference

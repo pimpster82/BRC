@@ -41,7 +41,9 @@ const DailyTextCard = () => {
   const handleOpenDailyText = () => {
     const language = localStorage.getItem('app_language') || 'de'
     const url = getDailyTextUrl(language)
-    window.open(url, '_blank', 'noopener,noreferrer')
+    // Use direct navigation instead of window.open() to avoid iOS PWA popup
+    // This allows iOS to properly handle the Universal Link and open JW Library app
+    window.location.href = url
   }
 
   return (

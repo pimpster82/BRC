@@ -783,7 +783,8 @@ export default function PersonalReadingPage() {
                                 null,  // endVerse (null = read whole chapter)
                                 language
                               )
-                              window.open(linkObj.web, '_blank')
+                              // Use direct navigation instead of window.open() to avoid iOS PWA popup
+                              window.location.href = linkObj.web
                             }
                           }}
                           onContextMenu={(e) => {

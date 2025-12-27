@@ -1,15 +1,36 @@
-import React, { createContext, useContext, useEffect, useState } from 'react'
+import React, { createContext, useContext, useEffect, useMemo, useState } from 'react'
 
 /**
  * ThemeContext - Manage dark/light/system theme preferences
  * Persists user choice to localStorage and applies to document
+ *
+ * Themes: 'light' | 'dark' | 'system'
+ * - 'light'/'dark': Manual selection, overrides system preference
+ * - 'system': Follows OS preference, updates on OS change
+ *
+ * Fix Log:
+ * - Added error handling for localStorage access
+ * - Added useMemo to prevent unnecessary re-renders
+ * - Dev-only logging (process.env.NODE_ENV check)
+ * - Improved initialization with try/catch
+ * - Always remove both light/dark classes before adding new one
  */
 const ThemeContext = createContext()
 
 export const ThemeProvider = ({ children }) => {
-  // Theme can be: 'light', 'dark', or 'system'
+  // Initialize from localStorage with error handling
   const [theme, setTheme] = useState(() => {
-    return localStorage.getItem('settings_theme') || 'system'
+    if (typeof window === 'undefined') return 'system'
+    try {
+      const saved = localStorage.getItem('settings_theme')
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🎨 [ThemeContext Init] Loaded from localStorage:', saved || 'null (using system)')
+      }
+      return saved || 'system'
+    } catch (error) {
+      console.warn('⚠️ localStorage not available:', error)
+      return 'system'
+    }
   })
 
   /**
@@ -17,7 +38,6 @@ export const ThemeProvider = ({ children }) => {
    */
   const getActualTheme = (themeValue) => {
     if (themeValue === 'system') {
-      // Check system preference
       return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
     }
     return themeValue
@@ -28,31 +48,36 @@ export const ThemeProvider = ({ children }) => {
    */
   useEffect(() => {
     const actualTheme = getActualTheme(theme)
-    const htmlElement = document.documentElement
+    const root = document.documentElement
 
-    console.log(`🎨 Theme changed: ${theme} → ${actualTheme}`)
+    // Remove both classes first to prevent conflicts
+    root.classList.remove('light', 'dark')
+    // Add current theme class
+    root.classList.add(actualTheme)
 
-    if (actualTheme === 'dark') {
-      htmlElement.classList.add('dark')
-      console.log('✓ Added dark class to html element')
-    } else {
-      htmlElement.classList.remove('dark')
-      console.log('✓ Removed dark class from html element')
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`🎨 [ThemeContext Apply] ${theme} → ${actualTheme}`)
     }
   }, [theme])
 
   /**
-   * Listen to system preference changes when theme is 'system'
+   * Listen to system preference changes (ONLY if theme is 'system')
    */
   useEffect(() => {
+    // Early exit if user has manual preference
     if (theme !== 'system') {
-      return // Only listen if system theme is selected
+      return
     }
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-    const handleChange = () => {
-      // Trigger re-render to apply new actual theme
-      setTheme('system') // This forces useEffect above to run
+
+    const handleChange = (e) => {
+      const newActualTheme = e.matches ? 'dark' : 'light'
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`🎨 [System Preference Changed] ${newActualTheme}`)
+      }
+      // Trigger re-render to apply new system theme
+      setTheme('system')
     }
 
     mediaQuery.addEventListener('change', handleChange)
@@ -60,11 +85,23 @@ export const ThemeProvider = ({ children }) => {
   }, [theme])
 
   /**
-   * Set theme preference
+   * Set and persist theme preference
    */
   const setThemePreference = (newTheme) => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`🎨 [setThemePreference] Changing from "${theme}" to "${newTheme}"`)
+    }
+
     setTheme(newTheme)
-    localStorage.setItem('settings_theme', newTheme)
+
+    try {
+      localStorage.setItem('settings_theme', newTheme)
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`🎨 [localStorage] Saved "${newTheme}" to localStorage`)
+      }
+    } catch (error) {
+      console.error('❌ Failed to save theme to localStorage:', error)
+    }
   }
 
   /**
@@ -72,8 +109,16 @@ export const ThemeProvider = ({ children }) => {
    */
   const actualTheme = getActualTheme(theme)
 
+  /**
+   * Memoize context value to prevent unnecessary re-renders of children
+   */
+  const value = useMemo(
+    () => ({ theme, setThemePreference, actualTheme }),
+    [theme, actualTheme]
+  )
+
   return (
-    <ThemeContext.Provider value={{ theme, setThemePreference, actualTheme }}>
+    <ThemeContext.Provider value={value}>
       {children}
     </ThemeContext.Provider>
   )

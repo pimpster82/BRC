@@ -15,6 +15,30 @@
     <link rel="icon" type="image/svg+xml" href="/icons/open-bible-icon.svg" />
     <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
 
+    <!-- FOUC Prevention: Apply theme BEFORE React loads -->
+    <!-- This script runs synchronously before any styles are applied -->
+    <!-- It prevents the "flash of light mode" when user has dark mode selected -->
+    <script>
+      (function() {
+        try {
+          const theme = localStorage.getItem('settings_theme') || 'system'
+          let actualTheme = theme
+
+          if (theme === 'system') {
+            actualTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+          }
+
+          // Apply dark class immediately if needed
+          if (actualTheme === 'dark') {
+            document.documentElement.classList.add('dark')
+          }
+        } catch (e) {
+          // Silently fail if localStorage unavailable
+          // Theme will be applied by React/ThemeContext
+        }
+      })()
+    </script>
+
     <title>Bible Reading Companion</title>
   </head>
   <body>

@@ -276,12 +276,15 @@ const SettingsPage = () => {
     { value: '6', label: t('weekday.saturday') }
   ]
 
-  const readingPlans = [
-    { value: 'free', label: t('reading.plan_free') },
-    { value: 'chronological', label: t('reading.plan_chronological') },
-    { value: 'oneyear', label: t('reading.plan_oneyear') },
-    { value: 'thematic', label: t('reading.plan_thematic') }
+  // Available reading plans - show coming soon plans only in admin mode
+  const allReadingPlans = [
+    { value: 'free', label: t('reading.plan_free'), available: true },
+    { value: 'chronological', label: t('reading.plan_chronological'), available: false },
+    { value: 'oneyear', label: t('reading.plan_oneyear'), available: false },
+    { value: 'thematic', label: t('reading.plan_thematic'), available: true }
   ]
+
+  const readingPlans = allReadingPlans.filter(plan => plan.available || isAdminMode)
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 dark:from-slate-800 to-indigo-50 dark:to-slate-700 dark:from-slate-900 dark:to-slate-800 p-4">

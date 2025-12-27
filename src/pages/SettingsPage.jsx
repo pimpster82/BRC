@@ -298,7 +298,7 @@ const SettingsPage = () => {
         </div>
 
         {/* Language Settings */}
-        <div className="card bg-white border border-gray-200 dark:border-gray-700 mb-3">
+        <div className="card bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-700 mb-3">
           <button
             onClick={() => toggleSection('language')}
             className="w-full flex items-center justify-between"
@@ -346,7 +346,7 @@ const SettingsPage = () => {
         </div>
 
         {/* Display Settings */}
-        <div className="card bg-white border border-gray-200 dark:border-gray-700 mb-3">
+        <div className="card bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-700 mb-3">
           <button
             onClick={() => toggleSection('display')}
             className="w-full flex items-center justify-between"
@@ -413,7 +413,7 @@ const SettingsPage = () => {
         </div>
 
         {/* Weekly Reading Settings */}
-        <div className="card bg-white border border-gray-200 dark:border-gray-700 mb-3">
+        <div className="card bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-700 mb-3">
           <button
             onClick={() => toggleSection('weekly')}
             className="w-full flex items-center justify-between"
@@ -459,7 +459,7 @@ const SettingsPage = () => {
         </div>
 
         {/* Personal Reading Plan */}
-        <div className="card bg-white border border-gray-200 dark:border-gray-700 mb-3">
+        <div className="card bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-700 mb-3">
           <button
             onClick={() => toggleSection('personal')}
             className="w-full flex items-center justify-between"
@@ -524,7 +524,7 @@ const SettingsPage = () => {
         </div>
 
         {/* Notifications */}
-        <div className="card bg-white border border-gray-200 dark:border-gray-700 mb-3">
+        <div className="card bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-700 mb-3">
           <button
             onClick={() => toggleSection('notifications')}
             className="w-full flex items-center justify-between"
@@ -590,7 +590,7 @@ const SettingsPage = () => {
         </div>
 
         {/* Schedule Update */}
-        <div className="card bg-white border border-gray-200 dark:border-gray-700 mb-3">
+        <div className="card bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-700 mb-3">
           <button
             onClick={() => toggleSection('schedule')}
             className="w-full flex items-center justify-between"
@@ -675,7 +675,7 @@ const SettingsPage = () => {
         </div>
 
         {/* Reset All */}
-        <div className="card bg-white border border-red-200 dark:border-red-700 mb-4">
+        <div className="card bg-white dark:bg-slate-900 border border-red-200 dark:border-red-700 mb-4">
           <button
             onClick={() => toggleSection('reset')}
             className="w-full flex items-center justify-between"
@@ -739,7 +739,7 @@ const SettingsPage = () => {
         </div>
 
         {/* Device Info */}
-        <div className="card bg-white border border-blue-200 dark:border-blue-700 mb-4">
+        <div className="card bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-700 mb-4">
           <button
             onClick={() => toggleSection('device')}
             className="w-full flex items-center justify-between"

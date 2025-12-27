@@ -1,116 +1,112 @@
 <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-  <!-- Open Bible Icon - 3D Perspective View
-       Book lying flat on table, viewed from above at angle (isometric view)
-       Professional, dimensional, modern design
+  <!-- Open Bible Icon - Modern professional design (DALL-E 3 inspired)
+       Clean lineart style with navy blue and accent blue color
   -->
 
-  <defs>
-    <linearGradient id="leftPageGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:white;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#f0f0f0;stop-opacity:1" />
-    </linearGradient>
-    <linearGradient id="rightPageGradient" x1="100%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:white;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#e8e8e8;stop-opacity:1" />
-    </linearGradient>
-    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
-      <feDropShadow dx="2" dy="3" stdDeviation="2" flood-opacity="0.3" />
-    </filter>
-  </defs>
+  <!-- Background circle for PWA -->
+  <circle cx="100" cy="100" r="95" fill="#f5f5f5" stroke="none" />
 
-  <!-- Book shadow (subtle depth) -->
-  <ellipse cx="100" cy="155" rx="65" ry="12" fill="black" opacity="0.08" />
+  <!-- Left page -->
+  <path d="M 50 50 Q 50 40 60 40 L 95 40 L 95 160 L 60 160 Q 50 160 50 150 Z"
+        fill="white"
+        stroke="#1a3a52"
+        stroke-width="4"
+        stroke-linejoin="round"
+        stroke-linecap="round" />
 
-  <!-- SPINE/BINDING - Dark center where pages meet -->
-  <path d="M 90 50 L 100 40 L 100 150 L 90 160 Z"
-        fill="#2a2a2a"
+  <!-- Right page -->
+  <path d="M 105 40 L 140 40 Q 150 40 150 50 L 150 150 Q 150 160 140 160 L 105 160 Z"
+        fill="white"
+        stroke="#1a3a52"
+        stroke-width="4"
+        stroke-linejoin="round"
+        stroke-linecap="round" />
+
+  <!-- Center binding/spine -->
+  <line x1="95" y1="40" x2="105" y2="40"
+        stroke="#1a3a52"
+        stroke-width="4"
+        stroke-linecap="round" />
+  <line x1="95" y1="160" x2="105" y2="160"
+        stroke="#1a3a52"
+        stroke-width="4"
+        stroke-linecap="round" />
+
+  <!-- Text lines on left page -->
+  <line x1="62" y1="62" x2="88" y2="62"
+        stroke="#1a3a52"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        opacity="0.7" />
+  <line x1="62" y1="78" x2="92" y2="78"
+        stroke="#1a3a52"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        opacity="0.7" />
+  <line x1="62" y1="94" x2="90" y2="94"
+        stroke="#1a3a52"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        opacity="0.7" />
+  <line x1="62" y1="110" x2="88" y2="110"
+        stroke="#1a3a52"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        opacity="0.7" />
+  <line x1="62" y1="126" x2="86" y2="126"
+        stroke="#1a3a52"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        opacity="0.7" />
+  <line x1="62" y1="142" x2="88" y2="142"
+        stroke="#1a3a52"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        opacity="0.7" />
+
+  <!-- Text lines on right page -->
+  <line x1="115" y1="62" x2="141" y2="62"
+        stroke="#1a3a52"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        opacity="0.7" />
+  <line x1="115" y1="78" x2="145" y2="78"
+        stroke="#1a3a52"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        opacity="0.7" />
+  <line x1="115" y1="94" x2="143" y2="94"
+        stroke="#1a3a52"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        opacity="0.7" />
+  <line x1="115" y1="110" x2="141" y2="110"
+        stroke="#1a3a52"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        opacity="0.7" />
+  <line x1="115" y1="126" x2="139" y2="126"
+        stroke="#1a3a52"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        opacity="0.7" />
+  <line x1="115" y1="142" x2="141" y2="142"
+        stroke="#1a3a52"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        opacity="0.7" />
+
+  <!-- Blue bookmark ribbon (accent color) -->
+  <path d="M 100 35 L 107 35 Q 110 35 110 40 L 110 85 Q 107 90 100 85 Q 93 90 90 85 L 90 40 Q 90 35 93 35 Z"
+        fill="#2563eb"
         stroke="none" />
 
-  <!-- LEFT PAGE (front, angled view) -->
-  <path d="M 30 55 L 90 50 L 100 150 L 40 160 Z"
-        fill="url(#leftPageGradient)"
+  <!-- Bookmark accent lines for detail -->
+  <path d="M 100 50 Q 100 55 100 70"
+        fill="none"
         stroke="white"
-        stroke-width="3.5"
-        stroke-linejoin="round"
-        filter="url(#shadow)" />
-
-  <!-- LEFT PAGE edge detail (3D effect) -->
-  <path d="M 30 55 L 35 52 L 95 47 L 90 50 Z"
-        fill="#f5f5f5"
+        stroke-width="1.5"
+        stroke-linecap="round"
         opacity="0.6" />
-
-  <!-- RIGHT PAGE (front, angled view) -->
-  <path d="M 100 150 L 110 150 L 160 45 L 170 50 Z"
-        fill="url(#rightPageGradient)"
-        stroke="white"
-        stroke-width="3.5"
-        stroke-linejoin="round"
-        filter="url(#shadow)" />
-
-  <!-- RIGHT PAGE edge detail (3D effect) -->
-  <path d="M 110 150 L 115 153 L 165 48 L 160 45 Z"
-        fill="#e0e0e0"
-        opacity="0.5" />
-
-  <!-- TEXT LINES on LEFT PAGE (angled perspective) -->
-  <line x1="45" y1="70" x2="75" y2="68"
-        stroke="#cccccc"
-        stroke-width="2.5"
-        stroke-linecap="round"
-        opacity="0.8"/>
-  <line x1="42" y1="85" x2="80" y2="83"
-        stroke="#cccccc"
-        stroke-width="2.5"
-        stroke-linecap="round"
-        opacity="0.8"/>
-  <line x1="40" y1="100" x2="78" y2="98"
-        stroke="#cccccc"
-        stroke-width="2.5"
-        stroke-linecap="round"
-        opacity="0.8"/>
-  <line x1="43" y1="115" x2="82" y2="113"
-        stroke="#cccccc"
-        stroke-width="2.5"
-        stroke-linecap="round"
-        opacity="0.8"/>
-  <line x1="45" y1="130" x2="76" y2="128"
-        stroke="#cccccc"
-        stroke-width="2.5"
-        stroke-linecap="round"
-        opacity="0.8"/>
-
-  <!-- TEXT LINES on RIGHT PAGE (angled perspective, opposite angle) -->
-  <line x1="120" y1="105" x2="150" y2="103"
-        stroke="#cccccc"
-        stroke-width="2.5"
-        stroke-linecap="round"
-        opacity="0.8"/>
-  <line x1="118" y1="120" x2="155" y2="118"
-        stroke="#cccccc"
-        stroke-width="2.5"
-        stroke-linecap="round"
-        opacity="0.8"/>
-  <line x1="120" y1="135" x2="152" y2="133"
-        stroke="#cccccc"
-        stroke-width="2.5"
-        stroke-linecap="round"
-        opacity="0.8"/>
-
-  <!-- CROSS/PLUS symbol (book with faith content) -->
-  <g opacity="0.7">
-    <line x1="100" y1="75" x2="100" y2="110"
-          stroke="white"
-          stroke-width="2"
-          stroke-linecap="round"/>
-    <line x1="85" y1="92.5" x2="115" y2="92.5"
-          stroke="white"
-          stroke-width="2"
-          stroke-linecap="round"/>
-  </g>
-
-  <!-- Highlight on left page corner (shine/polish) -->
-  <ellipse cx="50" cy="65" rx="8" ry="12"
-           fill="white"
-           opacity="0.4" />
 
 </svg>

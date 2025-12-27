@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="description" content="Bible Reading Companion - Track your daily Bible reading" />
     <meta name="theme-color" content="#1E40AF" />
 
@@ -13,7 +13,18 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16x16.png" />
     <link rel="icon" type="image/svg+xml" href="/icons/open-bible-icon.svg" />
-    <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+
+    <!-- iOS App Icons (iOS 25+ and earlier versions) -->
+    <link rel="apple-touch-icon" href="/icons/icon-ios-180x180.png" />
+    <link rel="apple-touch-icon" sizes="120x120" href="/icons/icon-ios-120x120.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-ios-152x152.png" />
+    <link rel="apple-touch-icon" sizes="167x167" href="/icons/icon-ios-167x167.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-ios-180x180.png" />
+
+    <!-- iOS Web App Configuration -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="BRC" />
 
     <!-- FOUC Prevention: Apply theme BEFORE React loads -->
     <!-- This script runs synchronously before any styles are applied -->

@@ -8,19 +8,49 @@
  * - PATCH: Bug fixes
  */
 
-export const APP_VERSION = '1.0.0'
+export const APP_VERSION = 'dev0.2.0'
 
 /**
  * Build Information
  * Updated automatically with each build
  */
 export const BUILD_DATE = new Date().toISOString().split('T')[0] // YYYY-MM-DD format
-export const BUILD_INFO = `v${APP_VERSION} (${BUILD_DATE})`
+export const BUILD_TIMESTAMP = new Date().toISOString().split(':').slice(0, 2).join(':') // HH:MM format
+export const BUILD_CODE = `${BUILD_DATE.replace(/-/g, '')}-${Math.random().toString(16).substr(2, 8).toUpperCase()}` // YYYYMMDD-RANDOMHEX
+export const BUILD_INFO = `v${APP_VERSION} (${BUILD_CODE})`
 
 /**
+ * VERSIONING STRATEGY
+ * ===================
+ *
+ * PRODUCTION (master branch)
+ *   - 1.0.0, 1.0.1, 1.1.0, 1.2.0, 2.0.0, etc.
+ *   - Semantic Versioning: MAJOR.MINOR.PATCH
+ *   - 1.0.1 = Bugfix for 1.0.0
+ *   - 1.1.0 = New feature added to 1.0.x
+ *   - 2.0.0 = Breaking changes or major redesign
+ *   - For testers and end users (stable, tested)
+ *
+ * DEVELOPMENT (development branch)
+ *   - dev0.2.0, dev0.2.1, dev0.2.2, etc.
+ *   - Format: dev0.MINOR.PATCH-[buildcode]
+ *   - [buildcode] = YYYYMMDD-RANDOMHEX (auto-generated)
+ *   - Example: dev0.2.3-20251228-A3F9C2E1
+ *   - For developers and internal testing
+ *
+ * WORKFLOW
+ * ========
+ * 1. Work on development branch with dev0.2.x versions
+ * 2. When feature is complete and tested:
+ *    - Switch to master
+ *    - Bump version (1.0.1 for bugfix, 1.1.0 for feature)
+ *    - Merge development changes
+ *    - Tag and release (v1.0.1, v1.1.0)
+ * 3. Continue dev work on development branch
+ *
  * Version History
  *
- * 1.0.0 (Stable Release - Production Ready)
+ * dev0.2.0 (Development - Started v2.0 Roadmap)
  * - Comprehensive dark mode support across all UI elements
  * - Dynamic daily text links with date parameter (mobile-friendly JW.org finder URLs)
  * - Fixed thematic topics background colors in dark mode

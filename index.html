@@ -33,6 +33,7 @@
     <!-- FOUC Prevention: Apply theme BEFORE React loads -->
     <!-- This script runs synchronously before any styles are applied -->
     <!-- It prevents the "flash of light mode" when user has dark mode selected -->
+    <!-- Also dynamically sets app icon for Dev vs Prod identification -->
     <script>
       (function() {
         try {
@@ -50,6 +51,23 @@
         } catch (e) {
           // Silently fail if localStorage unavailable
           // Theme will be applied by React/ThemeContext
+        }
+
+        // Dev/Prod Icon Detection
+        // If running on dev URL, use dark icons for visual distinction
+        const isDevMode = window.location.hostname.includes('dev')
+        if (isDevMode) {
+          // Replace all icon references with dark versions for Dev environment
+          const iconLinks = document.querySelectorAll('link[rel*="icon"]')
+          iconLinks.forEach(link => {
+            if (link.href.includes('icon-light')) {
+              link.href = link.href.replace('icon-light', 'icon-dark')
+            }
+            if (link.href.includes('apple-touch-icon') && link.href.includes('icon-light')) {
+              link.href = link.href.replace('icon-light', 'icon-dark')
+            }
+          })
+          console.log('🔧 [DEV MODE] Using dark icons for visual distinction')
         }
       })()
     </script>

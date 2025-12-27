@@ -11,6 +11,7 @@ const WeeklyReadingCard = () => {
   const navigate = useNavigate()
   const [weekReading, setWeekReading] = useState(null)
   const [chaptersRead, setChaptersRead] = useState([])
+  const [nextChapter, setNextChapter] = useState(null)
 
   const loadReading = async () => {
     // Get test date from localStorage if set
@@ -40,12 +41,25 @@ const WeeklyReadingCard = () => {
     // Load saved progress from localStorage
     if (reading) {
       const saved = localStorage.getItem('weeklyReading_current')
+      let chaptersReadData = []
       if (saved) {
         const data = JSON.parse(saved)
         // Check if it's the same week
         if (data.weekStart === reading.weekStart) {
-          setChaptersRead(data.chaptersRead || [])
+          chaptersReadData = data.chaptersRead || []
+          setChaptersRead(chaptersReadData)
         }
+      }
+
+      // Calculate next unread chapter
+      const chaptersReadSet = new Set(chaptersReadData.map(c => c.chapter))
+      const nextUnreadChapter = reading.chapters.find(chapter => !chaptersReadSet.has(chapter))
+
+      if (nextUnreadChapter) {
+        setNextChapter(nextUnreadChapter)
+      } else {
+        // All chapters read
+        setNextChapter(null)
       }
     }
   }
@@ -114,7 +128,21 @@ const WeeklyReadingCard = () => {
       </h2>
 
       <p className="card-description">
-        {t('weekly.week_of')} {parseReadingText(weekReading.reading, getCurrentLanguage())}
+        {t('weekly.week_of')}{' '}
+        {nextChapter ? (
+          <>
+            <button
+              onClick={() => navigate(`/weekly?chapter=${nextChapter}`)}
+              className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors"
+              title="Continue reading"
+            >
+              {t('weekly.title')}
+            </button>
+            {' '} • {parseReadingText(weekReading.reading, getCurrentLanguage())}
+          </>
+        ) : (
+          parseReadingText(weekReading.reading, getCurrentLanguage())
+        )}
       </p>
 
       <div className="card-footer card-footer-blue">

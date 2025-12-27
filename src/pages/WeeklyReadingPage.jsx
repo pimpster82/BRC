@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { ArrowLeft, ExternalLink, Check, Circle, Edit3, RotateCcw, Trash2 } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useLoading } from '../context/LoadingContext'
 import LoadingSpinner from '../components/LoadingSpinner'
 import { getCurrentWeekReading, formatWeekRange, loadScheduleForYear } from '../../data/weekly-reading-schedule'
@@ -13,6 +13,7 @@ import { calculateVerseProgress, formatProgressText } from '../utils/verseProgre
 
 const WeeklyReadingPage = () => {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const { showLoading, hideLoading } = useLoading()
   const [weekReading, setWeekReading] = useState(null)
   const [chaptersRead, setChaptersRead] = useState([])
@@ -23,6 +24,7 @@ const WeeklyReadingPage = () => {
   const [showClearConfirm, setShowClearConfirm] = useState(false)
   const [lastAction, setLastAction] = useState(null) // Track last action for undo
   const [isLoadingInitial, setIsLoadingInitial] = useState(true)
+  const [autoScrollChapter, setAutoScrollChapter] = useState(null) // For chapter from query params
 
   useEffect(() => {
     const loadReading = async () => {
@@ -59,6 +61,16 @@ const WeeklyReadingPage = () => {
               setChaptersRead(data.chaptersRead || [])
             }
           }
+
+          // Check for chapter query parameter to auto-scroll
+          const chapterParam = searchParams.get('chapter')
+          if (chapterParam) {
+            const chapterNumber = parseInt(chapterParam)
+            // Verify it's a valid chapter in this week's reading
+            if (reading.chapters.includes(chapterNumber)) {
+              setAutoScrollChapter(chapterNumber)
+            }
+          }
         }
       } finally {
         setIsLoadingInitial(false)
@@ -66,7 +78,27 @@ const WeeklyReadingPage = () => {
     }
 
     loadReading()
-  }, [])
+  }, [searchParams])
+
+  // Auto-scroll to chapter when navigating from card
+  useEffect(() => {
+    if (autoScrollChapter && !isLoadingInitial) {
+      // Small delay to ensure DOM is ready
+      setTimeout(() => {
+        const chapterElement = document.querySelector(`[data-chapter="${autoScrollChapter}"]`)
+        if (chapterElement) {
+          chapterElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
+          // Also highlight the element briefly
+          chapterElement.classList.add('ring-2', 'ring-blue-400', 'dark:ring-blue-500')
+          setTimeout(() => {
+            chapterElement.classList.remove('ring-2', 'ring-blue-400', 'dark:ring-blue-500')
+          }, 2000)
+        }
+        // Clear the parameter so it doesn't scroll again
+        setAutoScrollChapter(null)
+      }, 100)
+    }
+  }, [autoScrollChapter, isLoadingInitial])
 
   const handleSubmitReading = async () => {
     if (!readingInput.trim()) {
@@ -582,7 +614,8 @@ const WeeklyReadingPage = () => {
             return (
               <div
                 key={chapter}
-                className={`card ${
+                data-chapter={chapter}
+                className={`card transition-all duration-500 ${
                   isRead ? 'border-green-200 dark:border-green-700 bg-green-50 dark:bg-green-900' :
                   isPartial ? 'border-yellow-200 dark:border-yellow-700 bg-yellow-50 dark:bg-yellow-900' :
                   'card-blue'

@@ -12,7 +12,6 @@ import SettingsPage from './pages/SettingsPage'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import PersonalReadingPage from './pages/PersonalReadingPage'
-import LoadingSpinner from './components/LoadingSpinner'
 import { processPendingSyncQueue } from './utils/firebaseUserProgress'
 
 /**

@@ -101,7 +101,7 @@ export const translations = {
     'dailytext.marked_read': '✓ Gelesen',
     'dailytext.day_streak_singular': 'Tag',
     'dailytext.day_streak_plural': 'Tage',
-    'dailytext.preview': '"Friede Gottes, bewahrt eure Herzen..." — Philipper 4:7',
+    'dailytext.preview': 'Lies Gottes Wort täglich!',
     'dailytext.open': 'Öffnen',
 
     // Weekly Reading Card & Page
@@ -329,7 +329,7 @@ export const translations = {
     'dailytext.marked_read': '✓ Read',
     'dailytext.day_streak_singular': 'day',
     'dailytext.day_streak_plural': 'days',
-    'dailytext.preview': '"Let the peace of God rule in your hearts..." — Philippians 4:7',
+    'dailytext.preview': 'Read God\'s Word Daily!',
     'dailytext.open': 'Open',
 
     // Weekly Reading Card & Page
@@ -542,7 +542,7 @@ export const translations = {
     'dailytext.marked_read': '✓ Leído',
     'dailytext.day_streak_singular': 'día',
     'dailytext.day_streak_plural': 'días',
-    'dailytext.preview': '"Reine el paz de Dios en vuestros corazones..." — Filipenses 4:7',
+    'dailytext.preview': '¡Lee la Palabra de Dios diariamente!',
     'dailytext.open': 'Abrir',
 
     // Weekly Reading Card & Page
@@ -755,7 +755,7 @@ export const translations = {
     'dailytext.marked_read': '✓ Letto',
     'dailytext.day_streak_singular': 'giorno',
     'dailytext.day_streak_plural': 'giorni',
-    'dailytext.preview': '"La pace di Dio custodisca i vostri cuori..." — Filippesi 4:7',
+    'dailytext.preview': 'Leggi la Parola di Dio quotidianamente!',
     'dailytext.open': 'Apri',
 
     // Weekly Reading Card & Page
@@ -971,7 +971,7 @@ export const translations = {
     'dailytext.marked_read': '✓ Lu',
     'dailytext.day_streak_singular': 'jour',
     'dailytext.day_streak_plural': 'jours',
-    'dailytext.preview': '"Que la paix de Dieu, qui dépasse toute compréhension, garde vos cœurs..." — Philippiens 4:7',
+    'dailytext.preview': 'Lisez la Parole de Dieu quotidiennement!',
     'dailytext.open': 'Ouvrir',
 
     // Weekly Reading Card & Page

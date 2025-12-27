@@ -590,8 +590,8 @@ export default function PersonalReadingPage() {
                                 }}
                                 className={`flex-shrink-0 w-6 h-6 rounded border-2 flex items-center justify-center transition-all ${
                                   isCompleted
-                                    ? 'bg-purple-600 border-purple-600'
-                                    : 'border-gray-300 hover:border-purple-400'
+                                    ? 'bg-purple-600 dark:bg-purple-500 border-purple-600 dark:border-purple-500'
+                                    : 'border-gray-300 dark:border-gray-600 hover:border-purple-400'
                                 }`}
                               >
                                 {isCompleted && <Check className="w-4 h-4 text-white" />}
@@ -742,10 +742,10 @@ export default function PersonalReadingPage() {
 
                     // Determine base background color based on status
                     const baseColor = status === 'complete'
-                      ? 'bg-green-600'
+                      ? 'bg-green-600 dark:bg-green-500'
                       : status === 'partial'
-                      ? 'bg-yellow-500'
-                      : 'bg-gray-100'
+                      ? 'bg-yellow-500 dark:bg-yellow-600'
+                      : 'bg-gray-100 dark:bg-slate-700'
 
                     const baseText = status ? 'text-white' : 'text-gray-700 dark:text-gray-300'
 
@@ -783,9 +783,9 @@ export default function PersonalReadingPage() {
                           } ${baseText} ${
                             isSelectMode
                               ? isSelected
-                                ? 'ring-4 ring-blue-400'
+                                ? 'ring-4 ring-blue-400 dark:ring-blue-500'
                                 : 'opacity-75 hover:opacity-100'
-                              : status ? 'hover:opacity-90' : 'hover:bg-gray-200'
+                              : status ? 'hover:opacity-90' : 'hover:bg-gray-200 dark:hover:bg-slate-600'
                           }`}
                         >
                           {isSelectMode && isSelected && <span className="absolute top-1 right-2 text-white text-lg font-bold">✓</span>}

@@ -107,6 +107,8 @@ Priority: LocalStorage cache → Firebase → static fallback
 
 **Parse Bible References:** Use `src/utils/readingParser.js` - handles "Genesis 1", "Gen 1:1-5", "1. Mose 1"
 
+**Implement Dark Mode:** Read `docs/DARK_MODE_IMPLEMENTATION_CHECKLIST.md` → Always test in Dark Mode during development → Use form field template with `space-y-2` and `dark:` variants for ALL colors
+
 **Build JW.org Links:** Use `data/bible-link-builder.js` - format: `bible=BBCCCVVV-BBCCCVVV` (book 1-66)
 
 **Add Routes:** Create page in `src/pages/` → Add to `App.jsx` → Link via navigation components
@@ -136,8 +138,17 @@ No automated tests. Manual testing via `ParserTestBench.jsx` (/test-parser). Rec
 
 **GitHub Pages:** Change `base: '/BRC/'` in vite.config.js, run `npm run deploy`
 
+## Dark Mode Documentation
+
+**Essential Reading for New Features:**
+- **DARK_MODE_IMPLEMENTATION_CHECKLIST.md** - Step-by-step checklist, templates, common mistakes
+- **DARK_MODE_COLOR_GUIDE.md** - Color palette, accessibility, best practices
+- **DARK_MODE_ISSUES_ANALYSIS.md** - What was broken in v0.1.1 and how we fixed it
+
 ## Quick Troubleshooting
 
+- **Dark mode UI still white?** Check for hardcoded `bg-white` without `dark:bg-slate-900`
+- **Form fields aren't dark?** Use template from DARK_MODE_IMPLEMENTATION_CHECKLIST.md - `space-y-2` and all color variants
 - **Translations showing keys?** Add to all 5 languages in `src/config/i18n.js`
 - **Tailwind not applying?** Restart dev server & clear cache
 - **localStorage empty?** Check DevTools Storage tab; not in private mode?

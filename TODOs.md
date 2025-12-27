@@ -559,6 +559,58 @@ development (CURRENT WORK) ✅ WORK HERE
 
 ---
 
+## 🔐 Admin Access System (v1.1.0)
+
+- [ ] **Implement Admin Access Control for Dev Features**
+  - **Overview:** Admin-Mode aktiviert durch 6-stellige PIN (170182) via Calendar Button
+    - Gibt Zugriff auf Admin-Only Features & Settings
+    - Bleibt persistent bis "Exit Admin Access" gedrückt wird
+    - Zentrale Admin Settings Section mit ALLEN hidden Features
+
+  - **Calendar Button (HomePage)**
+    - Icon: 📅 (Immer Calendar, nie Lock - weil neben Datum)
+    - Public Mode: Click → PIN Modal "PIN eingeben" [••••••] [OK] [Abbrechen]
+    - Wenn PIN korrekt (170182) → Admin-Mode aktiviert
+    - Admin Mode: Click → Date Picker öffnet (Test Date Functionality)
+    - Zum Deaktivieren: Settings → Admin Settings → "Exit Admin Access"
+
+  - **Admin Settings Section (Settings → ⚙️ ADMIN SETTINGS)**
+    - Only visible when Admin-Mode active
+    - Enthält ALLE Admin-only Settings:
+      - Exit Admin Access [Button] - Deactivates Admin Mode
+      - Reset App Settings [Button] - Reset all user data
+      - Device Info (Device ID Display + Copy Button)
+      - Daily Reminders (Toggle + Time Picker)
+      - Display Color Scheme (Light / Dark / System buttons)
+      - Update Schedule (Fetch new schedule from JW.org/Firebase)
+
+  - **Admin-Only Features (Hidden until Admin Mode)**
+    1. Test Date Picker (HomePage Calendar Button) - access: "admin"
+       - Only functional when Admin-Mode active
+    2. Coming Soon Reading Plans (PersonalReadingPage) - access: "admin"
+       - Plans with "Coming Soon" status only visible in dropdown when Admin-Mode
+       - Public users see only available plans
+    3. Schedule Update Dialog (Admin Settings Section) - access: "admin"
+       - Fetch/update reading schedule functionality
+
+  - **Implementation Details**
+    - Create: AdminContext.jsx (isAdminMode state + verifyPin(170182))
+    - localStorage: "app_adminMode" (true/false, until logout)
+    - Calendar Button: Conditional onClick (PIN Modal vs Date Picker)
+    - PIN verification: Modal without context, just PIN input + OK/Cancel
+    - Persistent: Stays active until "Exit Admin Access" clicked
+    - Migrate all admin settings to dedicated section in Settings page
+
+  - **Access Tags**
+    - access: "admin" → Hidden until Admin-Mode
+    - Settings in Admin Section require Admin to modify
+
+  - **Status:** NOT STARTED (Phase 4 - Development)
+  - **Priority:** 🟡 MEDIUM (Required for test user experience)
+  - **Estimated Effort:** 2-3 hours (Context setup + Conditional rendering)
+
+---
+
 ## 📊 Summary
 
 | Category | Total | Completed | Status |
@@ -571,7 +623,8 @@ development (CURRENT WORK) ✅ WORK HERE
 | Documentation | 1 | 1 | ✅ COMPLETE |
 | **UI Polish** | **3** | **3** | ✅ COMPLETE |
 | **Code Cleanup** | **1** | **1** | ✅ COMPLETE |
-| **TOTAL** | **29** | **27** | **93% Complete** |
+| **Admin Access System** | **1** | **0** | 🟡 MEDIUM (Phase 4 - Design Complete) |
+| **TOTAL** | **30** | **27** | **90% Complete** |
 
 ---
 
@@ -597,9 +650,9 @@ development (CURRENT WORK) ✅ WORK HERE
 
 ---
 
-**Last Updated:** 2025-12-27 (iOS 2025 icons + code cleanup completed: 27/29 total)
-**Total Tasks:** 29 (1 critical + 7 testing findings + 9 sync + 3 schedule + 4 UI/UX + 1 docs + 3 UI polish + 1 code cleanup)
-**Progress:** 27/29 (93%)
+**Last Updated:** 2025-12-27 (iOS 2025 icons + code cleanup + Admin Access System design: 27/30 total)
+**Total Tasks:** 30 (1 critical + 7 testing findings + 9 sync + 3 schedule + 4 UI/UX + 1 docs + 3 UI polish + 1 code cleanup + 1 admin access)
+**Progress:** 27/30 (90%)
 **Recent Completions:**
 - iOS 2025 App Icon System (Light/Dark/Tinted variants with DALL-E 3)
   - Professional design with navy blue outline and blue bookmark accent
@@ -614,8 +667,14 @@ development (CURRENT WORK) ✅ WORK HERE
   - Complete cleanup blueprint with git commands
 - Weekly Reading Logic documentation (CLAUDE.md: algorithm, examples, implementation)
 - Dark mode theme support (Light/Dark/System with system preference detection)
+- **Admin Access System (Design Complete)**
+  - PIN-based auth (6-digit: 170182)
+  - Calendar button dual-mode (PIN gateway / Date Picker toggle)
+  - Centralized Admin Settings Section
+  - Hidden features for test users
 
 **Remaining Open Items (Phase 4 - Future):**
+- Admin Access System Implementation (design complete, ready to dev)
 - Auto-Sync New Year Schedule (design pending)
 - Schedule Cache-Versioning (optimization only)
 - Delete deprecated files using readytoremove.md checklist (optional maintenance)

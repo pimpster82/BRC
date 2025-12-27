@@ -41,6 +41,33 @@ npm run lint
 npm run deploy
 ```
 
+## 📊 Versioning Strategy (Parallel Dev + Prod)
+
+**Production (master branch):**
+- Semantic: `1.0.0`, `1.0.1`, `1.1.0`, `2.0.0`, etc.
+- `1.0.1` = bugfix | `1.1.0` = new feature | `2.0.0` = breaking change
+- For testers and end users (stable, tested)
+- Currently at: **1.0.0** (Live: https://brc-liard.vercel.app)
+
+**Development (development branch):**
+- Format: `dev0.2.0`, `dev0.2.1`, `dev0.2.2`, etc.
+- Auto-generated BUILD_CODE: `YYYYMMDD-RANDOMHEX` (e.g., `20251227-A3F9C2E1`)
+- VERSION_INFO shows: `v dev0.2.0 (20251227-A3F9C2E1) → prod 1.0.0`
+- For developers and internal testing
+- Currently at: **dev0.2.0** (linked to prod 1.0.0)
+
+**Rollback Safety System:**
+- `LINKED_PRODUCTION_VERSION` = which prod version is currently live
+- Updated when features merge from dev to master
+- Enables safe rollbacks and feature dependency tracking
+
+**Workflow:**
+1. Work on `development` with `dev0.2.x` versions
+2. Feature complete & tested → merge to `master`
+3. On `master`: bump version (1.0.1 or 1.1.0), tag release
+4. Back on `development`: update `LINKED_PRODUCTION_VERSION` to new prod version
+5. Increment `dev0.2.X` and continue development
+
 ## Project Structure
 
 ```

@@ -5,6 +5,87 @@
 
 ---
 
+## ⚠️ CRITICAL: PRODUCTION PROTECTION
+
+**🚨 DO NOT PUSH DIRECTLY TO MASTER BRANCH 🚨**
+
+### Branch Structure (Parallel Dev + Prod)
+
+```
+master (PRODUCTION) ❌ DO NOT WORK HERE
+  ├── Version: 1.0.0, 1.0.1, 1.1.0, etc.
+  ├── Status: STABLE & TESTED
+  ├── Testers Use: YES
+  ├── Deployment: Vercel (Live at https://brc-liard.vercel.app)
+  └── Tagged Releases: v1.0.0, v1.0.1, v1.1.0, etc.
+
+development (CURRENT WORK) ✅ WORK HERE
+  ├── Version: dev0.2.0, dev0.2.1, dev0.2.2, etc.
+  ├── Status: EXPERIMENTAL & UNDER DEVELOPMENT
+  ├── Testers Use: NO (internal testing only)
+  ├── Deployment: NOT pushed to Vercel production
+  └── LINKED_PRODUCTION_VERSION: Tracks which prod is live
+```
+
+### Safety Rules
+
+1. **ALWAYS work on `development` branch:**
+   ```bash
+   git checkout development  # ✅ CORRECT
+   git checkout master       # ❌ NEVER do this to work
+   ```
+
+2. **NEVER push directly to master:**
+   ```bash
+   git push origin development  # ✅ CORRECT
+   git push origin master       # ❌ ONLY for releases
+   ```
+
+3. **ONLY merge to master when:**
+   - Feature is complete AND tested
+   - Code reviewed
+   - Ready for production release
+   - Version number bumped (1.0.1, 1.1.0, etc.)
+
+4. **Release Workflow (when feature ready):**
+   ```bash
+   # 1. Finalize on development
+   git checkout development
+   git add . && git commit -m "..."
+   git push origin development
+
+   # 2. Switch to master for release
+   git checkout master
+
+   # 3. Bump version in package.json & src/config/version.js
+   # Edit: version = "1.0.1" or "1.1.0"
+
+   # 4. Commit & tag release
+   git add . && git commit -m "Release v1.0.1: ..."
+   git tag v1.0.1
+   git push origin master && git push origin v1.0.1
+
+   # 5. Back to development with updated baseline
+   git checkout development
+   # Update LINKED_PRODUCTION_VERSION = "1.0.1"
+   git add src/config/version.js
+   git commit -m "Update linked prod version to 1.0.1"
+   # Increment dev version: dev0.2.1 → dev0.2.2
+   ```
+
+5. **Check Current Branch:**
+   ```bash
+   git branch -v  # Shows: * development (current) or * master
+   ```
+
+### Rollback Safety
+
+- `LINKED_PRODUCTION_VERSION` in `src/config/version.js` = which prod is live
+- If you need to rollback: check git history, checkout previous tag
+- Example: `git checkout v1.0.0` (returns to v1.0.0 state)
+
+---
+
 ## 🚀 Session Start - Files to Read First
 
 **Before starting work, read these files to understand the codebase architecture and available helpers:**

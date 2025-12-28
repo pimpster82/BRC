@@ -21,6 +21,7 @@ const SettingsPage = () => {
   // Expanded sections
   const [expandedSection, setExpandedSection] = useState(null)
   const [expandedReadingPlanDropdown, setExpandedReadingPlanDropdown] = useState(false)
+  const [isVersionExpanded, setIsVersionExpanded] = useState(false)
 
   // Language
   const [language, setLanguage] = useState(getCurrentLanguage())
@@ -921,11 +922,27 @@ const SettingsPage = () => {
         </div>
         )}
 
-        {/* Version & Build Info Card */}
-        <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 mt-6 mb-4 p-4">
-          <div className="flex items-start gap-3">
-            <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-1" />
-            <div className="flex-1 space-y-3">
+        {/* Version & Build Info Card - Collapsible */}
+        <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 mt-6 mb-4">
+          {/* Header - Always visible (slim mode) */}
+          <button
+            onClick={() => setIsVersionExpanded(!isVersionExpanded)}
+            className="w-full p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <Info className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <span className="text-sm font-mono text-gray-900 dark:text-gray-200">{APP_VERSION}</span>
+            </div>
+            {isVersionExpanded ? (
+              <ChevronDown className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+            ) : (
+              <ChevronRight className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+            )}
+          </button>
+
+          {/* Expanded Content */}
+          {isVersionExpanded && (
+            <div className="border-t border-slate-200 dark:border-slate-700 p-4 space-y-3">
               {/* App Version */}
               <div>
                 <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">APP VERSION</p>
@@ -957,7 +974,7 @@ const SettingsPage = () => {
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Current production version in use</p>
               </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Footer */}

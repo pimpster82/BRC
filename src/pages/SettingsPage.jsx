@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { ArrowLeft, Globe, Calendar, Bell, RotateCcw, ChevronDown, ChevronRight, BookOpen, Download, RefreshCw, Eye, Smartphone, Copy, Moon, Info, Lock, Plus } from 'lucide-react'
+import { ArrowLeft, Globe, Calendar, Bell, RotateCcw, ChevronDown, ChevronRight, BookOpen, Download, RefreshCw, Eye, Smartphone, Copy, Moon, Info, Lock, Plus, Check, AlertCircle } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useLoading } from '../context/LoadingContext'
 import { useAdmin } from '../context/AdminContext'
@@ -14,6 +14,7 @@ import { t } from '../config/i18n'
 import { APP_VERSION, BUILD_INFO, LINKED_PRODUCTION_VERSION } from '../config/version'
 import { useTheme } from '../context/ThemeContext'
 import bibleBooks from '../../data/bible-books-en.json'
+import { requestNotificationPermission, getNotificationPermission, testNotification } from '../utils/reminderService'
 
 const SettingsPage = () => {
   const navigate = useNavigate()
@@ -54,6 +55,10 @@ const SettingsPage = () => {
   const [reminderTime, setReminderTime] = useState(
     localStorage.getItem('settings_reminderTime') || '08:00'
   )
+  const [notificationPermission, setNotificationPermission] = useState(
+    getNotificationPermission()
+  )
+  const [permissionLoading, setPermissionLoading] = useState(false)
 
   // Schedule Update
   const [scheduleYear, setScheduleYear] = useState(new Date().getFullYear() + 1)
@@ -111,6 +116,32 @@ const SettingsPage = () => {
   const handleReminderTimeChange = (time) => {
     setReminderTime(time)
     localStorage.setItem('settings_reminderTime', time)
+  }
+
+  const handleRequestNotificationPermission = async () => {
+    setPermissionLoading(true)
+    try {
+      const permission = await requestNotificationPermission()
+      setNotificationPermission(permission)
+
+      if (permission === 'granted') {
+        alert('✓ Benachrichtigungen aktiviert! Sie erhalten ab sofort Erinnerungen zum Tagestext.')
+      } else if (permission === 'denied') {
+        alert('⚠️ Benachrichtigungen wurden abgelehnt. Sie können dies in Ihren Browser-Einstellungen ändern.')
+      }
+    } catch (error) {
+      console.error('Error requesting notification permission:', error)
+      alert('✗ Fehler beim Anfordern der Berechtigung')
+    } finally {
+      setPermissionLoading(false)
+    }
+  }
+
+  const handleTestNotification = () => {
+    const success = testNotification()
+    if (!success) {
+      alert('⚠️ Benachrichtigung konnte nicht gesendet werden. Bitte aktivieren Sie Benachrichtigungen in den Browser-Einstellungen.')
+    }
   }
 
   const handleFetchSchedule = async () => {
@@ -542,18 +573,69 @@ const SettingsPage = () => {
                     </button>
                   </div>
 
-                  {/* Reminder Time */}
+                  {/* Notification Permission Status */}
                   {dailyReminder && (
-                    <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Uhrzeit
-                      </label>
-                      <input
-                        type="time"
-                        value={reminderTime}
-                        onChange={(e) => handleReminderTimeChange(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
+                    <div className="space-y-3">
+                      {/* Permission Status Indicator */}
+                      <div className={`p-3 rounded-lg border flex items-start gap-2 ${
+                        notificationPermission === 'granted'
+                          ? 'bg-green-50 dark:bg-green-900/20 border-green-300 dark:border-green-700'
+                          : notificationPermission === 'denied'
+                          ? 'bg-red-50 dark:bg-red-900/20 border-red-300 dark:border-red-700'
+                          : 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-300 dark:border-yellow-700'
+                      }`}>
+                        {notificationPermission === 'granted' ? (
+                          <Check className="w-4 h-4 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+                        ) : (
+                          <AlertCircle className="w-4 h-4 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
+                        )}
+                        <p className={`text-xs ${
+                          notificationPermission === 'granted'
+                            ? 'text-green-700 dark:text-green-300'
+                            : notificationPermission === 'denied'
+                            ? 'text-red-700 dark:text-red-300'
+                            : 'text-yellow-700 dark:text-yellow-300'
+                        }`}>
+                          {notificationPermission === 'granted' && '✓ Benachrichtigungen aktiviert'}
+                          {notificationPermission === 'denied' && '✗ Benachrichtigungen abgelehnt - bitte in Browser-Einstellungen aktivieren'}
+                          {notificationPermission === 'default' && '⚠️ Berechtigung erforderlich - klick den Button unten'}
+                          {notificationPermission === 'unsupported' && '⚠️ Benachrichtigungen in diesem Browser nicht unterstützt'}
+                        </p>
+                      </div>
+
+                      {/* Request Permission Button */}
+                      {notificationPermission !== 'granted' && notificationPermission !== 'unsupported' && (
+                        <button
+                          onClick={handleRequestNotificationPermission}
+                          disabled={permissionLoading}
+                          className="w-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 py-2 px-4 rounded-lg font-medium hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors border border-blue-300 dark:border-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {permissionLoading ? 'Wird bearbeitet...' : 'Benachrichtigungen aktivieren'}
+                        </button>
+                      )}
+
+                      {/* Reminder Time */}
+                      <div className="space-y-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                          Uhrzeit
+                        </label>
+                        <input
+                          type="time"
+                          value={reminderTime}
+                          onChange={(e) => handleReminderTimeChange(e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+
+                      {/* Test Notification Button */}
+                      {notificationPermission === 'granted' && (
+                        <button
+                          onClick={handleTestNotification}
+                          className="w-full bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-100 py-2 px-4 rounded-lg font-medium hover:bg-purple-200 dark:hover:bg-purple-800 transition-colors border border-purple-300 dark:border-purple-700 text-sm"
+                        >
+                          📬 Test-Benachrichtigung senden
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>

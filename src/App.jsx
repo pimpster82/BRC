@@ -14,6 +14,7 @@ import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import PersonalReadingPage from './pages/PersonalReadingPage'
 import { processPendingSyncQueue } from './utils/firebaseUserProgress'
+import { startReminderService, stopReminderService } from './utils/reminderService'
 
 /**
  * ProtectedRoute - Only allows authenticated users
@@ -62,10 +63,14 @@ const AppContent = () => {
     window.addEventListener('online', handleOnline)
     window.addEventListener('offline', handleOffline)
 
+    // Start reminder service
+    startReminderService()
+
     // Cleanup on unmount
     return () => {
       window.removeEventListener('online', handleOnline)
       window.removeEventListener('offline', handleOffline)
+      stopReminderService()
     }
   }, [currentUser])
 

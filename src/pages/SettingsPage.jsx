@@ -1,27 +1,34 @@
 import React, { useState, useEffect } from 'react'
-import { ArrowLeft, Globe, Calendar, Bell, RotateCcw, ChevronDown, ChevronRight, BookOpen, Download, RefreshCw, Eye, Smartphone, Copy, Moon, Info, Lock } from 'lucide-react'
+import { ArrowLeft, Globe, Calendar, Bell, RotateCcw, ChevronDown, ChevronRight, BookOpen, Download, RefreshCw, Eye, Smartphone, Copy, Moon, Info, Lock, Plus, Check, AlertCircle } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useLoading } from '../context/LoadingContext'
 import { useAdmin } from '../context/AdminContext'
+import { useAuth } from '../context/AuthContext'
+import ReadingPlanCreator from '../components/ReadingPlanCreator'
+import { uploadReadingPlan } from '../utils/firebaseReadingPlans'
 import { SUPPORTED_LANGUAGES, getCurrentLanguage, setCurrentLanguage } from '../config/languages'
 import { fetchScheduleFromWOL, fetchYeartextFromWOL } from '../utils/scheduleUpdater'
 import { saveScheduleToFirebase, saveYeartextToFirebase } from '../utils/firebaseSchedules'
 import { getOrCreateDeviceId, getDeviceName, setDeviceName, getDeviceInfo } from '../utils/deviceId'
 import { t } from '../config/i18n'
-import { APP_VERSION, BUILD_INFO, LINKED_PRODUCTION_VERSION } from '../config/version'
+import { APP_VERSION, BUILD_INFO, BUILD_DATE, LINKED_PRODUCTION_VERSION } from '../config/version'
 import { useTheme } from '../context/ThemeContext'
 import bibleBooks from '../../data/bible-books-en.json'
+import { requestNotificationPermission, getNotificationPermission, testNotification } from '../utils/reminderService'
 
 const SettingsPage = () => {
   const navigate = useNavigate()
   const { showLoading, hideLoading } = useLoading()
   const { isAdminMode, exitAdminAccess } = useAdmin()
+  const { currentUser } = useAuth()
   const { theme, setThemePreference } = useTheme()
+  const [showPlanCreator, setShowPlanCreator] = useState(false)
+  const [planUploadMessage, setPlanUploadMessage] = useState('')
+  const [planUploadError, setPlanUploadError] = useState('')
 
   // Expanded sections
   const [expandedSection, setExpandedSection] = useState(null)
   const [expandedReadingPlanDropdown, setExpandedReadingPlanDropdown] = useState(false)
-  const [isVersionExpanded, setIsVersionExpanded] = useState(false)
 
   // Language
   const [language, setLanguage] = useState(getCurrentLanguage())
@@ -48,6 +55,10 @@ const SettingsPage = () => {
   const [reminderTime, setReminderTime] = useState(
     localStorage.getItem('settings_reminderTime') || '08:00'
   )
+  const [notificationPermission, setNotificationPermission] = useState(
+    getNotificationPermission()
+  )
+  const [permissionLoading, setPermissionLoading] = useState(false)
 
   // Schedule Update
   const [scheduleYear, setScheduleYear] = useState(new Date().getFullYear() + 1)
@@ -105,6 +116,32 @@ const SettingsPage = () => {
   const handleReminderTimeChange = (time) => {
     setReminderTime(time)
     localStorage.setItem('settings_reminderTime', time)
+  }
+
+  const handleRequestNotificationPermission = async () => {
+    setPermissionLoading(true)
+    try {
+      const permission = await requestNotificationPermission()
+      setNotificationPermission(permission)
+
+      if (permission === 'granted') {
+        alert('✓ Benachrichtigungen aktiviert! Sie erhalten ab sofort Erinnerungen zum Tagestext.')
+      } else if (permission === 'denied') {
+        alert('⚠️ Benachrichtigungen wurden abgelehnt. Sie können dies in Ihren Browser-Einstellungen ändern.')
+      }
+    } catch (error) {
+      console.error('Error requesting notification permission:', error)
+      alert('✗ Fehler beim Anfordern der Berechtigung')
+    } finally {
+      setPermissionLoading(false)
+    }
+  }
+
+  const handleTestNotification = () => {
+    const success = testNotification()
+    if (!success) {
+      alert('⚠️ Benachrichtigung konnte nicht gesendet werden. Bitte aktivieren Sie Benachrichtigungen in den Browser-Einstellungen.')
+    }
   }
 
   const handleFetchSchedule = async () => {
@@ -249,6 +286,33 @@ const SettingsPage = () => {
   const handleCancelEditDeviceName = () => {
     setTempDeviceName(deviceName)
     setIsEditingDeviceName(false)
+  }
+
+  // Reading Plan Creator Handler
+  const handlePlanUpload = async (plan) => {
+    if (!currentUser) {
+      setPlanUploadError('You must be logged in to upload plans')
+      return
+    }
+
+    try {
+      showLoading()
+      setPlanUploadError('')
+      setPlanUploadMessage('')
+
+      await uploadReadingPlan(plan, currentUser.uid)
+
+      setPlanUploadMessage(`✓ Plan "${plan.name.en || plan.name.de}" uploaded successfully!`)
+      setTimeout(() => {
+        setPlanUploadMessage('')
+        setShowPlanCreator(false)
+      }, 3000)
+    } catch (error) {
+      setPlanUploadError(`Failed to upload plan: ${error.message}`)
+      console.error('Plan upload error:', error)
+    } finally {
+      hideLoading()
+    }
   }
 
   const toggleSection = (section) => {
@@ -509,18 +573,94 @@ const SettingsPage = () => {
                     </button>
                   </div>
 
-                  {/* Reminder Time */}
+                  {/* Notification Permission Status */}
                   {dailyReminder && (
-                    <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Uhrzeit
-                      </label>
-                      <input
-                        type="time"
-                        value={reminderTime}
-                        onChange={(e) => handleReminderTimeChange(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
+                    <div className="space-y-3">
+                      {/* Permission Status Indicator */}
+                      <div className={`p-3 rounded-lg border flex items-start gap-2 ${
+                        notificationPermission === 'granted'
+                          ? 'bg-green-50 dark:bg-green-900/20 border-green-300 dark:border-green-700'
+                          : notificationPermission === 'denied'
+                          ? 'bg-red-50 dark:bg-red-900/20 border-red-300 dark:border-red-700'
+                          : 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-300 dark:border-yellow-700'
+                      }`}>
+                        {notificationPermission === 'granted' ? (
+                          <Check className="w-4 h-4 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+                        ) : (
+                          <AlertCircle className="w-4 h-4 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
+                        )}
+                        <p className={`text-xs ${
+                          notificationPermission === 'granted'
+                            ? 'text-green-700 dark:text-green-300'
+                            : notificationPermission === 'denied'
+                            ? 'text-red-700 dark:text-red-300'
+                            : 'text-yellow-700 dark:text-yellow-300'
+                        }`}>
+                          {notificationPermission === 'granted' && '✓ Benachrichtigungen aktiviert'}
+                          {notificationPermission === 'denied' && '✗ Benachrichtigungen abgelehnt - bitte in Browser-Einstellungen aktivieren'}
+                          {notificationPermission === 'default' && '⚠️ Berechtigung erforderlich - klick den Button unten'}
+                          {notificationPermission === 'unsupported' && '⚠️ Benachrichtigungen in diesem Browser nicht unterstützt'}
+                        </p>
+                      </div>
+
+                      {/* Request Permission Button */}
+                      {notificationPermission !== 'granted' && notificationPermission !== 'unsupported' && (
+                        <button
+                          onClick={handleRequestNotificationPermission}
+                          disabled={permissionLoading}
+                          className="w-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 py-2 px-4 rounded-lg font-medium hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors border border-blue-300 dark:border-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {permissionLoading ? 'Wird bearbeitet...' : 'Benachrichtigungen aktivieren'}
+                        </button>
+                      )}
+
+                      {/* Reminder Time */}
+                      <div className="space-y-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                          Uhrzeit
+                        </label>
+                        <input
+                          type="time"
+                          value={reminderTime}
+                          onChange={(e) => handleReminderTimeChange(e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+
+                      {/* Test Notification Button */}
+                      {notificationPermission === 'granted' && (
+                        <button
+                          onClick={handleTestNotification}
+                          className="w-full bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-100 py-2 px-4 rounded-lg font-medium hover:bg-purple-200 dark:hover:bg-purple-800 transition-colors border border-purple-300 dark:border-purple-700 text-sm"
+                        >
+                          📬 Test-Benachrichtigung senden
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Create Reading Plan */}
+                <div className="pt-3 border-t border-indigo-300 dark:border-indigo-700">
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">📚 Create Reading Plan</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 dark:text-gray-300 mb-3">
+                    Create and upload your own custom reading plans to Firebase
+                  </p>
+                  <button
+                    onClick={() => setShowPlanCreator(true)}
+                    className="w-full bg-indigo-600 dark:bg-indigo-700 text-white py-2 px-4 rounded-lg font-medium hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Create New Plan
+                  </button>
+                  {planUploadMessage && (
+                    <div className="mt-3 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                      <p className="text-sm text-green-700 dark:text-green-300">{planUploadMessage}</p>
+                    </div>
+                  )}
+                  {planUploadError && (
+                    <div className="mt-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                      <p className="text-sm text-red-700 dark:text-red-300">{planUploadError}</p>
                     </div>
                   )}
                 </div>
@@ -922,59 +1062,14 @@ const SettingsPage = () => {
         </div>
         )}
 
-        {/* Version & Build Info Card - Collapsible */}
-        <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 mt-6 mb-4">
-          {/* Header - Always visible (slim mode) */}
-          <button
-            onClick={() => setIsVersionExpanded(!isVersionExpanded)}
-            className="w-full p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <Info className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-              <span className="text-sm font-mono text-gray-900 dark:text-gray-200">{APP_VERSION}</span>
-            </div>
-            {isVersionExpanded ? (
-              <ChevronDown className="w-5 h-5 text-gray-500 dark:text-gray-400" />
-            ) : (
-              <ChevronRight className="w-5 h-5 text-gray-500 dark:text-gray-400" />
-            )}
-          </button>
-
-          {/* Expanded Content */}
-          {isVersionExpanded && (
-            <div className="border-t border-slate-200 dark:border-slate-700 p-4 space-y-3">
-              {/* App Version */}
-              <div>
-                <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">APP VERSION</p>
-                <p className="text-sm font-mono text-gray-900 dark:text-gray-200 mt-1">{APP_VERSION}</p>
-              </div>
-
-              {/* Build Code - With Copy Button */}
-              <div>
-                <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">BUILD CODE</p>
-                <div className="flex items-center gap-2 mt-1">
-                  <p className="text-sm font-mono text-gray-900 dark:text-gray-200 flex-1 break-all">{BUILD_INFO}</p>
-                  <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(BUILD_INFO)
-                      alert('Build code copied to clipboard!')
-                    }}
-                    className="flex-shrink-0 p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded transition-colors"
-                    title="Copy build code"
-                  >
-                    <Copy className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Production Version Link */}
-              <div>
-                <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">LINKED PRODUCTION</p>
-                <p className="text-sm font-mono text-gray-900 dark:text-gray-200 mt-1">v{LINKED_PRODUCTION_VERSION}</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Current production version in use</p>
-              </div>
-            </div>
-          )}
+        {/* Version Info - Slim */}
+        <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 mb-4 p-3">
+          <div className="flex items-center gap-3">
+            <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+            <p className="flex-1 text-center text-sm font-mono text-gray-900 dark:text-gray-200">
+              Version {APP_VERSION} ({BUILD_DATE.split('-')[1]}-{BUILD_DATE.split('-')[2]}-{BUILD_DATE.split('-')[0]})
+            </p>
+          </div>
         </div>
 
         {/* Footer */}
@@ -982,6 +1077,13 @@ const SettingsPage = () => {
           <p>{t('settings.made_with')}</p>
         </div>
       </div>
+
+      {/* Reading Plan Creator Modal */}
+      <ReadingPlanCreator
+        isOpen={showPlanCreator}
+        onClose={() => setShowPlanCreator(false)}
+        onUpload={handlePlanUpload}
+      />
     </div>
   )
 }

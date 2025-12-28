@@ -228,6 +228,11 @@ export default function PersonalReadingPage() {
     localStorage.setItem('settings_readingPlan', planId)
   }
 
+  // Get custom plan details
+  const getCustomPlan = (planId) => {
+    return availablePlans.find(p => p.id === planId)
+  }
+
   /**
    * Get chapters read for a specific book
    * Returns array of chapter objects: { chapter, status: 'complete'|'partial', verses? }
@@ -637,13 +642,74 @@ export default function PersonalReadingPage() {
 
       {/* Content - Plan-Specific Views */}
       <div className="p-4 pb-32">
-        {/* Custom Plan Handler - Check if selectedPlan is a custom plan ID */}
-        {selectedPlan && !['free', 'chronological', 'oneyear', 'thematic'].includes(selectedPlan) && (
-          <div className="text-center py-12">
-            <p className="text-gray-600 dark:text-gray-400 mb-2">Custom Plan: {selectedPlan}</p>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Plan content rendering coming soon...</p>
-          </div>
-        )}
+        {/* Custom Plan Handler */}
+        {selectedPlan && !['free', 'chronological', 'oneyear', 'thematic'].includes(selectedPlan) && (() => {
+          const plan = getCustomPlan(selectedPlan)
+          if (!plan) {
+            return (
+              <div className="text-center py-12">
+                <p className="text-red-600 dark:text-red-400">Plan not found: {selectedPlan}</p>
+              </div>
+            )
+          }
+
+          // Render based on plan type
+          if (plan.type === 'chronological' || plan.type === 'category') {
+            // Chronological/Category: Show sections with subsections
+            return (
+              <div className="space-y-6">
+                {plan.sections?.map((section, idx) => (
+                  <div key={idx} className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                    <div className="bg-gradient-to-r from-blue-50 dark:from-slate-800 to-indigo-50 dark:to-slate-700 px-4 py-3">
+                      <h3 className="font-bold text-gray-800 dark:text-gray-300">{section.title?.[language] || section.title?.en || 'Section'}</h3>
+                    </div>
+                    <div className="p-4 space-y-2">
+                      {section.topics?.map((topic, tidx) => (
+                        <div key={tidx} className="border-l-2 border-blue-300 dark:border-blue-600 pl-3">
+                          <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{topic.title?.[language] || topic.title?.en}</p>
+                          {topic.verses && topic.verses.length > 0 && (
+                            <p className="text-xs text-gray-500 dark:text-gray-400">{topic.verses.length} verse reference(s)</p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )
+          }
+
+          // Thematic: Show topics with verses
+          if (plan.type === 'thematic') {
+            return (
+              <div className="space-y-6">
+                {plan.sections?.map((section, idx) => (
+                  <div key={idx} className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                    <div className="bg-gradient-to-r from-purple-50 dark:from-purple-900 to-pink-50 dark:to-pink-900 px-4 py-3">
+                      <h3 className="font-bold text-gray-800 dark:text-gray-300">{section.title?.[language] || section.title?.en}</h3>
+                    </div>
+                    <div className="p-4 space-y-2">
+                      {section.topics?.map((topic, tidx) => (
+                        <div key={tidx} className="text-sm text-gray-700 dark:text-gray-300">
+                          <p className="font-medium">{topic.title?.[language] || topic.title?.en}</p>
+                          {topic.verses && topic.verses.length > 0 && (
+                            <p className="text-xs text-gray-500 dark:text-gray-400">{topic.verses.length} verse(s)</p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )
+          }
+
+          return (
+            <div className="text-center py-12">
+              <p className="text-gray-600 dark:text-gray-400">Unknown plan type: {plan.type}</p>
+            </div>
+          )
+        })()}
 
         {selectedPlan === 'free' && (
           <div className="space-y-6">

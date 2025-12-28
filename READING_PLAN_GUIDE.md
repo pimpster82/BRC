@@ -52,19 +52,20 @@ Represents books 1-39 (Genesis to Malachi)
 ### 2. Specific Verses (for Thematic Plans)
 ```
 ## [de] Prayer | [en] Prayer
-19:23:1-5; 19:119:1-10; 62:1:5:14
+19_23:1-5; 19_119:1-10; 60_5:7
 ```
 Specific Bible passages for thematic topics
 
-**Format:** `BB:C:V` where:
+**Format:** `BB_C:V` where:
 - `BB` = Book number (01-66)
+- `_` = Underscore separator
 - `C` = Chapter
 - `V` = Verse(s)
 
 **Examples:**
-- `01:1:1-5` - Genesis 1:1-5
-- `19:23` - Psalm 23 (all verses)
-- `45:1:1-5:10` - Romans 1:1 to 5:10
+- `01_1:1-5` - Genesis 1:1-5
+- `19_23` - Psalm 23 (all verses)
+- `45_1:1-10` - Romans 1:1-10
 
 ### 3. Time-Based Plans (Auto-Divide)
 ```
@@ -117,15 +118,15 @@ type: thematic
 # [de] Wenn dir Mut fehlt | [en] When You're Discouraged | [es] Cuando estás desanimado | [it] Quando sei scoraggiato | [fr] Quand tu es découragé
 
 ## [de] Psalm 23 | [en] Psalm 23 | [es] Salmo 23 | [it] Salmo 23 | [fr] Psaume 23
-19:23
+19_23
 
 ## [de] Trost von Gott | [en] God's Comfort | [es] Consuelo de Dios | [it] Conforto di Dio | [fr] Réconfort de Dieu
-23:41:10; 47:1:3-4; 60:5:7
+23_41:10; 47_1:3-4; 60_5:7
 
 # [de] Hoffnung für die Zukunft | [en] Hope for the Future | [es] Esperanza para el futuro | [it] Speranza per il futuro | [fr] Espoir pour l'avenir
 
 ## [de] Gottes Reich | [en] God's Kingdom | [es] Reino de Dios | [it] Regno di Dio | [fr] Royaume de Dieu
-66:21:1-4
+66_21:1-4
 ```
 
 ### Example 3: Time-Based Challenge
@@ -220,7 +221,7 @@ Fix the issues and Preview again!
 **4. Combine Verses in Thematic**
 ```
 ## Key Teaching
-19:119:1-20; 19:119:89-104; 19:119:165-176
+19_119:1-20; 19_119:89-104; 19_119:165-176
 ```
 
 ---

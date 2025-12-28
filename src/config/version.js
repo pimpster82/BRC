@@ -16,7 +16,7 @@ export const APP_VERSION = 'dev0.2.0'
  * Updated when features merge from dev to production
  * Used for rollback tracking and dependency management
  */
-export const LINKED_PRODUCTION_VERSION = '1.1.2'  // Current prod version live at https://brc-liard.vercel.app
+export const LINKED_PRODUCTION_VERSION = '1.1.3'  // Current prod version live at https://brc-liard.vercel.app
 
 /**
  * Build Information

@@ -233,6 +233,17 @@ export default function PersonalReadingPage() {
     return availablePlans.find(p => p.id === planId)
   }
 
+  // Custom plan expanded topics tracking
+  const [customPlanTopics, setCustomPlanTopics] = useState({})
+
+  const toggleCustomTopic = (planId, sectionIdx, topicIdx) => {
+    const key = `${planId}_${sectionIdx}_${topicIdx}`
+    setCustomPlanTopics(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }))
+  }
+
   /**
    * Get chapters read for a specific book
    * Returns array of chapter objects: { chapter, status: 'complete'|'partial', verses? }
@@ -663,39 +674,70 @@ export default function PersonalReadingPage() {
                     <div className="bg-gradient-to-r from-blue-50 dark:from-slate-800 to-indigo-50 dark:to-slate-700 px-4 py-3">
                       <h3 className="font-bold text-gray-800 dark:text-gray-300">{section.title?.[language] || section.title?.en || 'Section'}</h3>
                     </div>
-                    <div className="p-4 space-y-2">
-                      {section.topics?.map((topic, tidx) => (
-                        <div key={tidx} className="border-l-2 border-blue-300 dark:border-blue-600 pl-3 py-2">
-                          <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{topic.title?.[language] || topic.title?.en}</p>
-                          {topic.verses && topic.verses.length > 0 && (
-                            <div className="flex flex-wrap gap-1">
-                              {topic.verses.map((verse, vidx) => {
-                                // Convert book number to name
-                                const book = bibleBooks.books[verse.book - 1]
-                                const bookName = book?.name || `Book ${verse.book}`
+                    <div className="p-4 space-y-3">
+                      {section.topics?.map((topic, tidx) => {
+                        const topicKey = `${plan.id}_${idx}_${tidx}`
+                        const isExpanded = customPlanTopics[topicKey]
 
-                                // Format verse reference
-                                let verseStr = bookName
-                                if (verse.chapter) {
-                                  verseStr += ` ${verse.chapter}`
-                                  if (verse.startVerse) {
-                                    verseStr += `:${verse.startVerse}`
-                                    if (verse.endVerse && verse.endVerse !== verse.startVerse) {
-                                      verseStr += `-${verse.endVerse}`
+                        return (
+                          <div key={tidx} className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                            {/* Topic Header */}
+                            <button
+                              onClick={() => toggleCustomTopic(plan.id, idx, tidx)}
+                              className="w-full bg-gray-50 dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700 px-3 py-2 flex items-center gap-2 transition-colors"
+                            >
+                              <ChevronRight size={18} className={`text-gray-600 dark:text-gray-300 transition-transform flex-shrink-0 ${isExpanded ? 'rotate-90' : ''}`} />
+                              <span className="font-medium text-sm text-left flex-1 text-gray-800 dark:text-gray-300">
+                                {topic.title?.[language] || topic.title?.en}
+                              </span>
+                            </button>
+
+                            {/* Verses (Expandable) */}
+                            {isExpanded && topic.verses && topic.verses.length > 0 && (
+                              <div className="p-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-slate-800 space-y-2">
+                                {topic.verses.map((verse, vidx) => {
+                                  const book = bibleBooks.books[verse.book - 1]
+                                  const bookName = book?.name || `Book ${verse.book}`
+
+                                  let verseStr = bookName
+                                  if (verse.chapter) {
+                                    verseStr += ` ${verse.chapter}`
+                                    if (verse.startVerse) {
+                                      verseStr += `:${verse.startVerse}`
+                                      if (verse.endVerse && verse.endVerse !== verse.startVerse) {
+                                        verseStr += `-${verse.endVerse}`
+                                      }
                                     }
                                   }
-                                }
 
-                                return (
-                                  <span key={vidx} className="inline-block text-xs bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-2 py-1 rounded">
-                                    {verseStr}
-                                  </span>
-                                )
-                              })}
-                            </div>
-                          )}
-                        </div>
-                      ))}
+                                  // Build link
+                                  const linkObj = buildLanguageSpecificWebLink(
+                                    verse.book,
+                                    verse.chapter,
+                                    verse.startVerse || 1,
+                                    verse.endVerse || null,
+                                    language
+                                  )
+
+                                  return (
+                                    <div key={vidx} className="flex items-center gap-2">
+                                      <a
+                                        href={linkObj.web}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline font-medium text-sm transition-colors flex-1"
+                                      >
+                                        {verseStr}
+                                        <ExternalLink className="inline w-3 h-3 ml-1" />
+                                      </a>
+                                    </div>
+                                  )
+                                })}
+                              </div>
+                            )}
+                          </div>
+                        )
+                      })}
                     </div>
                   </div>
                 ))}

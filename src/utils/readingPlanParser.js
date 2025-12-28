@@ -26,8 +26,15 @@ const parseTimeDuration = (directive) => {
 }
 
 /**
- * Parse verse reference (BB:C:V format)
- * Examples: "01:1:1-5", "01:1-3", "01-05", "45:1:1-5:10"
+ * Parse verse reference (BB_C:V format)
+ * Examples: "01_1:1-5", "01_1", "01-05", "45_1:1-5"
+ *
+ * Format guide:
+ * - "01-05" = Book range (books 1-5)
+ * - "40" = Single book
+ * - "40_28" = Book 40, Chapter 28 (all verses)
+ * - "40_1:1-5" = Book 40, Chapter 1, Verses 1-5
+ * - "40_1:2,5" = Book 40, Chapter 1, Verses 2 and 5
  */
 const parseVerse = (verseStr) => {
   verseStr = verseStr.trim()
@@ -50,8 +57,8 @@ const parseVerse = (verseStr) => {
     }
   }
 
-  // Single chapter: "40:28" (book 40, chapter 28 - all verses)
-  const singleChapterMatch = verseStr.match(/^(\d{2}):(\d+)$/)
+  // Single chapter: "40_28" (book 40, chapter 28 - all verses)
+  const singleChapterMatch = verseStr.match(/^(\d{2})_(\d+)$/)
   if (singleChapterMatch) {
     const [, book, chapter] = singleChapterMatch
     return {
@@ -63,22 +70,21 @@ const parseVerse = (verseStr) => {
     }
   }
 
-  // Full format: "01:1:1-5" or "01:1-3" or "45:1:1-5:10"
-  const fullMatch = verseStr.match(/^(\d{2}):(\d+):(\d+)(?:-(\d+)?)?(?::(\d+))?$/)
+  // Full format: "01_1:1-5" or "45_1:1-5"
+  const fullMatch = verseStr.match(/^(\d{2})_(\d+):(\d+)(?:-(\d+))?$/)
   if (fullMatch) {
-    const [, book, chapter, startVerse, endVerse, endChapter] = fullMatch
+    const [, book, chapter, startVerse, endVerse] = fullMatch
     return {
       type: 'specific',
       book: Number(book),
       chapter: Number(chapter),
       startVerse: Number(startVerse),
-      endVerse: endVerse ? Number(endVerse) : Number(startVerse),
-      endChapter: endChapter ? Number(endChapter) : undefined
+      endVerse: endVerse ? Number(endVerse) : Number(startVerse)
     }
   }
 
-  // Chapter range: "41:1-16"
-  const chapterMatch = verseStr.match(/^(\d{2}):(\d+)-(\d+)$/)
+  // Chapter range: "41_1-16" (book 41, chapters 1-16)
+  const chapterMatch = verseStr.match(/^(\d{2})_(\d+)-(\d+)$/)
   if (chapterMatch) {
     const [, book, startChapter, endChapter] = chapterMatch
     return {
@@ -89,7 +95,7 @@ const parseVerse = (verseStr) => {
     }
   }
 
-  throw new Error(`Invalid verse format: ${verseStr}`)
+  throw new Error(`Invalid verse format: ${verseStr}. Use: 40_28 or 40_1:1-5 or 40-43`)
 }
 
 /**

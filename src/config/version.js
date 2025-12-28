@@ -8,7 +8,7 @@
  * - PATCH: Bug fixes
  */
 
-export const APP_VERSION = 'dev0.2.0'
+export const APP_VERSION = '1.1.0'
 
 /**
  * Production Version Tracking
@@ -16,7 +16,7 @@ export const APP_VERSION = 'dev0.2.0'
  * Updated when features merge from dev to production
  * Used for rollback tracking and dependency management
  */
-export const LINKED_PRODUCTION_VERSION = '1.0.0'  // Current prod version live at https://brc-liard.vercel.app
+export const LINKED_PRODUCTION_VERSION = '1.1.0'  // Current prod version live at https://brc-liard.vercel.app
 
 /**
  * Build Information

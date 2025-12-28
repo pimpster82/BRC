@@ -17,6 +17,7 @@ master (PRODUCTION) ❌ DO NOT WORK HERE
   ├── Status: STABLE & TESTED
   ├── Testers Use: YES
   ├── Deployment: Vercel (Live at https://brc-liard.vercel.app)
+  ├── Current Version: **1.1.0** (Admin Access System released)
   └── Tagged Releases: v1.0.0, v1.0.1, v1.1.0, etc.
 
 development (CURRENT WORK) ✅ WORK HERE
@@ -559,9 +560,9 @@ development (CURRENT WORK) ✅ WORK HERE
 
 ---
 
-## 🔐 Admin Access System (v1.1.0)
+## 🔐 Admin Access System (✅ v1.1.0 PRODUCTION RELEASE)
 
-- [ ] **Implement Admin Access Control for Dev Features**
+- [x] **Implement Admin Access Control for Dev Features** ✅ RELEASED TO PRODUCTION
   - **Overview:** Admin-Mode aktiviert durch 6-stellige PIN (170182) via Calendar Button
     - Gibt Zugriff auf Admin-Only Features & Settings
     - Bleibt persistent bis "Exit Admin Access" gedrückt wird
@@ -605,10 +606,9 @@ development (CURRENT WORK) ✅ WORK HERE
     - access: "admin" → Hidden until Admin-Mode
     - Settings in Admin Section require Admin to modify
 
-  - **Status:** ✅ COMPLETED (Phase 4 - Implementation Complete)
+  - **Status:** ✅ COMPLETED & RELEASED TO PRODUCTION (v1.1.0)
   - **Priority:** 🟡 MEDIUM (Required for test user experience)
-  - **Estimated Effort:** 2-3 hours (Context setup + Conditional rendering)
-  - **Completed:** Commit 71cd6d8
+  - **Development:** Commit 71cd6d8 (dev branch)
     - AdminContext.jsx created with PIN verification (170182)
     - AdminPINModal component for PIN input
     - HomePage calendar button dual-mode (PIN gateway / Date Picker)
@@ -616,6 +616,11 @@ development (CURRENT WORK) ✅ WORK HERE
     - Feature flags for admin-only items (Date Picker, Schedule Update, Coming Soon Plans)
     - localStorage persistence ("app_adminMode")
     - Related fixes: Theme/Farbschema admin-only, Reading plans visibility
+  - **Production Release:** Commit 4db48a3 (master branch - v1.1.0)
+    - Cherry-picked 14 admin + infrastructure commits to production
+    - Version bumped: 1.0.0 → 1.1.0
+    - Tagged: v1.1.0
+    - Live at: https://brc-liard.vercel.app
 
 ---
 
@@ -739,10 +744,10 @@ development (CURRENT WORK) ✅ WORK HERE
 | Documentation | 1 | 1 | ✅ COMPLETE |
 | **UI Polish** | **3** | **3** | ✅ COMPLETE |
 | **Code Cleanup** | **1** | **1** | ✅ COMPLETE |
-| **Admin Access System** | **1** | **1** | ✅ COMPLETE (Phase 4 - Implementation) |
+| **Admin Access System** | **1** | **1** | ✅ COMPLETE (v1.1.0 Production Release) |
 | **Social Interaction** | **1** | **0** | 🟡 MEDIUM (Phase 5 - Design Phase) |
 | **Favorite Scriptures** | **1** | **0** | 🟢 LOW (Phase 5 - Design Phase) |
-| **TOTAL** | **32** | **28** | **88% Complete** |
+| **TOTAL** | **32** | **29** | **91% Complete** |
 
 ---
 
@@ -768,10 +773,23 @@ development (CURRENT WORK) ✅ WORK HERE
 
 ---
 
-**Last Updated:** 2025-12-27 (Admin Access System Implementation Complete: 28/32 total)
-**Total Tasks:** 32 (1 critical + 7 testing findings + 9 sync + 3 schedule + 4 UI/UX + 1 docs + 3 UI polish + 1 code cleanup + 1 admin access ✅ + 1 social + 1 favorites)
-**Progress:** 28/32 (88%)
+**Last Updated:** 2025-12-28 (Admin Access System Released to Production v1.1.0: 29/32 total)
+**Total Tasks:** 32 (1 critical + 7 testing findings + 9 sync + 3 schedule + 4 UI/UX + 1 docs + 3 UI polish + 1 code cleanup + 1 admin access ✅ PROD + 1 social + 1 favorites)
+**Progress:** 29/32 (91%)
 **Recent Completions:**
+- **Admin Access System (✅ RELEASED TO PRODUCTION v1.1.0 - 2025-12-28)**
+  - Cherry-picked 14 admin + infrastructure commits to production
+  - Version bumped: 1.0.0 → 1.1.0
+  - Tagged: v1.1.0, pushed to origin
+  - Live at: https://brc-liard.vercel.app
+  - AdminContext.jsx with PIN verification (170182)
+  - AdminPINModal component for PIN input dialog
+  - HomePage calendar button dual-mode (PIN gateway ↔️ Date Picker)
+  - Admin Settings Section in SettingsPage (Exit Admin, Device Info, Reminders, Theme, Schedule Update)
+  - Feature flags for admin-only items (Date Picker, Schedule Update, Coming Soon Plans)
+  - localStorage persistence ("app_adminMode") until exit
+  - Related fixes: Theme/Farbschema moved to admin-only, Coming Soon plans hidden for non-admin
+  - **Important:** Reading Plan Store System (Phase 1) NOT released - stays dev-only
 - iOS 2025 App Icon System (Light/Dark/Tinted variants with DALL-E 3)
   - Professional design with navy blue outline and blue bookmark accent
   - Apple iOS 2025 compliant (sRGB + Gray Gamma 2.2 color spaces)
@@ -785,14 +803,6 @@ development (CURRENT WORK) ✅ WORK HERE
   - Complete cleanup blueprint with git commands
 - Weekly Reading Logic documentation (CLAUDE.md: algorithm, examples, implementation)
 - Dark mode theme support (Light/Dark/System with system preference detection)
-- **Admin Access System (✅ IMPLEMENTATION COMPLETE)**
-  - AdminContext.jsx with PIN verification (170182)
-  - AdminPINModal component for PIN input dialog
-  - HomePage calendar button dual-mode (PIN gateway ↔️ Date Picker)
-  - Admin Settings Section in SettingsPage (Exit Admin, Device Info, Reminders, Theme, Schedule Update)
-  - Feature flags for admin-only items (Date Picker, Schedule Update, Coming Soon Plans)
-  - localStorage persistence ("app_adminMode") until exit
-  - Related fixes: Theme/Farbschema moved to admin-only, Coming Soon plans hidden for non-admin
 - **Social Interaction Features (Design Phase - Ready for v1.2.0)**
   - User profiles with nickname + avatar icons
   - QR Code friend codes (bilateral connections)
@@ -804,9 +814,11 @@ development (CURRENT WORK) ✅ WORK HERE
   - Private storage (localStorage + Firebase sync)
 
 **Remaining Open Items (Phase 4-5 - Future):**
-- Admin Access System Implementation (design complete, ready to dev)
-- Social Interaction Implementation (design phase, TBD scope)
-- Favorite Scriptures Implementation (design phase, TBD scope)
-- Auto-Sync New Year Schedule (design pending)
-- Schedule Cache-Versioning (optimization only)
+- Social Interaction Implementation (design phase, TBD scope) → v1.2.0
+- Favorite Scriptures Implementation (design phase, TBD scope) → v1.2.0
+- Reading Plan Store System Phase 2+ (dev-only, stays on development branch)
+  - Advanced plan creation & custom handling
+  - Expandable topics, verse links, formatting
+- Auto-Sync New Year Schedule (design pending) → Phase 4
+- Schedule Cache-Versioning (optimization only) → Phase 4
 - Delete deprecated files using readytoremove.md checklist (optional maintenance)

@@ -665,10 +665,22 @@ export default function PersonalReadingPage() {
                     </div>
                     <div className="p-4 space-y-2">
                       {section.topics?.map((topic, tidx) => (
-                        <div key={tidx} className="border-l-2 border-blue-300 dark:border-blue-600 pl-3">
-                          <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{topic.title?.[language] || topic.title?.en}</p>
+                        <div key={tidx} className="border-l-2 border-blue-300 dark:border-blue-600 pl-3 py-2">
+                          <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{topic.title?.[language] || topic.title?.en}</p>
                           {topic.verses && topic.verses.length > 0 && (
-                            <p className="text-xs text-gray-500 dark:text-gray-400">{topic.verses.length} verse reference(s)</p>
+                            <div className="flex flex-wrap gap-1">
+                              {topic.verses.map((verse, vidx) => {
+                                // Build simple verse reference text (BB_C or BB_C:V)
+                                const verseStr = verse.book
+                                  ? `${String(verse.book).padStart(2, '0')}_${verse.chapter}${verse.startVerse ? ':' + verse.startVerse : ''}`
+                                  : '?'
+                                return (
+                                  <span key={vidx} className="inline-block text-xs bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-2 py-1 rounded">
+                                    {verseStr}
+                                  </span>
+                                )
+                              })}
+                            </div>
                           )}
                         </div>
                       ))}

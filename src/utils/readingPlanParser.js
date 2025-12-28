@@ -126,11 +126,12 @@ const parseMultilangText = (text) => {
  */
 export const parseReadingPlan = (planText) => {
   try {
-    // Split header and content
-    const [headerBlock, ...contentLines] = planText.split('---').map(s => s.trim())
+    // Split header and content (filter empty strings from leading ---)
+    const parts = planText.split('---').map(s => s.trim()).filter(s => s)
+    const [headerBlock, ...contentLines] = parts
 
     if (!headerBlock || contentLines.length < 1) {
-      throw new Error('Invalid format: missing --- separators')
+      throw new Error('Invalid format: missing --- separators (need: ---\\nheader\\n---\\ncontent)')
     }
 
     // Parse header

@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import { ArrowLeft, Globe, Calendar, Bell, RotateCcw, ChevronDown, ChevronRight, BookOpen, Download, RefreshCw, Eye, Smartphone, Copy, Moon, Info, Lock } from 'lucide-react'
+import { ArrowLeft, Globe, Calendar, Bell, RotateCcw, ChevronDown, ChevronRight, BookOpen, Download, RefreshCw, Eye, Smartphone, Copy, Moon, Info, Lock, Plus } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useLoading } from '../context/LoadingContext'
 import { useAdmin } from '../context/AdminContext'
+import { useAuth } from '../context/AuthContext'
+import ReadingPlanCreator from '../components/ReadingPlanCreator'
+import { uploadReadingPlan } from '../utils/firebaseReadingPlans'
 import { SUPPORTED_LANGUAGES, getCurrentLanguage, setCurrentLanguage } from '../config/languages'
 import { fetchScheduleFromWOL, fetchYeartextFromWOL } from '../utils/scheduleUpdater'
 import { saveScheduleToFirebase, saveYeartextToFirebase } from '../utils/firebaseSchedules'
@@ -16,7 +19,11 @@ const SettingsPage = () => {
   const navigate = useNavigate()
   const { showLoading, hideLoading } = useLoading()
   const { isAdminMode, exitAdminAccess } = useAdmin()
+  const { currentUser } = useAuth()
   const { theme, setThemePreference } = useTheme()
+  const [showPlanCreator, setShowPlanCreator] = useState(false)
+  const [planUploadMessage, setPlanUploadMessage] = useState('')
+  const [planUploadError, setPlanUploadError] = useState('')
 
   // Expanded sections
   const [expandedSection, setExpandedSection] = useState(null)
@@ -248,6 +255,33 @@ const SettingsPage = () => {
   const handleCancelEditDeviceName = () => {
     setTempDeviceName(deviceName)
     setIsEditingDeviceName(false)
+  }
+
+  // Reading Plan Creator Handler
+  const handlePlanUpload = async (plan) => {
+    if (!currentUser) {
+      setPlanUploadError('You must be logged in to upload plans')
+      return
+    }
+
+    try {
+      showLoading()
+      setPlanUploadError('')
+      setPlanUploadMessage('')
+
+      await uploadReadingPlan(plan, currentUser.uid)
+
+      setPlanUploadMessage(`✓ Plan "${plan.name.en || plan.name.de}" uploaded successfully!`)
+      setTimeout(() => {
+        setPlanUploadMessage('')
+        setShowPlanCreator(false)
+      }, 3000)
+    } catch (error) {
+      setPlanUploadError(`Failed to upload plan: ${error.message}`)
+      console.error('Plan upload error:', error)
+    } finally {
+      hideLoading()
+    }
   }
 
   const toggleSection = (section) => {
@@ -520,6 +554,31 @@ const SettingsPage = () => {
                         onChange={(e) => handleReminderTimeChange(e.target.value)}
                         className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
+                    </div>
+                  )}
+                </div>
+
+                {/* Create Reading Plan */}
+                <div className="pt-3 border-t border-indigo-300 dark:border-indigo-700">
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">📚 Create Reading Plan</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 dark:text-gray-300 mb-3">
+                    Create and upload your own custom reading plans to Firebase
+                  </p>
+                  <button
+                    onClick={() => setShowPlanCreator(true)}
+                    className="w-full bg-indigo-600 dark:bg-indigo-700 text-white py-2 px-4 rounded-lg font-medium hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Create New Plan
+                  </button>
+                  {planUploadMessage && (
+                    <div className="mt-3 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                      <p className="text-sm text-green-700 dark:text-green-300">{planUploadMessage}</p>
+                    </div>
+                  )}
+                  {planUploadError && (
+                    <div className="mt-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                      <p className="text-sm text-red-700 dark:text-red-300">{planUploadError}</p>
                     </div>
                   )}
                 </div>
@@ -965,6 +1024,13 @@ const SettingsPage = () => {
           <p>{t('settings.made_with')}</p>
         </div>
       </div>
+
+      {/* Reading Plan Creator Modal */}
+      <ReadingPlanCreator
+        isOpen={showPlanCreator}
+        onClose={() => setShowPlanCreator(false)}
+        onUpload={handlePlanUpload}
+      />
     </div>
   )
 }

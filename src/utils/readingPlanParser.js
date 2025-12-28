@@ -50,6 +50,19 @@ const parseVerse = (verseStr) => {
     }
   }
 
+  // Single chapter: "40:28" (book 40, chapter 28 - all verses)
+  const singleChapterMatch = verseStr.match(/^(\d{2}):(\d+)$/)
+  if (singleChapterMatch) {
+    const [, book, chapter] = singleChapterMatch
+    return {
+      type: 'specific',
+      book: Number(book),
+      chapter: Number(chapter),
+      startVerse: 1,
+      endVerse: 999 // Will be capped by actual chapter length
+    }
+  }
+
   // Full format: "01:1:1-5" or "01:1-3" or "45:1:1-5:10"
   const fullMatch = verseStr.match(/^(\d{2}):(\d+):(\d+)(?:-(\d+)?)?(?::(\d+))?$/)
   if (fullMatch) {

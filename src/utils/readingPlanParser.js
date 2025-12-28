@@ -157,6 +157,11 @@ export const parseReadingPlan = (planText) => {
 
 /**
  * Parse content sections and topics
+ *
+ * Structure:
+ * - category: # [lang] Title | content (book ranges)
+ * - thematic: # [lang] Title | ## [lang] Topic | content (verses)
+ * - chronological: # [lang] Title | optionally ## [lang] Subsection | content (verses/books) with optional time directive
  */
 const parseContent = (content, planType) => {
   const sections = []
@@ -209,11 +214,18 @@ const parseContent = (content, planType) => {
           currentTopic.verses.push(...verses)
         }
       } else if (planType === 'chronological') {
-        // For chronological plans, store verses and duration
+        // For chronological plans, allow both with (##) and without subsections
         if (currentTopic) {
+          // If there's a topic (##), add to topic
           currentTopic.verses.push(...verses)
           if (timeDuration) {
             currentTopic.duration = timeDuration
+          }
+        } else if (!currentSection.bookRange && !currentSection.verses) {
+          // If no topic and section is empty, treat as direct section content
+          currentSection.verses = verses
+          if (timeDuration) {
+            currentSection.duration = timeDuration
           }
         }
       }
@@ -255,6 +267,11 @@ const parseContentLine = (line, planType) => {
 
 /**
  * Validate plan structure
+ *
+ * Rules:
+ * - category: requires bookRange in sections
+ * - thematic: requires verses in topics
+ * - chronological: requires verses or bookRange (time directive optional)
  */
 export const validatePlan = (plan) => {
   const errors = []
@@ -298,19 +315,33 @@ export const validatePlan = (plan) => {
  * Format plan for display (preview)
  */
 export const formatPlanPreview = (plan) => {
-  let preview = `📖 Plan: ${plan.name.en || plan.name.de}\n\n`
+  let preview = `📖 Plan: ${plan.name.en || plan.name.de}\n`
+  preview += `Type: ${plan.type}\n\n`
 
   for (const section of plan.sections) {
     preview += `📂 ${section.title.en || section.title.de}\n`
 
     if (section.bookRange) {
-      preview += `   Books: ${section.bookRange.startBook || section.bookRange.book}\n`
+      const start = section.bookRange.startBook || section.bookRange.book || '?'
+      const end = section.bookRange.endBook || ''
+      preview += `   Books: ${start}${end ? `-${end}` : ''}\n`
+    }
+
+    if (section.verses && section.verses.length > 0) {
+      preview += `   Verses: ${section.verses.length} reference(s)\n`
+    }
+
+    if (section.duration) {
+      preview += `   Duration: ${section.duration} days\n`
     }
 
     for (const topic of section.topics || []) {
-      preview += `   • ${topic.title.en || topic.title.de}\n`
+      preview += `   📌 ${topic.title.en || topic.title.de}\n`
+      if (topic.verses && topic.verses.length > 0) {
+        preview += `      ${topic.verses.length} verse reference(s)\n`
+      }
       if (topic.duration) {
-        preview += `     Duration: ${topic.duration} days\n`
+        preview += `      Duration: ${topic.duration} days\n`
       }
     }
     preview += '\n'

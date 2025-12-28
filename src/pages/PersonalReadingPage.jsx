@@ -670,10 +670,22 @@ export default function PersonalReadingPage() {
                           {topic.verses && topic.verses.length > 0 && (
                             <div className="flex flex-wrap gap-1">
                               {topic.verses.map((verse, vidx) => {
-                                // Build simple verse reference text (BB_C or BB_C:V)
-                                const verseStr = verse.book
-                                  ? `${String(verse.book).padStart(2, '0')}_${verse.chapter}${verse.startVerse ? ':' + verse.startVerse : ''}`
-                                  : '?'
+                                // Convert book number to name
+                                const book = bibleBooks.books[verse.book - 1]
+                                const bookName = book?.name || `Book ${verse.book}`
+
+                                // Format verse reference
+                                let verseStr = bookName
+                                if (verse.chapter) {
+                                  verseStr += ` ${verse.chapter}`
+                                  if (verse.startVerse) {
+                                    verseStr += `:${verse.startVerse}`
+                                    if (verse.endVerse && verse.endVerse !== verse.startVerse) {
+                                      verseStr += `-${verse.endVerse}`
+                                    }
+                                  }
+                                }
+
                                 return (
                                   <span key={vidx} className="inline-block text-xs bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-2 py-1 rounded">
                                     {verseStr}

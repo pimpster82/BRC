@@ -1067,26 +1067,22 @@ const SettingsPage = () => {
         <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 mt-6 mb-4">
           <button
             onClick={() => setExpandedVersionInfo(!expandedVersionInfo)}
-            className="w-full flex items-center justify-between p-4"
+            className="w-full flex items-center justify-between"
           >
-            <div className="flex items-center gap-3">
-              <button
+            <div className="flex items-center gap-2">
+              <Info
+                className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
                 onClick={(e) => {
                   e.stopPropagation()
                   setExpandedVersionInfo(!expandedVersionInfo)
                 }}
-                className="flex-shrink-0 p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded transition-colors"
-                title="Toggle version info"
-              >
-                <Info className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-              </button>
-              <span className="text-sm font-medium text-gray-800 dark:text-gray-300">Version</span>
+              />
+              <h2 className="font-semibold text-gray-800 dark:text-gray-300">{t('settings.version') || 'Version'}</h2>
             </div>
-            <div className="text-right text-sm text-gray-700 dark:text-gray-300">
-              <p className="font-mono">{APP_VERSION}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                {new Date().toISOString().split('T')[0]}
-              </p>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-600 dark:text-gray-400">
+                {APP_VERSION} ({new Date().toISOString().split('T')[0]})
+              </span>
             </div>
           </button>
 

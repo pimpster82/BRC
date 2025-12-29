@@ -29,6 +29,7 @@ const SettingsPage = () => {
   // Expanded sections
   const [expandedSection, setExpandedSection] = useState(null)
   const [expandedReadingPlanDropdown, setExpandedReadingPlanDropdown] = useState(false)
+  const [expandedVersionInfo, setExpandedVersionInfo] = useState(false)
 
   // Language
   const [language, setLanguage] = useState(getCurrentLanguage())
@@ -1062,22 +1063,42 @@ const SettingsPage = () => {
         </div>
         )}
 
-        {/* Version & Build Info Card */}
-        <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 mt-6 mb-4 p-4">
-          <div className="flex items-start gap-3">
-            <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-1" />
-            <div className="flex-1 space-y-3">
-              {/* App Version */}
-              <div>
-                <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">APP VERSION</p>
-                <p className="text-sm font-mono text-gray-900 dark:text-gray-200 mt-1">{APP_VERSION}</p>
-              </div>
+        {/* Version & Build Info Card - Expandable */}
+        <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 mt-6 mb-4">
+          <button
+            onClick={() => setExpandedVersionInfo(!expandedVersionInfo)}
+            className="w-full flex items-center justify-between p-4"
+          >
+            <div className="flex items-center gap-3">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setExpandedVersionInfo(!expandedVersionInfo)
+                }}
+                className="flex-shrink-0 p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded transition-colors"
+                title="Toggle version info"
+              >
+                <Info className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              </button>
+              <span className="text-sm font-medium text-gray-800 dark:text-gray-300">Version</span>
+            </div>
+            <div className="text-right text-sm text-gray-700 dark:text-gray-300">
+              <p className="font-mono">{APP_VERSION}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                {new Date().toISOString().split('T')[0]}
+              </p>
+            </div>
+          </button>
 
+          {expandedVersionInfo && (
+            <div className="mt-0 pt-4 px-4 pb-4 border-t border-slate-200 dark:border-slate-700 space-y-3">
               {/* Build Code - With Copy Button */}
               <div>
-                <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">BUILD CODE</p>
-                <div className="flex items-center gap-2 mt-1">
-                  <p className="text-sm font-mono text-gray-900 dark:text-gray-200 flex-1 break-all">{BUILD_INFO}</p>
+                <p className="text-xs text-gray-600 dark:text-gray-400 font-medium mb-2">BUILD CODE</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-xs font-mono text-gray-900 dark:text-gray-200 flex-1 break-all bg-gray-50 dark:bg-slate-800 p-2 rounded border border-gray-200 dark:border-slate-700">
+                    {BUILD_INFO}
+                  </p>
                   <button
                     onClick={() => {
                       navigator.clipboard.writeText(BUILD_INFO)
@@ -1093,12 +1114,13 @@ const SettingsPage = () => {
 
               {/* Production Version Link */}
               <div>
-                <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">LINKED PRODUCTION</p>
-                <p className="text-sm font-mono text-gray-900 dark:text-gray-200 mt-1">v{LINKED_PRODUCTION_VERSION}</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Current production version in use</p>
+                <p className="text-xs text-gray-600 dark:text-gray-400 font-medium mb-2">LINKED PRODUCTION</p>
+                <p className="text-sm font-mono text-gray-900 dark:text-gray-200 bg-gray-50 dark:bg-slate-800 p-2 rounded border border-gray-200 dark:border-slate-700">
+                  v{LINKED_PRODUCTION_VERSION}
+                </p>
               </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Footer */}

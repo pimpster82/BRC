@@ -1,0 +1,41 @@
+{
+  "rules": {
+    "admins": {
+      ".read": "auth != null",
+      ".write": "root.child('admins').child(auth.uid).exists()"
+    },
+    "schedules": {
+      ".read": true,
+      ".write": "root.child('admins').child(auth.uid).exists()"
+    },
+    "yeartexts": {
+      ".read": true,
+      ".write": "root.child('admins').child(auth.uid).exists()"
+    },
+    "readingPlans": {
+      ".read": true,
+      "available": {
+        "$planId": {
+          ".read": true,
+          ".write": "root.child('admins').child(auth.uid).exists()",
+          "installations": {
+            ".read": true,
+            ".write": "auth != null"
+          }
+        }
+      },
+      "users": {
+        "$userId": {
+          ".read": "$userId === auth.uid",
+          ".write": "$userId === auth.uid"
+        }
+      }
+    },
+    "users": {
+      "$uid": {
+        ".read": "$uid === auth.uid",
+        ".write": "$uid === auth.uid"
+      }
+    }
+  }
+}

@@ -8,6 +8,7 @@ import { t, getCurrentLanguage } from '../config/i18n'
 import { getBibleBooks } from '../config/languages'
 import { readingCategories, getBooksInCategory } from '../config/reading-categories'
 import { thematicTopics, getThematicSections, getTopicsInSection } from '../config/thematic-topics'
+import { bibleOverviewReadings, bibleOverviewSections, getReadingsInSection, getBibleOverviewProgress, isReadingCompleted, markReadingComplete, unmarkReadingComplete } from '../config/bible-overview-readings'
 import { getPersonalReadingData, savePersonalReadingData, syncPersonalReadingToFirebase, markThematicTopicComplete, unmarkThematicTopicComplete, isThematicTopicComplete, getThematicProgress } from '../utils/storage'
 import { buildLanguageSpecificWebLink } from '../../data/bible-link-builder'
 import { auth } from '../config/firebase'
@@ -552,6 +553,7 @@ export default function PersonalReadingPage() {
               {/* System Plans */}
               <optgroup label="System Plans">
                 <option value="free">{t('reading.plan_free') || 'Free Reading'}</option>
+                <option value="bible_overview">{t('reading.plan_bible_overview') || 'Overview of the Bible'}</option>
                 <option value="thematic">{t('reading.plan_thematic') || 'Thematic'}</option>
               </optgroup>
 
@@ -831,6 +833,133 @@ export default function PersonalReadingPage() {
                           )
                         })}
                       </div>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        )}
+
+        {selectedPlan === 'bible_overview' && (
+          <div className="space-y-6">
+            {/* Bible Overview Progress */}
+            {(() => {
+              const progress = getBibleOverviewProgress()
+              return (
+                <div className="bg-gradient-to-r from-blue-50 dark:from-blue-900 to-indigo-50 dark:to-indigo-900 rounded-lg p-4 border border-blue-100 dark:border-blue-800">
+                  <div className="flex justify-between text-sm text-gray-700 dark:text-gray-300 mb-2">
+                    <span className="font-medium">{t('reading.plan_bible_overview')}</span>
+                    <span className="font-semibold">{progress.completed}/{progress.total} {t('bible_overview.readings_completed')}</span>
+                  </div>
+                  <div className="w-full bg-blue-200 dark:bg-blue-700 rounded-full h-2 overflow-hidden">
+                    <div
+                      className="bg-blue-600 dark:bg-blue-500 h-full transition-all"
+                      style={{ width: `${progress.percentage}%` }}
+                    />
+                  </div>
+                  <div className="text-xs text-gray-600 dark:text-gray-400 dark:text-gray-300 mt-2">{progress.percentage}% {t('reading.complete')}</div>
+                </div>
+              )
+            })()}
+
+            {/* Bible Overview Sections */}
+            {bibleOverviewSections.map((section) => {
+              const isExpanded = expandedSections[section.key] !== false // Default to expanded
+              const readingsInSection = getReadingsInSection(section.key)
+
+              return (
+                <div key={section.key} className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                  {/* Section Header */}
+                  <button
+                    onClick={() => {
+                      setExpandedSections(prev => ({
+                        ...prev,
+                        [section.key]: !prev[section.key]
+                      }))
+                    }}
+                    className="w-full bg-gradient-to-r from-blue-50 dark:from-blue-900 to-indigo-50 dark:to-indigo-900 hover:from-blue-100 dark:hover:from-blue-800 hover:to-indigo-100 dark:hover:to-indigo-800 px-4 py-3 flex items-center justify-between border-b border-gray-200 dark:border-gray-700"
+                  >
+                    <div className="flex items-center gap-3 flex-1">
+                      <ChevronDown
+                        size={20}
+                        className={`text-blue-600 transition-transform ${isExpanded ? 'rotate-0' : '-rotate-90'}`}
+                      />
+                      <h3 className="font-bold text-gray-800 dark:text-gray-300">{t(section.titleKey)}</h3>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">({section.count} readings)</span>
+                    </div>
+                  </button>
+
+                  {/* Readings in Section */}
+                  {isExpanded && (
+                    <div className="p-4 bg-white dark:bg-slate-800 space-y-2">
+                      {readingsInSection.map((reading) => {
+                        const isCompleted = isReadingCompleted(reading.id)
+                        const book = bibleBooks.books[reading.book - 1]
+                        const bookName = book?.name || `Book ${reading.book}`
+
+                        // Build readable reference (e.g., "Genesis 12-15")
+                        let referenceText = bookName
+                        if (reading.startChapter === reading.endChapter) {
+                          referenceText += ` ${reading.startChapter}`
+                        } else {
+                          referenceText += ` ${reading.startChapter}-${reading.endChapter}`
+                        }
+
+                        // Build JW.org link
+                        const linkObj = buildLanguageSpecificWebLink(
+                          reading.book,
+                          reading.startChapter,
+                          1,  // startVerse
+                          null,  // endVerse (null = whole chapter)
+                          language
+                        )
+
+                        return (
+                          <div key={reading.id} className={`border rounded-lg overflow-hidden transition-colors ${isCompleted ? 'border-blue-300 bg-blue-50 dark:bg-blue-900 dark:border-blue-700' : 'border-gray-100 dark:border-gray-800'}`}>
+                            <div className="flex items-center gap-2 p-2">
+                              {/* Checkbox */}
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  if (isCompleted) {
+                                    unmarkReadingComplete(reading.id)
+                                  } else {
+                                    markReadingComplete(reading.id)
+                                  }
+                                  setPersonalData(getPersonalReadingData())
+                                  window.dispatchEvent(new Event('personalReadingUpdated'))
+                                }}
+                                className={`flex-shrink-0 w-6 h-6 rounded border-2 flex items-center justify-center transition-all ${
+                                  isCompleted
+                                    ? 'bg-blue-600 dark:bg-blue-500 border-blue-600 dark:border-blue-500'
+                                    : 'border-gray-300 dark:border-gray-600 hover:border-blue-400'
+                                }`}
+                              >
+                                {isCompleted && <Check className="w-4 h-4 text-white" />}
+                              </button>
+
+                              {/* Reading Reference Link */}
+                              <a
+                                href={linkObj.web}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={`flex-1 text-left px-2 py-1 font-medium text-sm transition-colors ${
+                                  isCompleted
+                                    ? 'text-blue-700 dark:text-blue-300 line-through'
+                                    : 'text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline'
+                                }`}
+                              >
+                                {referenceText}
+                                <ExternalLink className="inline w-3 h-3 ml-1" />
+                              </a>
+
+                              {/* Reading ID */}
+                              <span className="text-xs text-gray-500 dark:text-gray-400 flex-shrink-0">#{reading.id}</span>
+                            </div>
+                          </div>
+                        )
+                      })}
                     </div>
                   )}
                 </div>

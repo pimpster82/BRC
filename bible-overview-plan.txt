@@ -1,0 +1,13 @@
+---
+id: bible_overview
+name: [de] Bibelübersicht | [en] Overview of the Bible | [es] Visión General de la Biblia | [it] Panoramica della Bibbia | [fr] Aperçu de la Bible
+type: chronological
+---
+
+# [de] Historische Übersicht von Gottes Umgang mit den Israeliten | [en] Historical Overview of God's Dealings with the Israelites | [es] Visión Histórica de los Tratos de Dios con los Israelitas | [it] Panoramica Storica dei Rapporti di Dio con gli Israeliti | [fr] Aperçu Historique des Relations de Dieu avec les Israélites
+
+01_12-15; 01_16-18; 01_19-22; 01_23-24; 01_25-27; 01_28-30; 01_31-32; 01_33-34; 01_35-37; 01_38-40; 01_41-42; 01_43-45; 01_46-48; 01_49-50; 02_1-4; 02_5-7; 02_8-10; 02_11-13; 02_14-15; 02_16-18; 02_19-21; 02_31-33; 02_34-35; 04_10-12; 04_13-15; 04_16-18; 04_19-21; 04_22-24; 04_25-27; 04_31-32; 04_33-36; 05_3-4; 05_17-19; 05_29-31; 05_32; 05_33-34; 06_1-4; 06_5-7; 06_8-9; 06_10-12; 06_13-15; 06_16-18; 06_19-21; 06_22-24; 07_1-2; 07_3-5; 07_6-7; 07_8-9; 07_10-11; 07_12-13; 07_14-16; 07_17-19; 07_20-21; 08_1-4; 09_1-2; 09_3-6; 09_7-9; 09_10-12; 09_13-14; 09_15-16; 09_17-18; 09_19-21; 09_22-24; 09_25-27; 09_28-31; 10_1-2; 10_3-5; 10_6-8; 10_9-12; 10_13-14; 10_15-16; 10_17-18; 10_19-20; 10_21-22; 10_23-24; 11_1-2; 11_3-5; 11_6-7; 11_8; 11_9-10; 11_11-12; 11_13-14; 11_15-17; 11_18-19; 11_20-21; 11_22; 12_1-3; 12_4-5; 12_6-8; 12_9-10; 12_11-13; 12_14-15; 12_16-17; 12_18-19; 12_20-22; 12_23-25; 15_1-3; 15_4-7; 15_8-10; 16_1-3; 16_4-6; 16_7-8; 16_9-10; 16_11-13; 17_1-4; 17_5-10
+
+# [de] Chronologische Übersicht der Entwicklung der christlichen Versammlung | [en] Chronological Overview of the Development of the Christian Congregation | [es] Visión Cronológica del Desarrollo de la Congregación Cristiana | [it] Panoramica Cronologica dello Sviluppo della Congregazione Cristiana | [fr] Aperçu Chronologique du Développement de la Congrégation Chrétienne
+
+41_1-3; 41_4-5; 42_6-8; 42_9-10; 42_11-13; 42_14-16; 44_1-3; 44_4-6; 44_7-8; 44_9-11; 44_12-14; 44_15-16; 44_17-19; 44_20-21; 44_22-23; 44_24-26; 44_27-28

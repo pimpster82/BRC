@@ -201,6 +201,9 @@ export const translations = {
     'common.mark_undone': 'Als ungelesen markieren',
     'common.mark_all': 'Alle markieren',
     'common.unmark_all': 'Alle abwählen',
+    'common.install': 'Installieren',
+    'common.uninstall': 'Deinstallieren',
+    'common.login_required': 'Anmeldung erforderlich',
 
     // Parser suggestions & status
     'reading.suggest_chapter_verse': 'Kapitel {chapter}, Vers {verse}',
@@ -418,6 +421,9 @@ export const translations = {
     'common.mark_undone': 'Mark as Unread',
     'common.mark_all': 'Mark All',
     'common.unmark_all': 'Unmark All',
+    'common.install': 'Install',
+    'common.uninstall': 'Uninstall',
+    'common.login_required': 'Login Required',
 
     // Parser suggestions & status
     'reading.suggest_chapter_verse': 'Chapter {chapter}, Verse {verse}',
@@ -635,6 +641,9 @@ export const translations = {
     'common.mark_undone': 'Marcar como no leído',
     'common.mark_all': 'Marcar todo',
     'common.unmark_all': 'Desmarcar todo',
+    'common.install': 'Instalar',
+    'common.uninstall': 'Desinstalar',
+    'common.login_required': 'Inicio de sesión requerido',
 
     // Parser suggestions & status
     'reading.suggest_chapter_verse': 'Capítulo {chapter}, Versículo {verse}',
@@ -852,6 +861,9 @@ export const translations = {
     'common.select': 'Selezionare',
     'common.mark_done': 'Segna come letto',
     'common.mark_undone': 'Segna come non letto',
+    'common.install': 'Installa',
+    'common.uninstall': 'Disinstalla',
+    'common.login_required': 'Accesso richiesto',
 
     // Parser suggestions & status
     'reading.suggest_chapter_verse': 'Capitolo {chapter}, Versetto {verse}',
@@ -1100,6 +1112,12 @@ export const translations = {
     'common.cancel': 'Annuler',
     'common.mark_all': 'Tout cocher',
     'common.unmark_all': 'Tout décocher',
+    'common.select': 'Sélectionner',
+    'common.mark_done': 'Marquer comme lu',
+    'common.mark_undone': 'Marquer comme non lu',
+    'common.install': 'Installer',
+    'common.uninstall': 'Désinstaller',
+    'common.login_required': 'Connexion requise',
   },
 }
 

@@ -163,26 +163,6 @@ export const getCurrentWeekReading = (meetingDay = 1, date = null) => {
   const checkDate = date ? new Date(date) : new Date()
   checkDate.setHours(0, 0, 0, 0)
 
-  const currentYear = checkDate.getFullYear()
-
-  // Try current year first (MUST be cached already)
-  let schedule = scheduleCache[currentYear]
-
-  // If not found, try next year (for end-of-year transitions)
-  if (!schedule) {
-    schedule = scheduleCache[currentYear + 1]
-  }
-
-  // If still no schedule, try previous year (for beginning-of-year)
-  if (!schedule) {
-    schedule = scheduleCache[currentYear - 1]
-  }
-
-  if (!schedule || schedule.length === 0) {
-    console.warn(`No schedule available for year ${currentYear} in cache. Schedule must be loaded first via loadScheduleForYear()`)
-    return null
-  }
-
   // Find the NEXT meeting day (when to prepare for next meeting)
   const todayDayOfWeek = checkDate.getDay()
   let daysUntilNextMeeting
@@ -201,6 +181,28 @@ export const getCurrentWeekReading = (meetingDay = 1, date = null) => {
   const nextMeetingDate = new Date(checkDate)
   nextMeetingDate.setDate(checkDate.getDate() + daysUntilNextMeeting)
 
+  // Use the year of the NEXT MEETING to determine which schedule to load
+  // This fixes the year-boundary bug when meeting crosses into new year
+  const targetYear = nextMeetingDate.getFullYear()
+
+  // Try target year first (MUST be cached already)
+  let schedule = scheduleCache[targetYear]
+
+  // If not found, try next year (for end-of-year transitions)
+  if (!schedule) {
+    schedule = scheduleCache[targetYear + 1]
+  }
+
+  // If still no schedule, try previous year (for beginning-of-year)
+  if (!schedule) {
+    schedule = scheduleCache[targetYear - 1]
+  }
+
+  if (!schedule || schedule.length === 0) {
+    console.warn(`No schedule available for year ${targetYear} in cache. Schedule must be loaded first via loadScheduleForYear()`)
+    return null
+  }
+
   // Find which schedule week this next meeting date falls into
   for (const week of schedule) {
     const scheduleStart = new Date(week.weekStart)
@@ -215,7 +217,7 @@ export const getCurrentWeekReading = (meetingDay = 1, date = null) => {
     }
   }
 
-  console.warn('No matching week found for date:', checkDate.toISOString())
+  console.warn('No matching week found for date:', checkDate.toISOString(), 'Next meeting:', nextMeetingDate.toISOString())
   return null
 }
 

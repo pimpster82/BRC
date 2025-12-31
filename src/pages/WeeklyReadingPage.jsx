@@ -37,7 +37,7 @@ const WeeklyReadingPage = () => {
         // Get meeting day from settings
         const meetingDay = parseInt(localStorage.getItem('settings_meetingDay') || '1')
 
-        // Determine which year we need
+        // Determine which year(s) we need
         const checkDate = testDate ? new Date(testDate) : new Date()
         const year = checkDate.getFullYear()
 
@@ -48,6 +48,14 @@ const WeeklyReadingPage = () => {
           console.warn(`No schedule available for ${year}. User needs to import via Settings.`)
           setWeekReading(null)
           return
+        }
+
+        // At year boundaries, we might need next year's schedule too
+        // Check if we're in December and meeting might cross into next year
+        const month = checkDate.getMonth()
+        if (month === 11) { // December (0-indexed)
+          // Preload next year's schedule in case next meeting is in new year
+          await loadScheduleForYear(year + 1)
         }
 
         const reading = getCurrentWeekReading(meetingDay, testDate)

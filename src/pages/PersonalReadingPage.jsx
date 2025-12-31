@@ -8,7 +8,8 @@ import { t, getCurrentLanguage } from '../config/i18n'
 import { getBibleBooks } from '../config/languages'
 import { readingCategories, getBooksInCategory } from '../config/reading-categories'
 import { thematicTopics, getThematicSections, getTopicsInSection } from '../config/thematic-topics'
-import { bibleOverviewReadings, bibleOverviewSections, getReadingsInSection, getBibleOverviewProgress, isReadingCompleted, markReadingComplete, unmarkReadingComplete } from '../config/bible-overview-readings'
+import { bibleOverviewReadings, bibleOverviewSections, getReadingsInSection as getBibleOverviewReadingsInSection, getBibleOverviewProgress, isReadingCompleted as isBibleOverviewReadingCompleted, markReadingComplete as markBibleOverviewReadingComplete, unmarkReadingComplete as unmarkBibleOverviewReadingComplete } from '../config/bible-overview-readings'
+import { oneyearReadings, oneyearSections, getReadingsInSection as getOneyearReadingsInSection, getOneyearProgress, isReadingCompleted as isOneyearReadingCompleted, markReadingComplete as markOneyearReadingComplete, unmarkReadingComplete as unmarkOneyearReadingComplete } from '../config/oneyear-readings'
 import { getPersonalReadingData, savePersonalReadingData, syncPersonalReadingToFirebase, markThematicTopicComplete, unmarkThematicTopicComplete, isThematicTopicComplete, getThematicProgress } from '../utils/storage'
 import { buildLanguageSpecificWebLink } from '../../data/bible-link-builder'
 import { auth } from '../config/firebase'
@@ -710,7 +711,7 @@ export default function PersonalReadingPage() {
             {/* Bible Overview Sections */}
             {bibleOverviewSections.map((section) => {
               const isExpanded = expandedSections[section.key] !== false // Default to expanded
-              const readingsInSection = getReadingsInSection(section.key)
+              const readingsInSection = getBibleOverviewReadingsInSection(section.key)
 
               return (
                 <div key={section.key} className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
@@ -738,7 +739,7 @@ export default function PersonalReadingPage() {
                   {isExpanded && (
                     <div className="p-4 bg-white dark:bg-slate-800 space-y-2">
                       {readingsInSection.map((reading) => {
-                        const isCompleted = isReadingCompleted(reading.id)
+                        const isCompleted = isBibleOverviewReadingCompleted(reading.id)
                         const book = bibleBooks.books[reading.book - 1]
                         const bookName = book?.name || `Book ${reading.book}`
 
@@ -767,9 +768,9 @@ export default function PersonalReadingPage() {
                                 onClick={(e) => {
                                   e.stopPropagation()
                                   if (isCompleted) {
-                                    unmarkReadingComplete(reading.id)
+                                    unmarkBibleOverviewReadingComplete(reading.id)
                                   } else {
-                                    markReadingComplete(reading.id)
+                                    markBibleOverviewReadingComplete(reading.id)
                                   }
                                   setPersonalData(getPersonalReadingData())
                                   window.dispatchEvent(new Event('personalReadingUpdated'))
@@ -820,9 +821,132 @@ export default function PersonalReadingPage() {
         )}
 
         {selectedPlan === 'oneyear' && (
-          <div className="text-center py-12">
-            <p className="text-gray-600 dark:text-gray-400 dark:text-gray-300 mb-2">{t('reading.plan_oneyear')}</p>
-            <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-300">{t('reading.coming_soon')}</p>
+          <div className="space-y-6">
+            {/* One Year Plan Progress */}
+            {(() => {
+              const progress = getOneyearProgress()
+              return (
+                <div className="bg-gradient-to-r from-green-50 dark:from-green-900 to-lime-50 dark:to-lime-900 rounded-lg p-4 border border-green-100 dark:border-green-800">
+                  <div className="flex justify-between text-sm text-gray-700 dark:text-gray-300 mb-2">
+                    <span className="font-medium">{t('reading.plan_oneyear')}</span>
+                    <span className="font-semibold">{progress.completed}/{progress.total} {t('oneyear.readings_completed')}</span>
+                  </div>
+                  <div className="w-full bg-green-200 dark:bg-green-700 rounded-full h-2 overflow-hidden">
+                    <div
+                      className="bg-green-600 dark:bg-green-500 h-full transition-all"
+                      style={{ width: `${progress.percentage}%` }}
+                    />
+                  </div>
+                  <div className="text-xs text-gray-600 dark:text-gray-400 dark:text-gray-300 mt-2">{progress.percentage}% {t('reading.complete')}</div>
+                </div>
+              )
+            })()}
+
+            {/* One Year Sections */}
+            {oneyearSections.map((section) => {
+              const isExpanded = expandedSections[section.key] !== false // Default to expanded
+              const readingsInSection = getOneyearReadingsInSection(section.key)
+
+              return (
+                <div key={section.key} className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                  {/* Section Header */}
+                  <button
+                    onClick={() => {
+                      setExpandedSections(prev => ({
+                        ...prev,
+                        [section.key]: !prev[section.key]
+                      }))
+                    }}
+                    className="w-full bg-gradient-to-r from-green-50 dark:from-green-900 to-lime-50 dark:to-lime-900 hover:from-green-100 dark:hover:from-green-800 hover:to-lime-100 dark:hover:to-lime-800 px-4 py-3 flex items-center justify-between border-b border-gray-200 dark:border-gray-700"
+                  >
+                    <div className="flex items-center gap-3 flex-1">
+                      <ChevronDown
+                        size={20}
+                        className={`text-green-600 transition-transform ${isExpanded ? 'rotate-0' : '-rotate-90'}`}
+                      />
+                      <h3 className="font-bold text-gray-800 dark:text-gray-300">{t(section.titleKey)}</h3>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">({section.count} days)</span>
+                    </div>
+                  </button>
+
+                  {/* Readings in Section */}
+                  {isExpanded && (
+                    <div className="p-4 bg-white dark:bg-slate-800 space-y-2">
+                      {readingsInSection.map((reading) => {
+                        const isCompleted = isOneyearReadingCompleted(reading.id)
+                        const book = bibleBooks.books[reading.book - 1]
+                        const bookName = book?.name || `Book ${reading.book}`
+
+                        // Build readable reference (e.g., "Genesis 1-3" or "Psalms 119:64-176")
+                        let referenceText = bookName
+                        if (reading.startVerse && reading.endVerse) {
+                          // Verse-specific reading like "Psalms 119:64-176"
+                          referenceText += ` ${reading.startChapter}:${reading.startVerse}-${reading.endVerse}`
+                        } else if (reading.startChapter === reading.endChapter) {
+                          referenceText += ` ${reading.startChapter}`
+                        } else {
+                          referenceText += ` ${reading.startChapter}-${reading.endChapter}`
+                        }
+
+                        // Build JW.org link
+                        const linkObj = buildLanguageSpecificWebLink(
+                          reading.book,
+                          reading.startChapter,
+                          reading.startVerse || 1,  // startVerse
+                          null,  // endVerse (null = whole chapter)
+                          language
+                        )
+
+                        return (
+                          <div key={reading.id} className={`border rounded-lg overflow-hidden transition-colors ${isCompleted ? 'border-green-300 bg-green-50 dark:bg-green-900 dark:border-green-700' : 'border-gray-100 dark:border-gray-800'}`}>
+                            <div className="flex items-center gap-2 p-2">
+                              {/* Checkbox */}
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  if (isCompleted) {
+                                    unmarkOneyearReadingComplete(reading.id)
+                                  } else {
+                                    markOneyearReadingComplete(reading.id)
+                                  }
+                                  setPersonalData(getPersonalReadingData())
+                                  window.dispatchEvent(new Event('personalReadingUpdated'))
+                                }}
+                                className={`flex-shrink-0 w-6 h-6 rounded border-2 flex items-center justify-center transition-all ${
+                                  isCompleted
+                                    ? 'bg-green-600 dark:bg-green-500 border-green-600 dark:border-green-500'
+                                    : 'border-gray-300 dark:border-gray-600 hover:border-green-400'
+                                }`}
+                              >
+                                {isCompleted && <Check className="w-4 h-4 text-white" />}
+                              </button>
+
+                              {/* Reading Reference Link */}
+                              <a
+                                href={linkObj.web}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={`flex-1 text-left px-2 py-1 font-medium text-sm transition-colors ${
+                                  isCompleted
+                                    ? 'text-green-700 dark:text-green-300 line-through'
+                                    : 'text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 hover:underline'
+                                }`}
+                              >
+                                {referenceText}
+                                <ExternalLink className="inline w-3 h-3 ml-1" />
+                              </a>
+
+                              {/* Day Number */}
+                              <span className="text-xs text-gray-500 dark:text-gray-400 flex-shrink-0">Day {Math.floor(reading.id)}</span>
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
           </div>
         )}
 

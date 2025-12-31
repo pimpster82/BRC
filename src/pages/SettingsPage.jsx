@@ -5,7 +5,7 @@ import { useLoading } from '../context/LoadingContext'
 import { useAdmin } from '../context/AdminContext'
 import { useAuth } from '../context/AuthContext'
 import ReadingPlanCreator from '../components/ReadingPlanCreator'
-import { uploadReadingPlan } from '../utils/firebaseReadingPlans'
+import { uploadReadingPlan, getAvailableReadingPlans, installReadingPlan, uninstallReadingPlan, getInstalledPlans } from '../utils/firebaseReadingPlans'
 import { SUPPORTED_LANGUAGES, getCurrentLanguage, setCurrentLanguage } from '../config/languages'
 import { fetchScheduleFromWOL, fetchYeartextFromWOL } from '../utils/scheduleUpdater'
 import { saveScheduleToFirebase, saveYeartextToFirebase } from '../utils/firebaseSchedules'
@@ -73,6 +73,35 @@ const SettingsPage = () => {
   const [tempDeviceName, setTempDeviceName] = useState(getDeviceName())
   const [copySuccess, setCopySuccess] = useState(false)
 
+  // Custom Reading Plans
+  const [availablePlans, setAvailablePlans] = useState([]) // Custom plans from Firebase
+  const [installedPlans, setInstalledPlans] = useState([]) // User's installed plans
+  const [loadingPlans, setLoadingPlans] = useState(false) // Loading state for plans
+
+  // Load available and installed plans
+  useEffect(() => {
+    const loadPlans = async () => {
+      try {
+        setLoadingPlans(true)
+
+        // Load available plans from Firebase
+        const available = await getAvailableReadingPlans()
+        setAvailablePlans(available)
+
+        // Load user's installed plans
+        if (currentUser) {
+          const installed = await getInstalledPlans(currentUser.uid)
+          setInstalledPlans(installed)
+        }
+      } catch (error) {
+        console.error('✗ Failed to load reading plans:', error)
+      } finally {
+        setLoadingPlans(false)
+      }
+    }
+
+    loadPlans()
+  }, [currentUser])
 
   const handleLanguageChange = (newLanguage) => {
     // Clear yeartext cache when switching languages so the new language is loaded fresh
@@ -106,6 +135,44 @@ const SettingsPage = () => {
     setReadingPlan(plan)
     localStorage.setItem('settings_readingPlan', plan)
     setExpandedReadingPlanDropdown(false)
+  }
+
+  // Install a custom reading plan
+  const handleInstallPlan = async (planId) => {
+    if (!currentUser) {
+      alert(t('common.login_required'))
+      return
+    }
+
+    try {
+      await installReadingPlan(planId, currentUser.uid)
+      // Refresh installed plans list
+      const updated = await getInstalledPlans(currentUser.uid)
+      setInstalledPlans(updated)
+    } catch (error) {
+      console.error('✗ Failed to install plan:', error)
+      alert('Failed to install plan: ' + error.message)
+    }
+  }
+
+  // Uninstall a custom reading plan
+  const handleUninstallPlan = async (planId) => {
+    if (!currentUser) return
+
+    try {
+      await uninstallReadingPlan(planId, currentUser.uid)
+      // Refresh installed plans list
+      const updated = await getInstalledPlans(currentUser.uid)
+      setInstalledPlans(updated)
+
+      // If the uninstalled plan was selected, switch to 'free' plan
+      if (readingPlan === planId) {
+        handleReadingPlanChange('free')
+      }
+    } catch (error) {
+      console.error('✗ Failed to uninstall plan:', error)
+      alert('Failed to uninstall plan: ' + error.message)
+    }
   }
 
   const handleDailyReminderToggle = () => {
@@ -329,7 +396,17 @@ const SettingsPage = () => {
   }
 
   const getReadingPlanName = () => {
-    return readingPlans.find(p => p.value === readingPlan)?.label || t('reading.plan_free')
+    // Check system plans first
+    const systemPlan = readingPlans.find(p => p.value === readingPlan)
+    if (systemPlan) return systemPlan.label
+
+    // Check custom plans
+    const customPlan = availablePlans.find(p => p.id === readingPlan)
+    if (customPlan) {
+      return customPlan.name?.[language] || customPlan.name?.en || customPlan.id
+    }
+
+    return t('reading.plan_free')
   }
 
   const weekDays = [
@@ -345,9 +422,10 @@ const SettingsPage = () => {
   // Available reading plans - show coming soon plans only in admin mode
   const allReadingPlans = [
     { value: 'free', label: t('reading.plan_free'), available: true },
+    { value: 'bible_overview', label: t('reading.plan_bible_overview'), available: true },
+    { value: 'thematic', label: t('reading.plan_thematic'), available: true },
     { value: 'chronological', label: t('reading.plan_chronological'), available: false },
-    { value: 'oneyear', label: t('reading.plan_oneyear'), available: false },
-    { value: 'thematic', label: t('reading.plan_thematic'), available: true }
+    { value: 'oneyear', label: t('reading.plan_oneyear'), available: false }
   ]
 
   const readingPlans = allReadingPlans.filter(plan => plan.available || isAdminMode)
@@ -807,14 +885,18 @@ const SettingsPage = () => {
                   onClick={() => setExpandedReadingPlanDropdown(!expandedReadingPlanDropdown)}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-300 rounded-lg text-left text-gray-700 dark:text-gray-300 font-medium flex items-center justify-between hover:border-gray-400 transition-colors"
                 >
-                  {readingPlans.find(p => p.value === readingPlan)?.label || t('reading.plan_free')}
+                  {getReadingPlanName()}
                   <ChevronDown className={`w-4 h-4 text-gray-600 dark:text-gray-300 transition-transform ${expandedReadingPlanDropdown ? 'rotate-180' : ''}`} />
                 </button>
 
                 {/* Dropdown Menu */}
                 {expandedReadingPlanDropdown && (
-                  <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-300 rounded-lg shadow-lg z-50">
-                    <div className="py-2">
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-300 rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto">
+                    {/* System Plans */}
+                    <div className="py-2 border-b border-gray-200 dark:border-gray-700">
+                      <div className="px-3 py-1 text-xs font-semibold text-gray-500 dark:text-gray-400">
+                        {t('settings.system_plans') || 'System Plans'}
+                      </div>
                       {readingPlans.map((plan) => (
                         <button
                           key={plan.value}
@@ -829,6 +911,30 @@ const SettingsPage = () => {
                         </button>
                       ))}
                     </div>
+
+                    {/* Custom Plans */}
+                    {installedPlans.length > 0 && (
+                      <div className="py-2">
+                        <div className="px-3 py-1 text-xs font-semibold text-gray-500 dark:text-gray-400">
+                          {t('settings.my_plans') || 'My Plans'}
+                        </div>
+                        {availablePlans
+                          .filter(plan => installedPlans.includes(plan.id))
+                          .map(plan => (
+                            <button
+                              key={plan.id}
+                              onClick={() => handleReadingPlanChange(plan.id)}
+                              className={`w-full text-left px-3 py-2 transition-all ${
+                                readingPlan === plan.id
+                                  ? 'bg-blue-100 dark:bg-blue-900 text-blue-900 dark:text-blue-100 font-medium'
+                                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700'
+                              }`}
+                            >
+                              {plan.name?.[language] || plan.name?.en || plan.id}
+                            </button>
+                          ))}
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -836,6 +942,72 @@ const SettingsPage = () => {
                   {t('settings.reading_plan_note')}
                 </p>
               </div>
+
+              {/* Custom Reading Plans Section */}
+              {currentUser && availablePlans.length > 0 && (
+                <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                  <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                    <Download className="w-4 h-4" />
+                    {t('settings.custom_plans') || 'Custom Reading Plans'}
+                  </h3>
+
+                  <div className="space-y-2">
+                    {availablePlans.map(plan => {
+                      const isInstalled = installedPlans.includes(plan.id)
+                      const planName = plan.name?.[language] || plan.name?.en || plan.id
+
+                      return (
+                        <div
+                          key={plan.id}
+                          className={`p-3 rounded-lg border transition-all ${
+                            isInstalled
+                              ? 'border-green-300 dark:border-green-600 bg-green-50 dark:bg-green-900/20'
+                              : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-slate-800'
+                          }`}
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                <h4 className="font-medium text-gray-800 dark:text-gray-300 text-sm truncate">
+                                  {planName}
+                                </h4>
+                                {isInstalled && (
+                                  <Check className="w-4 h-4 text-green-600 dark:text-green-400 flex-shrink-0" />
+                                )}
+                              </div>
+                              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                {plan.type} • {plan.installations || 0} {t('settings.installs') || 'installs'}
+                              </p>
+                            </div>
+                            <button
+                              onClick={() => {
+                                if (isInstalled) {
+                                  handleUninstallPlan(plan.id)
+                                } else {
+                                  handleInstallPlan(plan.id)
+                                }
+                              }}
+                              className={`flex-shrink-0 px-3 py-1.5 rounded text-xs font-medium transition-colors ${
+                                isInstalled
+                                  ? 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800'
+                                  : 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800'
+                              }`}
+                            >
+                              {isInstalled ? t('common.uninstall') || 'Uninstall' : t('common.install') || 'Install'}
+                            </button>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+
+                  {installedPlans.length > 0 && (
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-3">
+                      ✓ {installedPlans.length} {t('settings.plans_installed') || 'plan(s) installed'}
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
           )}
         </div>

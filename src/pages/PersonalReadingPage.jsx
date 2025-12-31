@@ -63,6 +63,31 @@ export default function PersonalReadingPage() {
   const [isSelectMode, setIsSelectMode] = useState(false) // Chapter selection mode
   const [selectedChapters, setSelectedChapters] = useState(new Set()) // Selected chapters for batch operations
 
+  // Reading Plans Store (needed for custom plans display)
+  const [availablePlans, setAvailablePlans] = useState([]) // Custom plans from Firebase
+  const [installedPlans, setInstalledPlans] = useState([]) // User's installed plans
+
+  // Load available and installed plans
+  useEffect(() => {
+    const loadPlans = async () => {
+      try {
+        // Load available plans from Firebase
+        const available = await getAvailableReadingPlans()
+        setAvailablePlans(available)
+
+        // Load user's installed plans
+        if (currentUser) {
+          const installed = await getInstalledPlans(currentUser.uid)
+          setInstalledPlans(installed)
+        }
+      } catch (error) {
+        console.error('✗ Failed to load reading plans:', error)
+      }
+    }
+
+    loadPlans()
+  }, [currentUser])
+
   // Find the category ID of the last-read chapter (for Free plan)
   const getLastReadCategoryId = () => {
     if (!personalData || !personalData.chaptersRead || personalData.chaptersRead.length === 0) {
@@ -158,6 +183,11 @@ export default function PersonalReadingPage() {
         console.warn('⚠️ Failed to sync to Firebase:', error)
       }
     }
+  }
+
+  // Get custom plan details
+  const getCustomPlan = (planId) => {
+    return availablePlans.find(p => p.id === planId)
   }
 
   // Custom plan expanded topics tracking
@@ -470,7 +500,7 @@ export default function PersonalReadingPage() {
       {/* Content - Plan-Specific Views */}
       <div className="p-4 pb-32">
         {/* Custom Plan Handler */}
-        {selectedPlan && !['free', 'chronological', 'oneyear', 'thematic'].includes(selectedPlan) && (() => {
+        {selectedPlan && !['free', 'chronological', 'oneyear', 'thematic', 'bible_overview'].includes(selectedPlan) && (() => {
           const plan = getCustomPlan(selectedPlan)
           if (!plan) {
             return (

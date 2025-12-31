@@ -8,7 +8,7 @@
  * - PATCH: Bug fixes
  */
 
-export const APP_VERSION = '1.1.1'
+export const APP_VERSION = 'dev0.2.0'
 
 /**
  * Production Version Tracking

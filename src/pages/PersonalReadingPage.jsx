@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { ChevronLeft, ExternalLink, Check, Edit2, ChevronDown, ChevronRight, Settings } from 'lucide-react'
+import { ChevronLeft, ExternalLink, Check, Edit2, ChevronDown, ChevronRight, Settings, Download, X, Star } from 'lucide-react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useLoading } from '../context/LoadingContext'
+import { useAuth } from '../context/AuthContext'
 import LoadingSpinner from '../components/LoadingSpinner'
 import { t, getCurrentLanguage } from '../config/i18n'
 import { getBibleBooks } from '../config/languages'
@@ -12,6 +13,7 @@ import { buildLanguageSpecificWebLink } from '../../data/bible-link-builder'
 import { auth } from '../config/firebase'
 import { parseReadingInput } from '../utils/readingParser'
 import { parseMultipleVerses } from '../utils/versesLinksBuilder'
+import { getAvailableReadingPlans, installReadingPlan, uninstallReadingPlan, getInstalledPlans } from '../utils/firebaseReadingPlans'
 import {
   getTotalVerses,
   calculateVersesRead,
@@ -39,6 +41,7 @@ export default function PersonalReadingPage() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const { showLoading, hideLoading } = useLoading()
+  const { currentUser } = useAuth()
   const language = getCurrentLanguage()
   const bibleBooks = getBibleBooks(language)
 
@@ -58,6 +61,11 @@ export default function PersonalReadingPage() {
   const [expandedTopics, setExpandedTopics] = useState({}) // Track which thematic topics are expanded
   const [isSelectMode, setIsSelectMode] = useState(false) // Chapter selection mode
   const [selectedChapters, setSelectedChapters] = useState(new Set()) // Selected chapters for batch operations
+
+  // Reading Plans Store
+  const [availablePlans, setAvailablePlans] = useState([]) // Custom plans from Firebase
+  const [installedPlans, setInstalledPlans] = useState([]) // User's installed plans
+  const [loadingPlans, setLoadingPlans] = useState(false) // Loading state for plans
 
   // Find the category ID of the last-read chapter (for Free plan)
   const getLastReadCategoryId = () => {
@@ -142,6 +150,31 @@ export default function PersonalReadingPage() {
     setIsLoadingInitial(false)
   }, [searchParams])
 
+  // Load available and installed plans
+  useEffect(() => {
+    const loadPlans = async () => {
+      try {
+        setLoadingPlans(true)
+
+        // Load available plans from Firebase
+        const available = await getAvailableReadingPlans()
+        setAvailablePlans(available)
+
+        // Load user's installed plans
+        if (currentUser) {
+          const installed = await getInstalledPlans(currentUser.uid)
+          setInstalledPlans(installed)
+        }
+      } catch (error) {
+        console.error('✗ Failed to load reading plans:', error)
+      } finally {
+        setLoadingPlans(false)
+      }
+    }
+
+    loadPlans()
+  }, [currentUser])
+
   // Helper: Save to localStorage and sync to Firebase if authenticated
   const saveAndSync = async (data) => {
     savePersonalReadingData(data)
@@ -154,6 +187,61 @@ export default function PersonalReadingPage() {
         console.warn('⚠️ Failed to sync to Firebase:', error)
       }
     }
+  }
+
+  // Install a reading plan
+  const handleInstallPlan = async (planId) => {
+    if (!currentUser) {
+      alert(t('common.login_required'))
+      return
+    }
+
+    try {
+      await installReadingPlan(planId, currentUser.uid)
+      // Refresh installed plans list
+      const updated = await getInstalledPlans(currentUser.uid)
+      setInstalledPlans(updated)
+    } catch (error) {
+      console.error('✗ Failed to install plan:', error)
+      alert('Failed to install plan: ' + error.message)
+    }
+  }
+
+  // Uninstall a reading plan
+  const handleUninstallPlan = async (planId) => {
+    if (!currentUser) return
+
+    try {
+      await uninstallReadingPlan(planId, currentUser.uid)
+      // Refresh installed plans list
+      const updated = await getInstalledPlans(currentUser.uid)
+      setInstalledPlans(updated)
+    } catch (error) {
+      console.error('✗ Failed to uninstall plan:', error)
+      alert('Failed to uninstall plan: ' + error.message)
+    }
+  }
+
+  // Handle plan selection change
+  const handleSelectPlan = (planId) => {
+    setSelectedPlan(planId)
+    localStorage.setItem('settings_readingPlan', planId)
+  }
+
+  // Get custom plan details
+  const getCustomPlan = (planId) => {
+    return availablePlans.find(p => p.id === planId)
+  }
+
+  // Custom plan expanded topics tracking
+  const [customPlanTopics, setCustomPlanTopics] = useState({})
+
+  const toggleCustomTopic = (planId, sectionIdx, topicIdx) => {
+    const key = `${planId}_${sectionIdx}_${topicIdx}`
+    setCustomPlanTopics(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }))
   }
 
   /**
@@ -450,10 +538,245 @@ export default function PersonalReadingPage() {
             />
           </div>
         </div>
+
+        {/* Plan Selector */}
+        <div className="px-4 pb-4 space-y-3">
+          {/* Installed Plans Dropdown */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('reading.reading_plan')}</label>
+            <select
+              value={selectedPlan}
+              onChange={(e) => handleSelectPlan(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              {/* System Plans */}
+              <optgroup label="System Plans">
+                <option value="free">{t('reading.plan_free') || 'Free Reading'}</option>
+                <option value="thematic">{t('reading.plan_thematic') || 'Thematic'}</option>
+              </optgroup>
+
+              {/* Installed Custom Plans */}
+              {installedPlans.length > 0 && (
+                <optgroup label="My Plans">
+                  {availablePlans
+                    .filter(plan => installedPlans.includes(plan.id))
+                    .map(plan => (
+                      <option key={plan.id} value={plan.id}>
+                        {plan.name?.[language] || plan.name?.en || plan.id}
+                      </option>
+                    ))}
+                </optgroup>
+              )}
+            </select>
+          </div>
+
+          {/* Available Plans Overview */}
+          {availablePlans.length > 0 && (
+            <div className="text-xs text-gray-500 dark:text-gray-400 p-2 bg-blue-50 dark:bg-blue-900/20 rounded">
+              📦 {availablePlans.length} plan{availablePlans.length !== 1 ? 's' : ''} available
+              {installedPlans.length > 0 && ` (${installedPlans.length} installed)`}
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* Available Plans Section */}
+      {currentUser && availablePlans.length > 0 && (
+        <div className="border-t border-gray-200 dark:border-gray-700 bg-gradient-to-b from-blue-50 dark:from-slate-800 to-white dark:to-slate-900">
+          <div className="p-4">
+            <h2 className="text-lg font-bold mb-4 flex items-center gap-2 text-gray-800 dark:text-gray-300">
+              <Download className="w-5 h-5" />
+              Available Plans
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {availablePlans.map(plan => {
+                const isInstalled = installedPlans.includes(plan.id)
+                const planName = plan.name?.[language] || plan.name?.en || plan.id
+
+                return (
+                  <div
+                    key={plan.id}
+                    className={`p-4 rounded-lg border-2 transition-all ${
+                      isInstalled
+                        ? 'border-green-300 dark:border-green-600 bg-green-50 dark:bg-green-900/20'
+                        : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-slate-800 hover:border-blue-300 dark:hover:border-blue-600'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex-1">
+                        <h3 className="font-bold text-gray-800 dark:text-gray-300 line-clamp-2">{planName}</h3>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                          Type: {plan.type} | {plan.installations || 0} installs
+                        </p>
+                      </div>
+                      {isInstalled && (
+                        <div className="ml-2 flex-shrink-0">
+                          <Check className="w-5 h-5 text-green-600 dark:text-green-400" />
+                        </div>
+                      )}
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        if (isInstalled) {
+                          handleUninstallPlan(plan.id)
+                        } else {
+                          handleInstallPlan(plan.id)
+                        }
+                      }}
+                      className={`w-full py-2 rounded-lg font-medium text-sm transition-colors ${
+                        isInstalled
+                          ? 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800'
+                          : 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800'
+                      }`}
+                    >
+                      {isInstalled ? (
+                        <>
+                          <X className="w-4 h-4 inline mr-1" />
+                          Uninstall
+                        </>
+                      ) : (
+                        <>
+                          <Download className="w-4 h-4 inline mr-1" />
+                          Install
+                        </>
+                      )}
+                    </button>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Content - Plan-Specific Views */}
       <div className="p-4 pb-32">
+        {/* Custom Plan Handler */}
+        {selectedPlan && !['free', 'chronological', 'oneyear', 'thematic'].includes(selectedPlan) && (() => {
+          const plan = getCustomPlan(selectedPlan)
+          if (!plan) {
+            return (
+              <div className="text-center py-12">
+                <p className="text-red-600 dark:text-red-400">Plan not found: {selectedPlan}</p>
+              </div>
+            )
+          }
+
+          // Render based on plan type
+          if (plan.type === 'chronological' || plan.type === 'category') {
+            // Chronological/Category: Show sections with subsections
+            return (
+              <div className="space-y-6">
+                {plan.sections?.map((section, idx) => (
+                  <div key={idx} className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                    <div className="bg-gradient-to-r from-blue-50 dark:from-slate-800 to-indigo-50 dark:to-slate-700 px-4 py-3">
+                      <h3 className="font-bold text-gray-800 dark:text-gray-300">{section.title?.[language] || section.title?.en || 'Section'}</h3>
+                    </div>
+                    <div className="p-4 space-y-3">
+                      {section.topics?.map((topic, tidx) => {
+                        const topicKey = `${plan.id}_${idx}_${tidx}`
+                        const isExpanded = customPlanTopics[topicKey]
+
+                        return (
+                          <div key={tidx} className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                            {/* Topic Header */}
+                            <button
+                              onClick={() => toggleCustomTopic(plan.id, idx, tidx)}
+                              className="w-full bg-gray-50 dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700 px-3 py-2 flex items-center gap-2 transition-colors"
+                            >
+                              <ChevronRight size={18} className={`text-gray-600 dark:text-gray-300 transition-transform flex-shrink-0 ${isExpanded ? 'rotate-90' : ''}`} />
+                              <span className="font-medium text-sm text-left flex-1 text-gray-800 dark:text-gray-300">
+                                {topic.title?.[language] || topic.title?.en}
+                              </span>
+                            </button>
+
+                            {/* Verses (Expandable) */}
+                            {isExpanded && topic.verses && topic.verses.length > 0 && (
+                              <div className="p-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-slate-800 space-y-2">
+                                {topic.verses.map((verse, vidx) => {
+                                  const book = bibleBooks.books[verse.book - 1]
+                                  const bookName = book?.name || `Book ${verse.book}`
+
+                                  let verseStr = bookName
+                                  if (verse.chapter) {
+                                    verseStr += ` ${verse.chapter}`
+                                    if (verse.startVerse) {
+                                      verseStr += `:${verse.startVerse}`
+                                      if (verse.endVerse && verse.endVerse !== verse.startVerse) {
+                                        verseStr += `-${verse.endVerse}`
+                                      }
+                                    }
+                                  }
+
+                                  // Build link
+                                  const linkObj = buildLanguageSpecificWebLink(
+                                    verse.book,
+                                    verse.chapter,
+                                    verse.startVerse || 1,
+                                    verse.endVerse || null,
+                                    language
+                                  )
+
+                                  return (
+                                    <div key={vidx} className="flex items-center gap-2">
+                                      <a
+                                        href={linkObj.web}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline font-medium text-sm transition-colors flex-1"
+                                      >
+                                        {verseStr}
+                                        <ExternalLink className="inline w-3 h-3 ml-1" />
+                                      </a>
+                                    </div>
+                                  )
+                                })}
+                              </div>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )
+          }
+
+          // Thematic: Show topics with verses
+          if (plan.type === 'thematic') {
+            return (
+              <div className="space-y-6">
+                {plan.sections?.map((section, idx) => (
+                  <div key={idx} className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                    <div className="bg-gradient-to-r from-purple-50 dark:from-purple-900 to-pink-50 dark:to-pink-900 px-4 py-3">
+                      <h3 className="font-bold text-gray-800 dark:text-gray-300">{section.title?.[language] || section.title?.en}</h3>
+                    </div>
+                    <div className="p-4 space-y-2">
+                      {section.topics?.map((topic, tidx) => (
+                        <div key={tidx} className="text-sm text-gray-700 dark:text-gray-300">
+                          <p className="font-medium">{topic.title?.[language] || topic.title?.en}</p>
+                          {topic.verses && topic.verses.length > 0 && (
+                            <p className="text-xs text-gray-500 dark:text-gray-400">{topic.verses.length} verse(s)</p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )
+          }
+
+          return (
+            <div className="text-center py-12">
+              <p className="text-gray-600 dark:text-gray-400">Unknown plan type: {plan.type}</p>
+            </div>
+          )
+        })()}
+
         {selectedPlan === 'free' && (
           <div className="space-y-6">
             {readingCategories.map((category) => {

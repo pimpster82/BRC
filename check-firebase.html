@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Firebase Daten Überprüfung - BRC</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 { color: #333; }
+        .section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status.success { background: #d4edda; color: #155724; }
+        .status.error { background: #f8d7da; color: #721c24; }
+        .status.warning { background: #fff3cd; color: #856404; }
+        button {
+            background: #0066cc;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover { background: #0052a3; }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        pre {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+        .tree {
+            font-family: monospace;
+            font-size: 13px;
+        }
+        .tree-node {
+            margin-left: 20px;
+            cursor: pointer;
+            user-select: none;
+        }
+        .tree-key {
+            color: #0066cc;
+            font-weight: bold;
+        }
+        .tree-value {
+            color: #666;
+        }
+        .tree-type {
+            color: #999;
+            font-size: 11px;
+        }
+        .expandable::before {
+            content: '▶ ';
+            display: inline-block;
+            margin-right: 5px;
+        }
+        .expanded::before {
+            content: '▼ ';
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        .error-box {
+            background: #fee;
+            border: 1px solid #fcc;
+            padding: 15px;
+            border-radius: 4px;
+            color: #c00;
+        }
+        .success-box {
+            background: #efe;
+            border: 1px solid #cfc;
+            padding: 15px;
+            border-radius: 4px;
+            color: #060;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background: #f0f0f0;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Firebase Datenbank Überprüfung</h1>
+
+    <div class="section">
+        <h2>📡 Verbindungsstatus</h2>
+        <div id="connection-status">
+            <div class="loading">Initialisiere Firebase...</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>📅 Schedules (Wöchentliche Lesepläne)</h2>
+        <button onclick="loadSchedules()">Schedules laden</button>
+        <button onclick="loadSchedule(2025)">2025 laden</button>
+        <button onclick="loadSchedule(2024)">2024 laden</button>
+        <div id="schedules-output" style="margin-top: 15px;">
+            <em>Klicke auf "Schedules laden" um verfügbare Jahrgänge zu sehen...</em>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>📖 Yeartexts (Jahrestexte)</h2>
+        <button onclick="loadYeartexts()">Yeartexts laden</button>
+        <button onclick="loadYeartext(2025)">2025 laden</button>
+        <div id="yeartexts-output" style="margin-top: 15px;">
+            <em>Klicke auf "Yeartexts laden" um verfügbare Jahrgänge zu sehen...</em>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>👥 Users (Benutzer-Fortschritt)</h2>
+        <button onclick="loadUsers()">User-Liste laden</button>
+        <button onclick="loadCurrentUser()">Aktueller User</button>
+        <div id="users-output" style="margin-top: 15px;">
+            <em>Klicke auf "User-Liste laden"...</em>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>🔐 Admins</h2>
+        <button onclick="loadAdmins()">Admin-Liste laden</button>
+        <div id="admins-output" style="margin-top: 15px;">
+            <em>Klicke auf "Admin-Liste laden"...</em>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>🌳 Komplette Datenbankstruktur</h2>
+        <button onclick="loadFullDatabase()">Gesamte Datenbank laden</button>
+        <button onclick="clearOutput()">Output löschen</button>
+        <div id="full-db-output" style="margin-top: 15px;"></div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js'
+        import { getDatabase, ref, get, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js'
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js'
+
+        // Firebase Config aus .env.local oder localStorage
+        const getFirebaseConfig = () => {
+            // Versuche aus parent window (falls in iframe)
+            if (window.parent && window.parent !== window) {
+                try {
+                    return {
+                        apiKey: window.parent.import?.meta?.env?.VITE_FIREBASE_API_KEY,
+                        authDomain: window.parent.import?.meta?.env?.VITE_FIREBASE_AUTH_DOMAIN,
+                        projectId: window.parent.import?.meta?.env?.VITE_FIREBASE_PROJECT_ID,
+                        storageBucket: window.parent.import?.meta?.env?.VITE_FIREBASE_STORAGE_BUCKET,
+                        messagingSenderId: window.parent.import?.meta?.env?.VITE_FIREBASE_MESSAGING_SENDER_ID,
+                        appId: window.parent.import?.meta?.env?.VITE_FIREBASE_APP_ID,
+                        databaseURL: window.parent.import?.meta?.env?.VITE_FIREBASE_DATABASE_URL
+                    }
+                } catch (e) {
+                    console.log('Cannot access parent window')
+                }
+            }
+
+            // Manuell eingeben (wird nach Firebase-Config fragen)
+            const projectId = prompt('Firebase Project ID eingeben:', 'brc-liard')
+            if (!projectId) return null
+
+            return {
+                apiKey: prompt('Firebase API Key:', ''),
+                authDomain: `${projectId}.firebaseapp.com`,
+                projectId: projectId,
+                storageBucket: `${projectId}.appspot.com`,
+                messagingSenderId: prompt('Messaging Sender ID:', ''),
+                appId: prompt('App ID:', ''),
+                databaseURL: `https://${projectId}-default-rtdb.firebaseio.com`
+            }
+        }
+
+        let app, database, auth
+        let currentUser = null
+
+        try {
+            const config = getFirebaseConfig()
+
+            if (config && config.apiKey) {
+                app = initializeApp(config)
+                database = getDatabase(app)
+                auth = getAuth(app)
+
+                // Auth state überwachen
+                onAuthStateChanged(auth, (user) => {
+                    currentUser = user
+                    updateConnectionStatus(true, user)
+                })
+
+                window.firebaseDB = database
+                window.firebaseAuth = auth
+
+                updateConnectionStatus(true, null)
+            } else {
+                updateConnectionStatus(false, null, 'Keine Firebase-Konfiguration gefunden')
+            }
+        } catch (error) {
+            console.error('Firebase init error:', error)
+            updateConnectionStatus(false, null, error.message)
+        }
+
+        function updateConnectionStatus(connected, user, error = null) {
+            const output = document.getElementById('connection-status')
+
+            if (error) {
+                output.innerHTML = `
+                    <div class="error-box">
+                        <strong>❌ Firebase Verbindung fehlgeschlagen</strong><br>
+                        ${error}<br><br>
+                        <em>Bitte .env.local Datei überprüfen oder Firebase-Credentials eingeben</em>
+                    </div>
+                `
+            } else if (connected) {
+                const userInfo = user ? `
+                    <div style="margin-top: 10px; padding: 10px; background: #e7f3ff; border-radius: 4px;">
+                        <strong>👤 Eingeloggt als:</strong><br>
+                        Email: ${user.email || 'N/A'}<br>
+                        UID: <code>${user.uid}</code>
+                    </div>
+                ` : `
+                    <div style="margin-top: 10px; padding: 10px; background: #fff3cd; border-radius: 4px;">
+                        <strong>⚠️ Nicht eingeloggt</strong><br>
+                        <em>Manche Funktionen sind eingeschränkt</em>
+                    </div>
+                `
+
+                output.innerHTML = `
+                    <div class="success-box">
+                        <strong>✅ Firebase verbunden</strong><br>
+                        Project ID: <code>${app.options.projectId}</code><br>
+                        Database URL: <code>${database.app.options.databaseURL}</code>
+                    </div>
+                    ${userInfo}
+                `
+            }
+        }
+
+        // Globale Funktionen
+        window.loadSchedules = async () => {
+            const output = document.getElementById('schedules-output')
+            output.innerHTML = '<div class="loading">Lade Schedules...</div>'
+
+            try {
+                const schedulesRef = ref(database, 'schedules')
+                const snapshot = await get(schedulesRef)
+
+                if (snapshot.exists()) {
+                    const data = snapshot.val()
+                    const years = Object.keys(data)
+
+                    let html = `<p><strong>📅 Verfügbare Jahrgänge:</strong> ${years.join(', ')}</p>`
+                    html += '<table><tr><th>Jahr</th><th>Wochen</th><th>Letzte Aktualisierung</th><th>Aktion</th></tr>'
+
+                    years.forEach(year => {
+                        const schedule = data[year]
+                        const weekCount = schedule.weeks?.length || 0
+                        const lastUpdated = schedule.lastUpdated || 'unbekannt'
+
+                        html += `
+                            <tr>
+                                <td><strong>${year}</strong></td>
+                                <td>${weekCount} Wochen</td>
+                                <td>${new Date(lastUpdated).toLocaleString('de-DE')}</td>
+                                <td><button onclick="loadSchedule(${year})">Details</button></td>
+                            </tr>
+                        `
+                    })
+
+                    html += '</table>'
+                    output.innerHTML = html
+                } else {
+                    output.innerHTML = '<div class="error-box">❌ Keine Schedules gefunden</div>'
+                }
+            } catch (error) {
+                output.innerHTML = `<div class="error-box">❌ Fehler: ${error.message}</div>`
+            }
+        }
+
+        window.loadSchedule = async (year) => {
+            const output = document.getElementById('schedules-output')
+            output.innerHTML = `<div class="loading">Lade Schedule ${year}...</div>`
+
+            try {
+                const scheduleRef = ref(database, `schedules/${year}`)
+                const snapshot = await get(scheduleRef)
+
+                if (snapshot.exists()) {
+                    const data = snapshot.val()
+                    output.innerHTML = `
+                        <h3>📅 Schedule ${year}</h3>
+                        <p><strong>Wochen:</strong> ${data.weeks?.length || 0}</p>
+                        <p><strong>Version:</strong> ${data.version || 'N/A'}</p>
+                        <p><strong>Aktualisiert:</strong> ${new Date(data.lastUpdated).toLocaleString('de-DE')}</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `
+                } else {
+                    output.innerHTML = `<div class="error-box">❌ Schedule ${year} nicht gefunden</div>`
+                }
+            } catch (error) {
+                output.innerHTML = `<div class="error-box">❌ Fehler: ${error.message}</div>`
+            }
+        }
+
+        window.loadYeartexts = async () => {
+            const output = document.getElementById('yeartexts-output')
+            output.innerHTML = '<div class="loading">Lade Yeartexts...</div>'
+
+            try {
+                const yeartextsRef = ref(database, 'yeartexts')
+                const snapshot = await get(yeartextsRef)
+
+                if (snapshot.exists()) {
+                    const data = snapshot.val()
+                    const years = Object.keys(data)
+
+                    let html = `<p><strong>📖 Verfügbare Jahrgänge:</strong> ${years.join(', ')}</p>`
+                    html += '<table><tr><th>Jahr</th><th>Sprachen</th><th>Aktion</th></tr>'
+
+                    years.forEach(year => {
+                        const languages = Object.keys(data[year])
+                        html += `
+                            <tr>
+                                <td><strong>${year}</strong></td>
+                                <td>${languages.join(', ')}</td>
+                                <td><button onclick="loadYeartext(${year})">Details</button></td>
+                            </tr>
+                        `
+                    })
+
+                    html += '</table>'
+                    output.innerHTML = html
+                } else {
+                    output.innerHTML = '<div class="error-box">❌ Keine Yeartexts gefunden</div>'
+                }
+            } catch (error) {
+                output.innerHTML = `<div class="error-box">❌ Fehler: ${error.message}</div>`
+            }
+        }
+
+        window.loadYeartext = async (year) => {
+            const output = document.getElementById('yeartexts-output')
+            output.innerHTML = `<div class="loading">Lade Yeartext ${year}...</div>`
+
+            try {
+                const yeartextRef = ref(database, `yeartexts/${year}`)
+                const snapshot = await get(yeartextRef)
+
+                if (snapshot.exists()) {
+                    const data = snapshot.val()
+                    let html = `<h3>📖 Yeartext ${year}</h3>`
+
+                    Object.entries(data).forEach(([lang, text]) => {
+                        html += `
+                            <div style="margin: 15px 0; padding: 15px; background: #f9f9f9; border-radius: 4px;">
+                                <h4 style="margin-top: 0;">${lang.toUpperCase()}</h4>
+                                <p><strong>Schriftstelle:</strong> ${text.scripture || 'N/A'}</p>
+                                <p><strong>Text:</strong> ${text.text || 'N/A'}</p>
+                                <p style="font-size: 11px; color: #999;">Aktualisiert: ${new Date(text.lastUpdated).toLocaleString('de-DE')}</p>
+                            </div>
+                        `
+                    })
+
+                    output.innerHTML = html
+                } else {
+                    output.innerHTML = `<div class="error-box">❌ Yeartext ${year} nicht gefunden</div>`
+                }
+            } catch (error) {
+                output.innerHTML = `<div class="error-box">❌ Fehler: ${error.message}</div>`
+            }
+        }
+
+        window.loadUsers = async () => {
+            const output = document.getElementById('users-output')
+            output.innerHTML = '<div class="loading">Lade User-Liste...</div>'
+
+            try {
+                const usersRef = ref(database, 'users')
+                const snapshot = await get(usersRef)
+
+                if (snapshot.exists()) {
+                    const data = snapshot.val()
+                    const userIds = Object.keys(data)
+
+                    let html = `<p><strong>👥 Anzahl User:</strong> ${userIds.length}</p>`
+                    html += '<table><tr><th>User ID</th><th>Hat Fortschritt</th></tr>'
+
+                    userIds.forEach(uid => {
+                        const hasProgress = data[uid]?.progress ? '✅' : '❌'
+                        html += `
+                            <tr>
+                                <td><code>${uid.substring(0, 20)}...</code></td>
+                                <td>${hasProgress}</td>
+                            </tr>
+                        `
+                    })
+
+                    html += '</table>'
+                    output.innerHTML = html
+                } else {
+                    output.innerHTML = '<div class="error-box">❌ Keine User gefunden</div>'
+                }
+            } catch (error) {
+                output.innerHTML = `<div class="error-box">❌ Fehler: ${error.message}</div>`
+            }
+        }
+
+        window.loadCurrentUser = () => {
+            const output = document.getElementById('users-output')
+
+            if (!currentUser) {
+                output.innerHTML = '<div class="error-box">❌ Nicht eingeloggt</div>'
+                return
+            }
+
+            output.innerHTML = `
+                <div class="success-box">
+                    <h3>👤 Aktueller User</h3>
+                    <p><strong>UID:</strong> <code>${currentUser.uid}</code></p>
+                    <p><strong>Email:</strong> ${currentUser.email || 'N/A'}</p>
+                    <p><strong>Display Name:</strong> ${currentUser.displayName || 'N/A'}</p>
+                </div>
+            `
+        }
+
+        window.loadAdmins = async () => {
+            const output = document.getElementById('admins-output')
+            output.innerHTML = '<div class="loading">Lade Admin-Liste...</div>'
+
+            try {
+                const adminsRef = ref(database, 'admins')
+                const snapshot = await get(adminsRef)
+
+                if (snapshot.exists()) {
+                    const data = snapshot.val()
+                    const adminIds = Object.keys(data)
+
+                    let html = `<p><strong>🔐 Anzahl Admins:</strong> ${adminIds.length}</p>`
+                    html += '<table><tr><th>Admin UID</th><th>Status</th></tr>'
+
+                    adminIds.forEach(uid => {
+                        html += `
+                            <tr>
+                                <td><code>${uid}</code></td>
+                                <td>✅ Aktiv</td>
+                            </tr>
+                        `
+                    })
+
+                    html += '</table>'
+                    output.innerHTML = html
+                } else {
+                    output.innerHTML = '<div class="error-box">❌ Keine Admins definiert (Path /admins existiert nicht)</div>'
+                }
+            } catch (error) {
+                output.innerHTML = `<div class="error-box">❌ Fehler: ${error.message}</div>`
+            }
+        }
+
+        window.loadFullDatabase = async () => {
+            const output = document.getElementById('full-db-output')
+            output.innerHTML = '<div class="loading">Lade gesamte Datenbank...</div>'
+
+            try {
+                const rootRef = ref(database, '/')
+                const snapshot = await get(rootRef)
+
+                if (snapshot.exists()) {
+                    const data = snapshot.val()
+                    output.innerHTML = `
+                        <h3>🌳 Komplette Datenbankstruktur</h3>
+                        <p><strong>Root-Keys:</strong> ${Object.keys(data).join(', ')}</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `
+                } else {
+                    output.innerHTML = '<div class="error-box">❌ Datenbank ist leer</div>'
+                }
+            } catch (error) {
+                output.innerHTML = `<div class="error-box">❌ Fehler: ${error.message}<br><br>Möglicherweise keine Berechtigung zum Lesen der Root-Ebene</div>`
+            }
+        }
+
+        window.clearOutput = () => {
+            document.getElementById('full-db-output').innerHTML = ''
+        }
+    </script>
+</body>
+</html>

@@ -13,7 +13,7 @@
 2. **Weekly Reading** - ✅ Fully working
 3. **Personal Plans** (Free/Thematic/Chronological/One-Year) - ✅ Fully working
 
-**Status:** 93% complete (see TODOs.md). Offline-capable, 5-language, Firebase synced.
+**Status:** 91% complete (see TODOs.md). Offline-capable, 5-language, Firebase synced. Latest: v1.1.0 with Admin Access System.
 
 ## Tech Stack
 
@@ -47,14 +47,16 @@ npm run deploy
 - Semantic: `1.0.0`, `1.0.1`, `1.1.0`, `2.0.0`, etc.
 - `1.0.1` = bugfix | `1.1.0` = new feature | `2.0.0` = breaking change
 - For testers and end users (stable, tested)
-- Currently at: **1.0.0** (Live: https://brc-liard.vercel.app)
+- Currently at: **1.1.0** (Live: https://brc-liard.vercel.app)
+  - Features: Admin Access System (PIN 170182), Version Management, Dev/Prod Isolation
 
 **Development (development branch):**
 - Format: `dev0.2.0`, `dev0.2.1`, `dev0.2.2`, etc.
-- Auto-generated BUILD_CODE: `YYYYMMDD-RANDOMHEX` (e.g., `20251227-A3F9C2E1`)
-- VERSION_INFO shows: `v dev0.2.0 (20251227-A3F9C2E1) → prod 1.0.0`
+- Auto-generated BUILD_CODE: `YYYYMMDD-RANDOMHEX` (e.g., `20251228-A3F9C2E1`)
+- VERSION_INFO shows: `v dev0.2.0 (20251228-A3F9C2E1) → prod 1.1.0`
 - For developers and internal testing
-- Currently at: **dev0.2.0** (linked to prod 1.0.0)
+- Currently at: **dev0.2.0** (linked to prod 1.1.0)
+- Next features: Social Interaction, Favorite Scriptures, Reading Plan Phase 2+
 
 **Rollback Safety System:**
 - `LINKED_PRODUCTION_VERSION` = which prod version is currently live
@@ -75,7 +77,7 @@ src/pages/        # Routes: HomePage, WeeklyReadingPage, PersonalReadingPage, Se
 src/components/   # UI cards & reusable components
 src/utils/        # Storage, Firebase sync, Bible parsing, scheduling
 src/config/       # i18n, languages, reading plans, Firebase config
-src/context/      # Auth & Theme context
+src/context/      # Auth, Theme & Admin context (AuthContext, ThemeContext, AdminContext)
 data/             # Bible metadata, schedules, yeartexts, links
 docs/             # Architecture docs: GOALS.md, UI_UX.md, MULTI_DEVICE_SYNC_TESTS.md
 ```

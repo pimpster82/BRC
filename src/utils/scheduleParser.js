@@ -6,7 +6,7 @@
  * making them truly multilingual and firebase-shareable
  */
 
-import { getLocalizedBookName } from '../../data/bible-link-builder'
+import { getLocalizedBookName, getBookNumberFromName } from '../../data/bible-link-builder'
 
 /**
  * Format a reading object to human-readable text in specified language
@@ -69,12 +69,16 @@ export const parseReadingFromText = (readingText) => {
     const startChapter = parseInt(match[2], 10)
     const endChapter = match[3] ? parseInt(match[3], 10) : startChapter
 
-    // Find book number by name (would need reverse lookup from bible-books)
-    // For now, this is a placeholder - would need to import book data
-    console.warn('parseReadingFromText needs book name lookup implementation')
+    // Find book number by name using multilingual lookup
+    const bookNumber = getBookNumberFromName(bookName)
+
+    if (!bookNumber) {
+      console.warn('Could not find book number for name:', bookName)
+      return null
+    }
 
     return {
-      book: null, // TODO: lookup book number by name
+      book: bookNumber,
       startChapter,
       endChapter
     }

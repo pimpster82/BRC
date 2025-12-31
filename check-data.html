@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>BRC - Daten Checker</title>
+    <style>
+        body { font-family: system-ui; padding: 20px; background: #f5f5f5; }
+        h1 { color: #333; }
+        .section { background: white; padding: 20px; margin: 20px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .key { color: #0066cc; font-weight: bold; }
+        .value { color: #666; font-family: monospace; }
+        pre { background: #f9f9f9; padding: 10px; border-radius: 4px; overflow-x: auto; }
+        button { background: #0066cc; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
+        button:hover { background: #0052a3; }
+    </style>
+</head>
+<body>
+    <h1>📊 BRC Datenspeicher Überprüfung</h1>
+
+    <div class="section">
+        <h2>🗄️ LocalStorage Daten</h2>
+        <button onclick="showLocalStorage()">LocalStorage anzeigen</button>
+        <button onclick="clearBRCData()">BRC-Daten löschen</button>
+        <pre id="localStorage-output">Klicke auf "LocalStorage anzeigen"...</pre>
+    </div>
+
+    <div class="section">
+        <h2>🌐 Firebase Status</h2>
+        <pre id="firebase-status">Überprüfe...</pre>
+    </div>
+
+    <div class="section">
+        <h2>💾 Exportieren/Importieren</h2>
+        <button onclick="exportData()">Alle Daten exportieren (JSON)</button>
+        <button onclick="importData()">Daten importieren</button>
+    </div>
+
+    <script>
+        function showLocalStorage() {
+            const output = document.getElementById('localStorage-output');
+            let html = '';
+
+            // Get all BRC-related keys
+            const brcKeys = Object.keys(localStorage).filter(key =>
+                key.startsWith('bibleCompanion_') ||
+                key.startsWith('app_') ||
+                key.startsWith('settings_') ||
+                key.startsWith('sync') ||
+                key.startsWith('device')
+            );
+
+            if (brcKeys.length === 0) {
+                html = 'Keine BRC-Daten gefunden. Starte die App zuerst.';
+            } else {
+                brcKeys.forEach(key => {
+                    const value = localStorage.getItem(key);
+                    html += `<div style="margin: 10px 0;">`;
+                    html += `<span class="key">${key}:</span><br>`;
+                    html += `<span class="value">${value}</span>`;
+                    html += `</div>`;
+                });
+            }
+
+            output.innerHTML = html;
+        }
+
+        function clearBRCData() {
+            if (confirm('WARNUNG: Alle BRC-Daten im LocalStorage löschen?')) {
+                const brcKeys = Object.keys(localStorage).filter(key =>
+                    key.startsWith('bibleCompanion_') ||
+                    key.startsWith('settings_')
+                );
+                brcKeys.forEach(key => localStorage.removeItem(key));
+                alert(`${brcKeys.length} Einträge gelöscht`);
+                showLocalStorage();
+            }
+        }
+
+        function exportData() {
+            const data = {};
+            Object.keys(localStorage).forEach(key => {
+                if (key.startsWith('bibleCompanion_') ||
+                    key.startsWith('app_') ||
+                    key.startsWith('settings_')) {
+                    try {
+                        data[key] = JSON.parse(localStorage.getItem(key));
+                    } catch {
+                        data[key] = localStorage.getItem(key);
+                    }
+                }
+            });
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `brc-backup-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'application/json';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const data = JSON.parse(event.target.result);
+                        Object.entries(data).forEach(([key, value]) => {
+                            localStorage.setItem(key, typeof value === 'string' ? value : JSON.stringify(value));
+                        });
+                        alert(`Import erfolgreich: ${Object.keys(data).length} Einträge`);
+                        showLocalStorage();
+                    } catch (error) {
+                        alert('Fehler beim Import: ' + error.message);
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        // Check Firebase status
+        function checkFirebase() {
+            const output = document.getElementById('firebase-status');
+
+            // Check if .env variables are set (simplified check)
+            const hasFirebase = typeof window !== 'undefined';
+
+            output.innerHTML = `
+Status: ❓ Unbekannt (muss in der App geprüft werden)
+
+Firebase-Konsole: https://console.firebase.google.com
+
+Konfigurationsdatei: /home/user/BRC/.env.local
+Beispieldatei: /home/user/BRC/.env.local.example
+
+Um Firebase einzurichten:
+1. cp .env.local.example .env.local
+2. Firebase-Credentials eintragen
+3. App neu starten
+            `;
+        }
+
+        // Auto-load on page open
+        window.onload = () => {
+            showLocalStorage();
+            checkFirebase();
+        };
+    </script>
+</body>
+</html>

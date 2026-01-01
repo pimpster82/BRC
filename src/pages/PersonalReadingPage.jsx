@@ -63,10 +63,20 @@ export default function PersonalReadingPage() {
   const [expandedTopics, setExpandedTopics] = useState({}) // Track which thematic topics are expanded
   const [isSelectMode, setIsSelectMode] = useState(false) // Chapter selection mode
   const [selectedChapters, setSelectedChapters] = useState(new Set()) // Selected chapters for batch operations
+  const [isScrolled, setIsScrolled] = useState(false) // Track scroll state for progress bar collapse
 
   // Reading Plans Store (needed for custom plans display)
   const [availablePlans, setAvailablePlans] = useState([]) // Custom plans from Firebase
   const [installedPlans, setInstalledPlans] = useState([]) // User's installed plans
+
+  // Scroll detection for progress bar collapse
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50)
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   // Load available and installed plans
   useEffect(() => {
@@ -483,18 +493,131 @@ export default function PersonalReadingPage() {
           </button>
         </div>
 
-        {/* Total Progress Bar (Verse-Based) */}
+        {/* Progress Bars - Plan-Specific */}
         <div className="px-4 pb-4">
-          <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400 dark:text-gray-300 mb-2">
-            <span>{totalProgress.versesRead} / {totalProgress.totalVerses} {t('reading.verses')}</span>
-            <span>{totalProgress.percentage}%</span>
-          </div>
-          <div className="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-2 overflow-hidden">
-            <div
-              className="bg-blue-600 dark:bg-blue-500 h-full transition-all"
-              style={{ width: `${totalProgress.percentage}%` }}
-            />
-          </div>
+          {/* Free Reading */}
+          {selectedPlan === 'free' && (
+            <div className="space-y-2">
+              {!isScrolled && (
+                <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400">
+                  <span>{t('reading.overall_progress')}</span>
+                  <span>{totalProgress.percentage}%</span>
+                </div>
+              )}
+              <div className="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-2 overflow-hidden">
+                <div
+                  className="bg-blue-600 dark:bg-blue-500 h-full transition-all"
+                  style={{ width: `${totalProgress.percentage}%` }}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Thematic Plan - Dual Bars */}
+          {selectedPlan === 'thematic' && (() => {
+            const thematicProgress = getThematicProgress()
+            const versesRead = personalData ? calculateVersesRead(personalData.chaptersRead || []) : 0
+            const totalVerses = getTotalVerses()
+            const overallPercentage = totalVerses > 0 ? Math.round((versesRead / totalVerses) * 100) : 0
+
+            return (
+              <div className="space-y-2">
+                {/* Overall Bible Progress */}
+                <div>
+                  {!isScrolled && (
+                    <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
+                      <span>{t('reading.overall_progress')}</span>
+                      <span>{overallPercentage}%</span>
+                    </div>
+                  )}
+                  <div className="w-full bg-blue-200 dark:bg-blue-700 rounded-full h-2 overflow-hidden">
+                    <div
+                      className="bg-blue-600 dark:bg-blue-500 h-full transition-all"
+                      style={{ width: `${overallPercentage}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* Thematic Plan Progress */}
+                <div>
+                  {!isScrolled && (
+                    <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
+                      <span>{t('reading.plan_thematic')}</span>
+                      <span>{thematicProgress.percentage}%</span>
+                    </div>
+                  )}
+                  <div className="w-full bg-purple-200 dark:bg-purple-700 rounded-full h-2 overflow-hidden">
+                    <div
+                      className="bg-purple-600 dark:bg-purple-500 h-full transition-all"
+                      style={{ width: `${thematicProgress.percentage}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+            )
+          })()}
+
+          {/* 1 Year Plan - On Track Meter */}
+          {selectedPlan === 'oneyear' && (() => {
+            const onTrack = getOnTrackStatus()
+            const MAX_THRESHOLD = 30
+            let position = 0
+            if (onTrack.hasStarted) {
+              const difference = onTrack.daysAhead - onTrack.daysBehind
+              const clampedDiff = Math.max(-MAX_THRESHOLD, Math.min(MAX_THRESHOLD, difference))
+              position = (clampedDiff / MAX_THRESHOLD) * 100
+            }
+
+            return (
+              <div className="space-y-2">
+                {!isScrolled && (
+                  <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400">
+                    <span>{t('reading.plan_oneyear')}</span>
+                    <span>{onTrack.actualReadings}/{oneyearReadings.length}</span>
+                  </div>
+                )}
+                {onTrack.hasStarted ? (
+                  <div className="w-full h-8 bg-gradient-to-r from-red-100 via-yellow-100 to-green-100 dark:from-red-900 dark:via-yellow-900 dark:to-green-900 rounded-lg relative">
+                    <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-gray-400 dark:bg-gray-500"></div>
+                    <div
+                      className="absolute top-1/2 w-1 h-10 bg-gray-800 dark:bg-gray-200 rounded-full transition-all duration-500 shadow-lg"
+                      style={{
+                        left: `calc(50% + ${position}% * 0.4)`,
+                        transform: 'translate(-50%, -50%)'
+                      }}
+                    >
+                      <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-gray-800 dark:border-b-gray-200"></div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-2 text-sm text-gray-600 dark:text-gray-400">
+                    {t('oneyear.not_started')}
+                  </div>
+                )}
+              </div>
+            )
+          })()}
+
+          {/* Bible Overview */}
+          {selectedPlan === 'bible_overview' && (() => {
+            const progress = getBibleOverviewProgress()
+            return (
+              <div className="space-y-2">
+                {!isScrolled && (
+                  <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400">
+                    <span>{t('reading.plan_bible_overview')}</span>
+                    <span>{progress.percentage}%</span>
+                  </div>
+                )}
+                <div className="w-full bg-blue-200 dark:bg-blue-700 rounded-full h-2 overflow-hidden">
+                  <div
+                    className="bg-blue-600 dark:bg-blue-500 h-full transition-all"
+                    style={{ width: `${progress.percentage}%` }}
+                  />
+                </div>
+              </div>
+            )
+          })()}
         </div>
       </div>
 

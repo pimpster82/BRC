@@ -33,7 +33,7 @@ export default function PersonalReadingCard() {
     const plans = {
       free: 'reading.plan_free',
       chronological: 'reading.plan_chronological',
-      oneyear: 'reading.plan_oneyear',
+      oneyear: 'readingplan.1year',
       thematic: 'reading.plan_thematic'
     }
     setPlanName(t(plans[savedPlan] || 'reading.plan_free'))

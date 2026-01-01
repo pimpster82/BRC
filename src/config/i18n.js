@@ -90,7 +90,7 @@ export const translations = {
 
     // Reading Plans
     'readingplan.free': 'Freies Lesen (Bible Tree)',
-    'readingplan.1year': 'Bibel in 1 Jahr',
+    'readingplan.1year': 'Bibel in einem Jahr',
     'readingplan.2years': 'Bibel in 2 Jahren',
     'readingplan.chronological': 'Chronologisch',
     'readingplan.bookbybook': 'Buch für Buch',
@@ -172,7 +172,6 @@ export const translations = {
     'reading.error_chapter_range': 'Kapitel außerhalb des gültigen Bereichs',
     'reading.plan_free': 'Freies Lesen',
     'reading.plan_chronological': 'Chronologisch',
-    'reading.plan_oneyear': '1-Jahres-Plan',
     'reading.plan_thematic': 'Thematisch',
     'reading.plan_bible_overview': 'Bibelübersicht',
     'reading.topics_completed': 'Themen abgeschlossen',
@@ -352,7 +351,7 @@ export const translations = {
 
     // Reading Plans
     'readingplan.free': 'Free Reading (Bible Tree)',
-    'readingplan.1year': 'Bible in 1 Year',
+    'readingplan.1year': 'Bible in One Year',
     'readingplan.2years': 'Bible in 2 Years',
     'readingplan.chronological': 'Chronological',
     'readingplan.bookbybook': 'Book by Book',
@@ -419,7 +418,6 @@ export const translations = {
     'reading.error_chapter_range': 'Chapter outside valid range',
     'reading.plan_free': 'Free Reading',
     'reading.plan_chronological': 'Chronological',
-    'reading.plan_oneyear': '1-Year Plan',
     'reading.plan_thematic': 'Thematic',
     'reading.plan_bible_overview': 'Overview of the Bible',
     'reading.topics_completed': 'Topics Completed',
@@ -599,7 +597,7 @@ export const translations = {
 
     // Reading Plans
     'readingplan.free': 'Lectura Libre (Árbol Bíblico)',
-    'readingplan.1year': 'Biblia en 1 Año',
+    'readingplan.1year': 'Biblia en Un Año',
     'readingplan.2years': 'Biblia en 2 Años',
     'readingplan.chronological': 'Cronológico',
     'readingplan.bookbybook': 'Libro por Libro',
@@ -666,7 +664,6 @@ export const translations = {
     'reading.error_chapter_range': 'Capítulo fuera del rango válido',
     'reading.plan_free': 'Lectura Libre',
     'reading.plan_chronological': 'Cronológico',
-    'reading.plan_oneyear': 'Plan de 1 Año',
     'reading.plan_thematic': 'Temático',
     'reading.plan_bible_overview': 'Visión General de la Biblia',
     'reading.topics_completed': 'Temas Completados',
@@ -846,7 +843,7 @@ export const translations = {
 
     // Reading Plans
     'readingplan.free': 'Lettura Libera (Albero Biblico)',
-    'readingplan.1year': 'Bibbia in 1 Anno',
+    'readingplan.1year': 'Bibbia in Un Anno',
     'readingplan.2years': 'Bibbia in 2 Anni',
     'readingplan.chronological': 'Cronologico',
     'readingplan.bookbybook': 'Libro per Libro',
@@ -913,7 +910,6 @@ export const translations = {
     'reading.error_chapter_range': 'Capitolo al di fuori dell\'intervallo valido',
     'reading.plan_free': 'Lettura Libera',
     'reading.plan_chronological': 'Cronologico',
-    'reading.plan_oneyear': 'Piano di 1 Anno',
     'reading.plan_thematic': 'Tematico',
     'reading.plan_bible_overview': 'Panoramica della Bibbia',
     'reading.topics_completed': 'Argomenti Completati',
@@ -1096,7 +1092,7 @@ export const translations = {
 
     // Reading Plans
     'readingplan.free': 'Lecture Libre (Arbre Biblique)',
-    'readingplan.1year': 'Bible en 1 An',
+    'readingplan.1year': 'Bible en Un An',
     'readingplan.2years': 'Bible en 2 Ans',
     'readingplan.chronological': 'Chronologique',
     'readingplan.bookbybook': 'Livre par Livre',
@@ -1163,7 +1159,6 @@ export const translations = {
     'reading.error_chapter_range': 'Chapitre hors plage valide',
     'reading.plan_free': 'Lecture Libre',
     'reading.plan_chronological': 'Chronologique',
-    'reading.plan_oneyear': 'Plan sur 1 An',
     'reading.plan_thematic': 'Thématique',
     'reading.plan_bible_overview': 'Aperçu de la Bible',
     'reading.topics_completed': 'Thèmes Complétés',

@@ -532,7 +532,7 @@ export default function PersonalReadingPage() {
                 <div>
                   {!isScrolled && (
                     <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
-                      <span>{t('reading.plan_oneyear')}</span>
+                      <span>{t('readingplan.1year')}</span>
                       <span>{onTrack.actualReadings}/{oneyearReadings.length}</span>
                     </div>
                   )}

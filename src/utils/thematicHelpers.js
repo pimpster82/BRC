@@ -302,18 +302,65 @@ export const unmarkThematicTopicComplete = (topic, chaptersRead) => {
 }
 
 /**
- * Unmark a single reading (disabled to prevent data loss)
+ * Unmark a single reading (removes chapters/verses from chaptersRead)
  *
- * Note: Disabled to prevent data loss. Users can unmark via Free Reading.
+ * WARNING: This will affect progress in ALL plans (Free Reading, Bible Overview, etc.)
+ * since they all share the same chaptersRead array.
  *
  * @param {Object} reading - Reading object
  * @param {Array} chaptersRead - Current chaptersRead array
- * @returns {Array} Unchanged chaptersRead array (function disabled)
+ * @returns {Array} New chaptersRead array with reading chapters removed
  */
 export const unmarkSingleReadingComplete = (reading, chaptersRead) => {
-  // Disabled: Removing chapters could affect other plans
-  // Users should use Free Reading to unmark individual chapters
-  return chaptersRead
+  let newChaptersRead = [...chaptersRead]
+
+  // Full chapter range
+  if (reading.startChapter && reading.endChapter && !reading.startVerse) {
+    for (let ch = reading.startChapter; ch <= reading.endChapter; ch++) {
+      const key = `${reading.book}:${ch}`
+      newChaptersRead = newChaptersRead.filter(item =>
+        !(item.book === reading.book && item.chapter === ch)
+      )
+    }
+    return newChaptersRead
+  }
+
+  // Single chapter
+  if (reading.chapter && !reading.startVerse && !reading.verses) {
+    newChaptersRead = newChaptersRead.filter(item =>
+      !(item.book === reading.book && item.chapter === reading.chapter)
+    )
+    return newChaptersRead
+  }
+
+  // Verse range in single chapter - remove the chapter entry
+  // (we can't partially remove verses from chaptersRead structure)
+  if (reading.chapter && reading.startVerse && reading.endVerse) {
+    newChaptersRead = newChaptersRead.filter(item =>
+      !(item.book === reading.book && item.chapter === reading.chapter)
+    )
+    return newChaptersRead
+  }
+
+  // Verse range across chapters - remove all chapters in range
+  if (reading.startChapter && reading.endChapter && reading.startVerse && reading.endVerse) {
+    for (let ch = reading.startChapter; ch <= reading.endChapter; ch++) {
+      newChaptersRead = newChaptersRead.filter(item =>
+        !(item.book === reading.book && item.chapter === ch)
+      )
+    }
+    return newChaptersRead
+  }
+
+  // Scattered verses - remove the chapter
+  if (reading.verses && Array.isArray(reading.verses) && reading.chapter) {
+    newChaptersRead = newChaptersRead.filter(item =>
+      !(item.book === reading.book && item.chapter === reading.chapter)
+    )
+    return newChaptersRead
+  }
+
+  return newChaptersRead
 }
 
 /**

@@ -1100,13 +1100,25 @@ export default function PersonalReadingPage() {
                                     let linkObj
                                     if (reading.chapter) {
                                       // Single chapter or verse range in one chapter
-                                      linkObj = buildLanguageSpecificWebLink(
-                                        reading.book,
-                                        reading.chapter,
-                                        reading.startVerse || 1,
-                                        reading.endVerse || null,
-                                        language
-                                      )
+                                      if (reading.verses && Array.isArray(reading.verses)) {
+                                        // Scattered verses - link to first verse
+                                        linkObj = buildLanguageSpecificWebLink(
+                                          reading.book,
+                                          reading.chapter,
+                                          reading.verses[0],
+                                          reading.verses[reading.verses.length - 1],
+                                          language
+                                        )
+                                      } else {
+                                        // Normal chapter or verse range
+                                        linkObj = buildLanguageSpecificWebLink(
+                                          reading.book,
+                                          reading.chapter,
+                                          reading.startVerse || 1,
+                                          reading.endVerse || null,
+                                          language
+                                        )
+                                      }
                                     } else if (reading.startChapter) {
                                       // Chapter range - link to first chapter
                                       linkObj = buildLanguageSpecificWebLink(
@@ -1121,7 +1133,7 @@ export default function PersonalReadingPage() {
                                     return (
                                       <a
                                         key={idx}
-                                        href={linkObj?.url}
+                                        href={linkObj?.web}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline font-medium transition-colors"

@@ -134,6 +134,27 @@ export default function PersonalReadingPage() {
     }
   }, [selectedPlan])
 
+  // Initialize expandedSections to show only the section with next unread reading
+  useEffect(() => {
+    if (!personalData || !chaptersIndex) return
+
+    let nextSection = null
+
+    if (selectedPlan === 'bible_overview') {
+      nextSection = getNextUnreadBibleOverviewSection()
+    } else if (selectedPlan === 'oneyear') {
+      nextSection = getNextUnreadOneyearSection()
+    } else if (selectedPlan === 'thematic') {
+      nextSection = getNextUnreadThematicSection()
+    }
+
+    if (nextSection) {
+      setExpandedSections({ [nextSection]: true })
+    } else {
+      setExpandedSections({}) // All closed if no next section found
+    }
+  }, [selectedPlan, personalData, chaptersIndex, bibleInOneYearState])
+
   // Find the category ID of the last-read chapter (for Free plan)
   const getLastReadCategoryId = () => {
     if (!personalData || !personalData.chaptersRead || personalData.chaptersRead.length === 0) {
@@ -179,6 +200,62 @@ export default function PersonalReadingPage() {
     }
 
     return null
+  }
+
+  // Find the section with the next unread reading for Bible Overview Plan
+  const getNextUnreadBibleOverviewSection = () => {
+    for (const section of bibleOverviewSections) {
+      const readingsInSection = getBibleOverviewReadingsInSection(section.key)
+
+      // Check if any reading in this section is incomplete
+      for (const reading of readingsInSection) {
+        if (!isReadingComplete(reading.book, reading.startChapter, reading.endChapter, chaptersIndex)) {
+          return section.key
+        }
+      }
+    }
+
+    // All complete or no sections - return first section
+    return bibleOverviewSections[0]?.key || null
+  }
+
+  // Find the section with the next unread reading for One Year Plan
+  const getNextUnreadOneyearSection = () => {
+    if (!bibleInOneYearState) {
+      // No state yet - return first section
+      return oneyearSections[0]?.key || null
+    }
+
+    for (const section of oneyearSections) {
+      const readingsInSection = getOneyearReadingsInSection(section.key)
+
+      // Check if any reading in this section is incomplete
+      for (const reading of readingsInSection) {
+        if (!bibleInOneYearState.completedReadings?.includes(reading.id)) {
+          return section.key
+        }
+      }
+    }
+
+    // All complete or no sections - return first section
+    return oneyearSections[0]?.key || null
+  }
+
+  // Find the section with the next unread topic for Thematic Plan
+  const getNextUnreadThematicSection = () => {
+    for (const section of getThematicSections()) {
+      const topicsInSection = getTopicsInSection(section.key)
+
+      // Check if any topic in this section is incomplete
+      for (const topic of topicsInSection) {
+        if (!isThematicTopicCompleteUnified(topic.id, chaptersIndex)) {
+          return section.key
+        }
+      }
+    }
+
+    // All complete or no sections - return first section
+    return getThematicSections()[0]?.key || null
   }
 
   // Load data on mount
@@ -828,7 +905,7 @@ export default function PersonalReadingPage() {
           <div className="space-y-6">
             {/* Bible Overview Sections */}
             {bibleOverviewSections.map((section) => {
-              const isExpanded = expandedSections[section.key] !== false // Default to expanded
+              const isExpanded = expandedSections[section.key] === true // Default to collapsed
               const readingsInSection = getBibleOverviewReadingsInSection(section.key)
 
               return (
@@ -941,7 +1018,7 @@ export default function PersonalReadingPage() {
           <div className="space-y-6">
             {/* One Year Sections */}
             {oneyearSections.map((section) => {
-              const isExpanded = expandedSections[section.key] !== false // Default to expanded
+              const isExpanded = expandedSections[section.key] === true // Default to collapsed
               const readingsInSection = getOneyearReadingsInSection(section.key)
 
               return (
@@ -1048,7 +1125,7 @@ export default function PersonalReadingPage() {
           <div className="space-y-6">
             {/* Thematic Sections */}
             {getThematicSections().map((section) => {
-              const isExpanded = expandedSections[section.key] !== false // Default to expanded
+              const isExpanded = expandedSections[section.key] === true // Default to collapsed
               const topicsInSection = getTopicsInSection(section.key)
 
               return (

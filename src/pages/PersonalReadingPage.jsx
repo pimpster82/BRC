@@ -3,14 +3,17 @@ import { ChevronLeft, ExternalLink, Check, Edit2, ChevronDown, ChevronRight, Set
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useLoading } from '../context/LoadingContext'
 import { useAuth } from '../context/AuthContext'
+import { useProgress } from '../context/ProgressContext'
+import { setChapterRead, removeChapter, isReadingComplete, markReadingComplete as markReadingCompleteUnified, unmarkReading } from '../utils/progressTracking'
+import { isThematicTopicComplete as isThematicTopicCompleteUnified, markThematicTopicComplete as markThematicTopicCompleteUnified, unmarkThematicTopicComplete as unmarkThematicTopicCompleteUnified, formatReadingForDisplay } from '../utils/thematicHelpers'
 import LoadingSpinner from '../components/LoadingSpinner'
 import { t, getCurrentLanguage } from '../config/i18n'
 import { getBibleBooks } from '../config/languages'
 import { readingCategories, getBooksInCategory } from '../config/reading-categories'
 import { thematicTopics, getThematicSections, getTopicsInSection } from '../config/thematic-topics'
-import { bibleOverviewReadings, bibleOverviewSections, getReadingsInSection as getBibleOverviewReadingsInSection, getBibleOverviewProgress, isReadingCompleted as isBibleOverviewReadingCompleted, markReadingComplete as markBibleOverviewReadingComplete, unmarkReadingComplete as unmarkBibleOverviewReadingComplete } from '../config/bible-overview-readings'
-import { oneyearReadings, oneyearSections, getReadingsInSection as getOneyearReadingsInSection, getOneyearProgress, isReadingCompleted as isOneyearReadingCompleted, markReadingComplete as markOneyearReadingComplete, unmarkReadingComplete as unmarkOneyearReadingComplete, getOnTrackStatus } from '../config/oneyear-readings'
-import { getPersonalReadingData, savePersonalReadingData, syncPersonalReadingToFirebase, markThematicTopicComplete, unmarkThematicTopicComplete, isThematicTopicComplete, getThematicProgress } from '../utils/storage'
+import { bibleOverviewReadings, bibleOverviewSections, getReadingsInSection as getBibleOverviewReadingsInSection } from '../config/bible-overview-readings'
+import { oneyearReadings, oneyearSections, getReadingsInSection as getOneyearReadingsInSection, getOnTrackStatus } from '../config/oneyear-readings'
+import { getPersonalReadingData, savePersonalReadingData, syncPersonalReadingToFirebase } from '../utils/storage'
 import { buildLanguageSpecificWebLink } from '../../data/bible-link-builder'
 import { auth } from '../config/firebase'
 import { parseReadingInput } from '../utils/readingParser'
@@ -21,8 +24,6 @@ import {
   calculateVersesRead,
   calculateVerseProgress,
   getVerseCount,
-  calculateTotalBibleVerses,
-  calculateAllVersesRead,
 } from '../utils/verseProgressCalculator'
 
 /**
@@ -46,6 +47,7 @@ export default function PersonalReadingPage() {
   const [searchParams] = useSearchParams()
   const { showLoading, hideLoading } = useLoading()
   const { currentUser } = useAuth()
+  const { overallProgress, oneyearProgress, bibleOverviewProgress, thematicProgress, chaptersRead, chaptersIndex, updateChaptersRead } = useProgress()
   const language = getCurrentLanguage()
   const bibleBooks = getBibleBooks(language)
 
@@ -271,79 +273,40 @@ export default function PersonalReadingPage() {
     return found?.verses || 0
   }
 
-  // Toggle chapter to complete status
+  // Toggle chapter to complete status (using unified progressTracking)
   const markChapterComplete = (bookNumber, chapter) => {
-    const updated = { ...personalData }
-    const index = updated.chaptersRead.findIndex(
-      ch => ch.book === bookNumber && ch.chapter === chapter
-    )
+    const newChaptersRead = setChapterRead(chaptersRead, bookNumber, chapter, 'complete', null, 'free')
+    updateChaptersRead(newChaptersRead)
 
-    if (index > -1) {
-      // Already exists, update to complete
-      updated.chaptersRead[index] = {
-        book: bookNumber,
-        chapter: chapter,
-        status: 'complete',
-        timestamp: Date.now()
-      }
-    } else {
-      // Add new complete chapter
-      updated.chaptersRead.push({
-        book: bookNumber,
-        chapter: chapter,
-        status: 'complete',
-        timestamp: Date.now()
-      })
-    }
-
-    saveAndSync(updated)
+    // Update local state for immediate UI update
+    const updated = { ...personalData, chaptersRead: newChaptersRead }
     setPersonalData(updated)
-    window.dispatchEvent(new Event('personalReadingUpdated'))
+    saveAndSync(updated)
   }
 
-  // Mark chapter as unread
+  // Mark chapter as unread (using unified progressTracking)
   const unmarkChapter = (bookNumber, chapter) => {
-    const updated = { ...personalData }
-    updated.chaptersRead = updated.chaptersRead.filter(
-      ch => !(ch.book === bookNumber && ch.chapter === chapter)
-    )
+    const newChaptersRead = removeChapter(chaptersRead, bookNumber, chapter)
+    updateChaptersRead(newChaptersRead)
 
-    saveAndSync(updated)
+    // Update local state for immediate UI update
+    const updated = { ...personalData, chaptersRead: newChaptersRead }
     setPersonalData(updated)
-    window.dispatchEvent(new Event('personalReadingUpdated'))
+    saveAndSync(updated)
   }
 
-  // Mark chapter as partial with verse count
+  // Mark chapter as partial with verse count (using unified progressTracking)
   const markChapterPartial = (bookNumber, chapter, verses) => {
-    const updated = { ...personalData }
-    const index = updated.chaptersRead.findIndex(
-      ch => ch.book === bookNumber && ch.chapter === chapter
-    )
-
     const verseCount = getVerseCount(bookNumber, chapter)
     if (verses > verseCount) return // Validation
 
-    if (index > -1) {
-      updated.chaptersRead[index] = {
-        book: bookNumber,
-        chapter: chapter,
-        status: 'partial',
-        verses: verses,
-        timestamp: Date.now()
-      }
-    } else {
-      updated.chaptersRead.push({
-        book: bookNumber,
-        chapter: chapter,
-        status: 'partial',
-        verses: verses,
-        timestamp: Date.now()
-      })
-    }
+    const newChaptersRead = setChapterRead(chaptersRead, bookNumber, chapter, 'partial', verses, 'free')
+    updateChaptersRead(newChaptersRead)
 
-    saveAndSync(updated)
+    // Update local state for immediate UI update
+    const updated = { ...personalData, chaptersRead: newChaptersRead }
     setPersonalData(updated)
-    window.dispatchEvent(new Event('personalReadingUpdated'))
+    saveAndSync(updated)
   }
 
   // Handle manual progress input with parser
@@ -388,36 +351,19 @@ export default function PersonalReadingPage() {
       return
     }
 
-    // Process chapters: mark complete or partial
-    const updated = { ...personalData }
+    // Process chapters: mark complete or partial (using unified progressTracking)
+    let newChaptersRead = [...chaptersRead]
 
     result.chapters.forEach(parsedChapter => {
       const { chapter, status, verses } = parsedChapter
-
-      // Find or create chapter entry
-      const index = updated.chaptersRead.findIndex(
-        ch => ch.book === bookNumber && ch.chapter === chapter
-      )
-
-      const newEntry = {
-        book: bookNumber,
-        chapter: chapter,
-        status: status,
-        ...(status === 'partial' && { verses }),
-        timestamp: Date.now()
-      }
-
-      if (index > -1) {
-        updated.chaptersRead[index] = newEntry
-      } else {
-        updated.chaptersRead.push(newEntry)
-      }
+      newChaptersRead = setChapterRead(newChaptersRead, bookNumber, chapter, status, verses, 'free')
     })
 
-    // Save and reset
-    saveAndSync(updated)
+    // Update context and persist
+    updateChaptersRead(newChaptersRead)
+    const updated = { ...personalData, chaptersRead: newChaptersRead }
     setPersonalData(updated)
-    window.dispatchEvent(new Event('personalReadingUpdated'))
+    saveAndSync(updated)
 
     // Reset form
     setProgressInputText('')
@@ -498,80 +444,64 @@ export default function PersonalReadingPage() {
         {/* Progress Bars - Plan-Specific */}
         <div className="px-4 pb-4">
           {/* Free Reading */}
-          {selectedPlan === 'free' && (() => {
-            const versesRead = personalData ? calculateAllVersesRead(personalData.chaptersRead || []) : 0
-            const totalVerses = calculateTotalBibleVerses()
-            const overallPercentage = totalVerses > 0 ? Math.round((versesRead / totalVerses) * 100) : 0
+          {selectedPlan === 'free' && (
+            <div className="space-y-2">
+              {!isScrolled && (
+                <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400">
+                  <span>{t('reading.overall_progress')}</span>
+                  <span>{overallProgress.percentage}%</span>
+                </div>
+              )}
+              <div className="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-2 overflow-hidden">
+                <div
+                  className="bg-blue-600 dark:bg-blue-500 h-full transition-all"
+                  style={{ width: `${overallProgress.percentage}%` }}
+                />
+              </div>
+            </div>
+          )}
 
-            return (
-              <div className="space-y-2">
+          {/* Thematic Plan - Dual Bars */}
+          {selectedPlan === 'thematic' && (
+            <div className="space-y-2">
+              {/* Overall Bible Progress */}
+              <div>
                 {!isScrolled && (
-                  <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400">
+                  <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
                     <span>{t('reading.overall_progress')}</span>
-                    <span>{overallPercentage}%</span>
+                    <span>{overallProgress.percentage}%</span>
                   </div>
                 )}
-                <div className="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-2 overflow-hidden">
+                <div className="w-full bg-blue-200 dark:bg-blue-700 rounded-full h-2 overflow-hidden">
                   <div
                     className="bg-blue-600 dark:bg-blue-500 h-full transition-all"
-                    style={{ width: `${overallPercentage}%` }}
+                    style={{ width: `${overallProgress.percentage}%` }}
                   />
                 </div>
               </div>
-            )
-          })()}
 
-          {/* Thematic Plan - Dual Bars */}
-          {selectedPlan === 'thematic' && (() => {
-            const thematicProgress = getThematicProgress()
-            const versesRead = personalData ? calculateAllVersesRead(personalData.chaptersRead || []) : 0
-            const totalVerses = calculateTotalBibleVerses()
-            const overallPercentage = totalVerses > 0 ? Math.round((versesRead / totalVerses) * 100) : 0
-
-            return (
-              <div className="space-y-2">
-                {/* Overall Bible Progress */}
-                <div>
-                  {!isScrolled && (
-                    <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
-                      <span>{t('reading.overall_progress')}</span>
-                      <span>{overallPercentage}%</span>
-                    </div>
-                  )}
-                  <div className="w-full bg-blue-200 dark:bg-blue-700 rounded-full h-2 overflow-hidden">
-                    <div
-                      className="bg-blue-600 dark:bg-blue-500 h-full transition-all"
-                      style={{ width: `${overallPercentage}%` }}
-                    />
+              {/* Thematic Plan Progress */}
+              <div>
+                {!isScrolled && (
+                  <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
+                    <span>{t('reading.plan_thematic')}</span>
+                    <span>{thematicProgress.percentage}%</span>
                   </div>
-                </div>
-
-                {/* Thematic Plan Progress */}
-                <div>
-                  {!isScrolled && (
-                    <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
-                      <span>{t('reading.plan_thematic')}</span>
-                      <span>{thematicProgress.percentage}%</span>
-                    </div>
-                  )}
-                  <div className="w-full bg-purple-200 dark:bg-purple-700 rounded-full h-2 overflow-hidden">
-                    <div
-                      className="bg-purple-600 dark:bg-purple-500 h-full transition-all"
-                      style={{ width: `${thematicProgress.percentage}%` }}
-                    />
-                  </div>
+                )}
+                <div className="w-full bg-purple-200 dark:bg-purple-700 rounded-full h-2 overflow-hidden">
+                  <div
+                    className="bg-purple-600 dark:bg-purple-500 h-full transition-all"
+                    style={{ width: `${thematicProgress.percentage}%` }}
+                  />
                 </div>
               </div>
-            )
-          })()}
+            </div>
+          )}
 
           {/* 1 Year Plan - Overall Bible Progress + On Track Meter */}
           {selectedPlan === 'oneyear' && (() => {
             const chaptersRead = personalData?.chaptersRead || []
             const onTrack = getOnTrackStatus(chaptersRead)
-            const versesRead = calculateAllVersesRead(chaptersRead)
-            const totalVerses = calculateTotalBibleVerses()
-            const overallPercentage = totalVerses > 0 ? Math.round((versesRead / totalVerses) * 100) : 0
             const MAX_THRESHOLD = 30
             let position = 0
             if (onTrack.hasStarted) {
@@ -587,13 +517,13 @@ export default function PersonalReadingPage() {
                   {!isScrolled && (
                     <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
                       <span>{t('reading.overall_progress')}</span>
-                      <span>{overallPercentage}%</span>
+                      <span>{overallProgress.percentage}%</span>
                     </div>
                   )}
                   <div className="w-full bg-blue-200 dark:bg-blue-700 rounded-full h-2 overflow-hidden">
                     <div
                       className="bg-blue-600 dark:bg-blue-500 h-full transition-all"
-                      style={{ width: `${overallPercentage}%` }}
+                      style={{ width: `${overallProgress.percentage}%` }}
                     />
                   </div>
                 </div>
@@ -630,49 +560,41 @@ export default function PersonalReadingPage() {
           })()}
 
           {/* Bible Overview - Overall Bible Progress + Bible Overview Progress */}
-          {selectedPlan === 'bible_overview' && (() => {
-            const chaptersRead = personalData?.chaptersRead || []
-            const progress = getBibleOverviewProgress(chaptersRead)
-            const versesRead = calculateAllVersesRead(chaptersRead)
-            const totalVerses = calculateTotalBibleVerses()
-            const overallPercentage = totalVerses > 0 ? Math.round((versesRead / totalVerses) * 100) : 0
-
-            return (
-              <div className="space-y-2">
-                {/* Overall Bible Progress */}
-                <div>
-                  {!isScrolled && (
-                    <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
-                      <span>{t('reading.overall_progress')}</span>
-                      <span>{overallPercentage}%</span>
-                    </div>
-                  )}
-                  <div className="w-full bg-blue-200 dark:bg-blue-700 rounded-full h-2 overflow-hidden">
-                    <div
-                      className="bg-blue-600 dark:bg-blue-500 h-full transition-all"
-                      style={{ width: `${overallPercentage}%` }}
-                    />
+          {selectedPlan === 'bible_overview' && (
+            <div className="space-y-2">
+              {/* Overall Bible Progress */}
+              <div>
+                {!isScrolled && (
+                  <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
+                    <span>{t('reading.overall_progress')}</span>
+                    <span>{overallProgress.percentage}%</span>
                   </div>
-                </div>
-
-                {/* Bible Overview Progress */}
-                <div>
-                  {!isScrolled && (
-                    <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
-                      <span>{t('reading.plan_bible_overview')}</span>
-                      <span>{progress.percentage}%</span>
-                    </div>
-                  )}
-                  <div className="w-full bg-green-200 dark:bg-green-700 rounded-full h-2 overflow-hidden">
-                    <div
-                      className="bg-green-600 dark:bg-green-500 h-full transition-all"
-                      style={{ width: `${progress.percentage}%` }}
-                    />
-                  </div>
+                )}
+                <div className="w-full bg-blue-200 dark:bg-blue-700 rounded-full h-2 overflow-hidden">
+                  <div
+                    className="bg-blue-600 dark:bg-blue-500 h-full transition-all"
+                    style={{ width: `${overallProgress.percentage}%` }}
+                  />
                 </div>
               </div>
-            )
-          })()}
+
+              {/* Bible Overview Progress */}
+              <div>
+                {!isScrolled && (
+                  <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
+                    <span>{t('reading.plan_bible_overview')}</span>
+                    <span>{bibleOverviewProgress.percentage}%</span>
+                  </div>
+                )}
+                <div className="w-full bg-green-200 dark:bg-green-700 rounded-full h-2 overflow-hidden">
+                  <div
+                    className="bg-green-600 dark:bg-green-500 h-full transition-all"
+                    style={{ width: `${bibleOverviewProgress.percentage}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -896,8 +818,8 @@ export default function PersonalReadingPage() {
                   {isExpanded && (
                     <div className="p-4 bg-white dark:bg-slate-800 space-y-2">
                       {readingsInSection.map((reading) => {
-                        const chaptersRead = personalData?.chaptersRead || []
-                        const isCompleted = isBibleOverviewReadingCompleted(reading.id, chaptersRead)
+                        // Use unified progressTracking with chaptersIndex for O(1) lookup
+                        const isCompleted = isReadingComplete(reading.book, reading.startChapter, reading.endChapter, chaptersIndex)
                         const book = bibleBooks.books[reading.book - 1]
                         const bookName = book?.name || `Book ${reading.book}`
 
@@ -925,13 +847,15 @@ export default function PersonalReadingPage() {
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation()
+                                  // Use unified progressTracking functions
                                   const newChaptersRead = isCompleted
-                                    ? unmarkBibleOverviewReadingComplete(reading.id, chaptersRead)
-                                    : markBibleOverviewReadingComplete(reading.id, chaptersRead)
+                                    ? unmarkReading(chaptersRead, reading.book, reading.startChapter, reading.endChapter)
+                                    : markReadingCompleteUnified(chaptersRead, reading.book, reading.startChapter, reading.endChapter, 'bible_overview')
+
+                                  updateChaptersRead(newChaptersRead)
                                   const updated = { ...personalData, chaptersRead: newChaptersRead }
                                   savePersonalReadingData(updated)
                                   setPersonalData(updated)
-                                  window.dispatchEvent(new Event('personalReadingUpdated'))
                                 }}
                                 className={`flex-shrink-0 w-6 h-6 rounded border-2 flex items-center justify-center transition-all ${
                                   isCompleted
@@ -1007,8 +931,8 @@ export default function PersonalReadingPage() {
                   {isExpanded && (
                     <div className="p-4 bg-white dark:bg-slate-800 space-y-2">
                       {readingsInSection.map((reading) => {
-                        const chaptersRead = personalData?.chaptersRead || []
-                        const isCompleted = isOneyearReadingCompleted(reading.id, chaptersRead)
+                        // Use unified progressTracking with chaptersIndex for O(1) lookup
+                        const isCompleted = isReadingComplete(reading.book, reading.startChapter, reading.endChapter, chaptersIndex)
                         const book = bibleBooks.books[reading.book - 1]
                         const bookName = book?.name || `Book ${reading.book}`
 
@@ -1039,13 +963,15 @@ export default function PersonalReadingPage() {
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation()
+                                  // Use unified progressTracking functions
                                   const newChaptersRead = isCompleted
-                                    ? unmarkOneyearReadingComplete(reading.id, chaptersRead)
-                                    : markOneyearReadingComplete(reading.id, chaptersRead)
+                                    ? unmarkReading(chaptersRead, reading.book, reading.startChapter, reading.endChapter)
+                                    : markReadingCompleteUnified(chaptersRead, reading.book, reading.startChapter, reading.endChapter, 'oneyear')
+
+                                  updateChaptersRead(newChaptersRead)
                                   const updated = { ...personalData, chaptersRead: newChaptersRead }
                                   savePersonalReadingData(updated)
                                   setPersonalData(updated)
-                                  window.dispatchEvent(new Event('personalReadingUpdated'))
                                 }}
                                 className={`flex-shrink-0 w-6 h-6 rounded border-2 flex items-center justify-center transition-all ${
                                   isCompleted
@@ -1115,7 +1041,8 @@ export default function PersonalReadingPage() {
                     <div className="p-4 bg-white dark:bg-slate-800 space-y-2">
                       {topicsInSection.map((topic) => {
                         const isTopicExpanded = expandedTopics[topic.id]
-                        const isCompleted = isThematicTopicComplete(topic.id)
+                        // Use unified thematicHelpers with chaptersIndex
+                        const isCompleted = isThematicTopicCompleteUnified(topic, chaptersIndex)
 
                         return (
                           <div key={topic.id} className={`border rounded-lg overflow-hidden transition-colors ${isCompleted ? 'border-purple-300 bg-purple-50 dark:bg-purple-900 dark:border-purple-700' : 'border-gray-100 dark:border-gray-800'}`}>
@@ -1124,13 +1051,15 @@ export default function PersonalReadingPage() {
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation()
-                                  if (isCompleted) {
-                                    unmarkThematicTopicComplete(topic.id)
-                                  } else {
-                                    markThematicTopicComplete(topic.id)
-                                  }
-                                  setPersonalData(getPersonalReadingData())
-                                  window.dispatchEvent(new Event('personalReadingUpdated'))
+                                  // Use unified thematicHelpers to mark/unmark
+                                  const newChaptersRead = isCompleted
+                                    ? unmarkThematicTopicCompleteUnified(topic, chaptersRead)
+                                    : markThematicTopicCompleteUnified(topic, chaptersRead, 'thematic')
+
+                                  updateChaptersRead(newChaptersRead)
+                                  const updated = { ...personalData, chaptersRead: newChaptersRead }
+                                  savePersonalReadingData(updated)
+                                  setPersonalData(updated)
                                 }}
                                 className={`flex-shrink-0 w-6 h-6 rounded border-2 flex items-center justify-center transition-all ${
                                   isCompleted
@@ -1160,28 +1089,34 @@ export default function PersonalReadingPage() {
                             </div>
 
                             {/* Topic Content - Scripture References */}
-                            {isTopicExpanded && (
+                            {isTopicExpanded && topic.readings && (
                               <div className={`border-t p-3 ${isCompleted ? 'border-purple-200 dark:border-purple-600 bg-purple-50 dark:bg-purple-900' : 'border-gray-100 dark:border-gray-800 bg-white dark:bg-slate-800'}`}>
-                                {(() => {
-                                  const versesLinks = parseMultipleVerses(topic.verses, language)
-                                  return (
-                                    <div className="flex flex-wrap gap-2">
-                                      {versesLinks.map((link, idx) => (
-                                        <a
-                                          key={idx}
-                                          href={link.url}
-                                          target="_blank"
-                                          rel="noopener noreferrer"
-                                          className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 dark:text-blue-100 hover:underline font-medium transition-colors"
-                                          title={`Open ${link.book} on JW.org`}
-                                        >
-                                          {link.text}
-                                          <ExternalLink className="inline w-3 h-3 ml-1" />
-                                        </a>
-                                      ))}
-                                    </div>
-                                  )
-                                })()}
+                                <div className="flex flex-wrap gap-2">
+                                  {topic.readings.map((reading, idx) => {
+                                    const formattedText = formatReadingForDisplay(reading, language)
+                                    const linkObj = buildLanguageSpecificWebLink(
+                                      reading.book,
+                                      reading.chapter || reading.startChapter,
+                                      reading.startVerse || 1,
+                                      reading.endVerse || null,
+                                      language
+                                    )
+
+                                    return (
+                                      <a
+                                        key={idx}
+                                        href={linkObj.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline font-medium transition-colors"
+                                        title={`Open ${formattedText} on JW.org`}
+                                      >
+                                        {formattedText}
+                                        <ExternalLink className="inline w-3 h-3 ml-1" />
+                                      </a>
+                                    )
+                                  })}
+                                </div>
                               </div>
                             )}
                           </div>
@@ -1256,13 +1191,18 @@ export default function PersonalReadingPage() {
                   </button>
                   <button
                     onClick={() => {
-                      const updated = { ...personalData }
-                      updated.chaptersRead = updated.chaptersRead.filter(ch => !(ch.book === selectedBook && selectedChapters.has(ch.chapter)))
-                      saveAndSync(updated)
+                      // Batch unmark using unified progressTracking
+                      let newChaptersRead = [...chaptersRead]
+                      selectedChapters.forEach(chapter => {
+                        newChaptersRead = removeChapter(newChaptersRead, selectedBook, chapter)
+                      })
+
+                      updateChaptersRead(newChaptersRead)
+                      const updated = { ...personalData, chaptersRead: newChaptersRead }
                       setPersonalData(updated)
+                      saveAndSync(updated)
                       setSelectedChapters(new Set())
                       setIsSelectMode(false)
-                      window.dispatchEvent(new Event('personalReadingUpdated'))
                     }}
                     disabled={selectedChapters.size === 0}
                     className="flex-1 py-2 px-3 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-100 rounded font-medium hover:bg-red-200 dark:hover:bg-red-800 disabled:opacity-50 disabled:cursor-not-allowed text-sm"

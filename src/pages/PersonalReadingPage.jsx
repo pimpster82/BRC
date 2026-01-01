@@ -692,7 +692,7 @@ export default function PersonalReadingPage() {
             {(() => {
               const progress = getBibleOverviewProgress()
               return (
-                <div className="bg-gradient-to-r from-blue-50 dark:from-blue-900 to-indigo-50 dark:to-indigo-900 rounded-lg p-4 border border-blue-100 dark:border-blue-800">
+                <div className="sticky top-0 z-10 bg-gradient-to-r from-blue-50 dark:from-blue-900 to-indigo-50 dark:to-indigo-900 rounded-lg p-4 border border-blue-100 dark:border-blue-800 shadow-md">
                   <div className="flex justify-between text-sm text-gray-700 dark:text-gray-300 mb-2">
                     <span className="font-medium">{t('reading.plan_bible_overview')}</span>
                     <span className="font-semibold">{progress.completed}/{progress.total} {t('bible_overview.readings_completed')}</span>
@@ -834,7 +834,7 @@ export default function PersonalReadingPage() {
               }
 
               return (
-                <div className="bg-gradient-to-r from-green-50 dark:from-green-900 to-lime-50 dark:to-lime-900 rounded-lg p-4 border border-green-100 dark:border-green-800">
+                <div className="sticky top-0 z-10 bg-gradient-to-r from-green-50 dark:from-green-900 to-lime-50 dark:to-lime-900 rounded-lg p-4 border border-green-100 dark:border-green-800 shadow-md">
                   <div className="flex justify-between text-sm text-gray-700 dark:text-gray-300 mb-3">
                     <span className="font-medium">{t('reading.plan_oneyear')}</span>
                     <span className="font-semibold">{onTrack.actualReadings}/{oneyearReadings.length}</span>
@@ -991,7 +991,7 @@ export default function PersonalReadingPage() {
               const overallPercentage = totalVerses > 0 ? Math.round((versesRead / totalVerses) * 100) : 0
 
               return (
-                <div className="space-y-4">
+                <div className="sticky top-0 z-10 space-y-4 pb-4 bg-white dark:bg-slate-900">
                   {/* Overall Bible Progress */}
                   <div className="bg-gradient-to-r from-blue-50 dark:from-blue-900 to-indigo-50 dark:to-indigo-900 rounded-lg p-4 border border-blue-100 dark:border-blue-800">
                     <div className="flex justify-between text-sm text-gray-700 dark:text-gray-300 mb-2">

@@ -5,7 +5,7 @@ import { useLoading } from '../context/LoadingContext'
 import { useAuth } from '../context/AuthContext'
 import { useProgress } from '../context/ProgressContext'
 import { setChapterRead, removeChapter, isReadingComplete, markReadingComplete as markReadingCompleteUnified, unmarkReading } from '../utils/progressTracking'
-import { isThematicTopicComplete as isThematicTopicCompleteUnified, markThematicTopicComplete as markThematicTopicCompleteUnified, unmarkThematicTopicComplete as unmarkThematicTopicCompleteUnified, formatReadingForDisplay } from '../utils/thematicHelpers'
+import { isThematicTopicComplete as isThematicTopicCompleteUnified, markThematicTopicComplete as markThematicTopicCompleteUnified, unmarkThematicTopicComplete as unmarkThematicTopicCompleteUnified, formatReadingForDisplay, isReadingSatisfied, markSingleReadingComplete, unmarkSingleReadingComplete } from '../utils/thematicHelpers'
 import LoadingSpinner from '../components/LoadingSpinner'
 import { t, getCurrentLanguage } from '../config/i18n'
 import { getBibleBooks } from '../config/languages'
@@ -1041,12 +1041,12 @@ export default function PersonalReadingPage() {
                     <div className="p-4 bg-white dark:bg-slate-800 space-y-2">
                       {topicsInSection.map((topic) => {
                         const isTopicExpanded = expandedTopics[topic.id]
-                        // Use unified thematicHelpers with chaptersIndex
-                        const isCompleted = isThematicTopicCompleteUnified(topic, chaptersIndex)
+                        // Check if ALL readings in topic are complete (for visual indication only)
+                        const isTopicFullyComplete = isThematicTopicCompleteUnified(topic, chaptersIndex)
 
                         return (
-                          <div key={topic.id} className={`border rounded-lg overflow-hidden transition-colors ${isCompleted ? 'border-purple-300 bg-purple-50 dark:bg-purple-900 dark:border-purple-700' : 'border-gray-100 dark:border-gray-800'}`}>
-                            {/* Topic Header - Checkbox + Expandable Title */}
+                          <div key={topic.id} className={`border rounded-lg overflow-hidden transition-colors ${isTopicFullyComplete ? 'border-purple-300 bg-purple-50 dark:bg-purple-900 dark:border-purple-700' : 'border-gray-100 dark:border-gray-800'}`}>
+                            {/* Topic Header - Expandable Title (no checkbox) */}
                             <button
                               onClick={() => {
                                 setExpandedTopics(prev => ({
@@ -1054,94 +1054,103 @@ export default function PersonalReadingPage() {
                                   [topic.id]: !prev[topic.id]
                                 }))
                               }}
-                              className={`w-full text-left px-3 py-2 flex items-center gap-2 transition-colors ${isCompleted ? 'bg-purple-100 dark:bg-purple-800 hover:bg-purple-150 dark:hover:bg-purple-700' : 'bg-gray-50 dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700'}`}
+                              className={`w-full text-left px-3 py-2 flex items-center gap-2 transition-colors ${isTopicFullyComplete ? 'bg-purple-100 dark:bg-purple-800 hover:bg-purple-150 dark:hover:bg-purple-700' : 'bg-gray-50 dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700'}`}
                             >
-                              {/* Checkbox */}
-                              <div
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  // Use unified thematicHelpers to mark/unmark
-                                  const newChaptersRead = isCompleted
-                                    ? unmarkThematicTopicCompleteUnified(topic, chaptersRead)
-                                    : markThematicTopicCompleteUnified(topic, chaptersRead, 'thematic')
-
-                                  updateChaptersRead(newChaptersRead)
-                                  const updated = { ...personalData, chaptersRead: newChaptersRead }
-                                  savePersonalReadingData(updated)
-                                  setPersonalData(updated)
-                                }}
-                                className={`flex-shrink-0 w-6 h-6 rounded border-2 flex items-center justify-center transition-all cursor-pointer ${
-                                  isCompleted
-                                    ? 'bg-purple-600 dark:bg-purple-500 border-purple-600 dark:border-purple-500'
-                                    : 'border-gray-300 dark:border-gray-600 hover:border-purple-400'
-                                }`}
-                              >
-                                {isCompleted && <Check className="w-4 h-4 text-white" />}
-                              </div>
-
                               {/* Chevron + Title */}
                               <ChevronRight
                                 size={18}
                                 className={`text-gray-600 dark:text-gray-300 transition-transform flex-shrink-0 ${isTopicExpanded ? 'rotate-90' : 'rotate-0'}`}
                               />
-                              <span className={`font-medium text-sm text-left flex-1 ${isCompleted ? 'text-purple-700 dark:text-purple-400 line-through' : 'text-gray-700 dark:text-gray-300'}`}>
+                              <span className={`font-medium text-sm text-left flex-1 ${isTopicFullyComplete ? 'text-purple-700 dark:text-purple-400' : 'text-gray-700 dark:text-gray-300'}`}>
                                 {t(topic.titleKey)}
                               </span>
                             </button>
 
-                            {/* Topic Content - Scripture References */}
+                            {/* Topic Content - Scripture References with individual checkboxes */}
                             {isTopicExpanded && topic.readings && (
-                              <div className={`border-t p-3 ${isCompleted ? 'border-purple-200 dark:border-purple-600 bg-purple-50 dark:bg-purple-900' : 'border-gray-100 dark:border-gray-800 bg-white dark:bg-slate-800'}`}>
-                                <div className="flex flex-wrap gap-2">
+                              <div className={`border-t p-3 ${isTopicFullyComplete ? 'border-purple-200 dark:border-purple-600 bg-purple-50 dark:bg-purple-900' : 'border-gray-100 dark:border-gray-800 bg-white dark:bg-slate-800'}`}>
+                                <div className="space-y-2">
                                   {topic.readings.map((reading, idx) => {
                                     const formattedText = formatReadingForDisplay(reading, language)
+                                    // Check if THIS reading is complete (auto-detection!)
+                                    const isReadingComplete = isReadingSatisfied(reading, chaptersIndex)
 
-                                    // Build proper JW.org link based on reading type
-                                    let linkObj
-                                    if (reading.chapter) {
-                                      // Single chapter or verse range in one chapter
-                                      if (reading.verses && Array.isArray(reading.verses)) {
-                                        // Scattered verses - link to first verse
-                                        linkObj = buildLanguageSpecificWebLink(
-                                          reading.book,
-                                          reading.chapter,
-                                          reading.verses[0],
-                                          reading.verses[reading.verses.length - 1],
-                                          language
-                                        )
-                                      } else {
-                                        // Normal chapter or verse range
-                                        linkObj = buildLanguageSpecificWebLink(
-                                          reading.book,
-                                          reading.chapter,
-                                          reading.startVerse || 1,
-                                          reading.endVerse || null,
-                                          language
-                                        )
+                                    // Build JW.org finder URL with full verse/chapter range support
+                                    const buildCompleteFinderUrl = (reading, lang) => {
+                                      const localeMap = { de: 'X', en: 'E', es: 'S', it: 'I', fr: 'F' }
+                                      const wtlocale = localeMap[lang] || 'E'
+
+                                      let startRef, endRef
+
+                                      if (reading.chapter) {
+                                        // Single chapter format
+                                        const chapter = reading.chapter.toString().padStart(3, '0')
+
+                                        if (reading.verses && Array.isArray(reading.verses)) {
+                                          // Scattered verses
+                                          const startVerse = reading.verses[0].toString().padStart(3, '0')
+                                          const endVerse = reading.verses[reading.verses.length - 1].toString().padStart(3, '0')
+                                          startRef = `${reading.book.toString().padStart(2, '0')}${chapter}${startVerse}`
+                                          endRef = `${reading.book.toString().padStart(2, '0')}${chapter}${endVerse}`
+                                        } else {
+                                          // Normal chapter or verse range
+                                          const startVerse = (reading.startVerse || 1).toString().padStart(3, '0')
+                                          const endVerse = (reading.endVerse || 999).toString().padStart(3, '0')
+                                          startRef = `${reading.book.toString().padStart(2, '0')}${chapter}${startVerse}`
+                                          endRef = `${reading.book.toString().padStart(2, '0')}${chapter}${endVerse}`
+                                        }
+                                      } else if (reading.startChapter) {
+                                        // Chapter range format (e.g., Ruth 1-4 or Genesis 6:9-9:19)
+                                        const startChapter = reading.startChapter.toString().padStart(3, '0')
+                                        const endChapter = (reading.endChapter || reading.startChapter).toString().padStart(3, '0')
+                                        const startVerse = (reading.startVerse || 1).toString().padStart(3, '0')
+                                        const endVerse = (reading.endVerse || 999).toString().padStart(3, '0')
+
+                                        startRef = `${reading.book.toString().padStart(2, '0')}${startChapter}${startVerse}`
+                                        endRef = `${reading.book.toString().padStart(2, '0')}${endChapter}${endVerse}`
                                       }
-                                    } else if (reading.startChapter) {
-                                      // Chapter range - link to first chapter
-                                      linkObj = buildLanguageSpecificWebLink(
-                                        reading.book,
-                                        reading.startChapter,
-                                        reading.startVerse || 1,
-                                        reading.endVerse || null,
-                                        language
-                                      )
+
+                                      return `https://www.jw.org/finder?srcid=jwlshare&wtlocale=${wtlocale}&prefer=lang&bible=${startRef}-${endRef}&pub=nwtsty`
                                     }
 
+                                    const webUrl = buildCompleteFinderUrl(reading, language)
+
                                     return (
-                                      <a
-                                        key={idx}
-                                        href={linkObj?.web}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline font-medium transition-colors"
-                                        title={`Open ${formattedText} on JW.org`}
-                                      >
-                                        {formattedText}
-                                        <ExternalLink className="inline w-3 h-3 ml-1" />
-                                      </a>
+                                      <div key={idx} className="flex items-center gap-2">
+                                        {/* Checkbox for individual reading */}
+                                        <div
+                                          onClick={() => {
+                                            // Mark/unmark single reading
+                                            const newChaptersRead = isReadingComplete
+                                              ? unmarkSingleReadingComplete(reading, chaptersRead)
+                                              : markSingleReadingComplete(reading, chaptersRead, 'thematic')
+
+                                            updateChaptersRead(newChaptersRead)
+                                            const updated = { ...personalData, chaptersRead: newChaptersRead }
+                                            savePersonalReadingData(updated)
+                                            setPersonalData(updated)
+                                          }}
+                                          className={`flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-all cursor-pointer ${
+                                            isReadingComplete
+                                              ? 'bg-purple-600 dark:bg-purple-500 border-purple-600 dark:border-purple-500'
+                                              : 'border-gray-300 dark:border-gray-600 hover:border-purple-400'
+                                          }`}
+                                        >
+                                          {isReadingComplete && <Check className="w-3 h-3 text-white" />}
+                                        </div>
+
+                                        {/* Scripture link */}
+                                        <a
+                                          href={webUrl}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className={`text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline font-medium transition-colors ${isReadingComplete ? 'line-through opacity-60' : ''}`}
+                                          title={`Open ${formattedText} on JW.org`}
+                                        >
+                                          {formattedText}
+                                          <ExternalLink className="inline w-3 h-3 ml-1" />
+                                        </a>
+                                      </div>
                                     )
                                   })}
                                 </div>

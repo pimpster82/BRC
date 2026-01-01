@@ -236,6 +236,56 @@ export const markThematicTopicComplete = (topic, chaptersRead, source = 'themati
 }
 
 /**
+ * Mark a single reading as complete
+ *
+ * @param {Object} reading - Reading object
+ * @param {Array} chaptersRead - Current chaptersRead array
+ * @param {string} source - Source identifier (e.g., 'thematic')
+ * @returns {Array} New chaptersRead array with reading added
+ */
+export const markSingleReadingComplete = (reading, chaptersRead, source = 'thematic') => {
+  let newChaptersRead = [...chaptersRead]
+
+  // Full chapter range
+  if (reading.startChapter && reading.endChapter && !reading.startVerse) {
+    for (let ch = reading.startChapter; ch <= reading.endChapter; ch++) {
+      newChaptersRead = setChapterRead(newChaptersRead, reading.book, ch, 'complete', null, source)
+    }
+    return newChaptersRead
+  }
+
+  // Single chapter
+  if (reading.chapter && !reading.startVerse && !reading.verses) {
+    newChaptersRead = setChapterRead(newChaptersRead, reading.book, reading.chapter, 'complete', null, source)
+    return newChaptersRead
+  }
+
+  // Verse range in single chapter
+  if (reading.chapter && reading.startVerse && reading.endVerse) {
+    const versesRead = reading.endVerse - reading.startVerse + 1
+    newChaptersRead = setChapterRead(newChaptersRead, reading.book, reading.chapter, 'partial', versesRead, source)
+    return newChaptersRead
+  }
+
+  // Verse range across chapters - mark all chapters as complete
+  if (reading.startChapter && reading.endChapter && reading.startVerse && reading.endVerse) {
+    for (let ch = reading.startChapter; ch <= reading.endChapter; ch++) {
+      newChaptersRead = setChapterRead(newChaptersRead, reading.book, ch, 'complete', null, source)
+    }
+    return newChaptersRead
+  }
+
+  // Scattered verses
+  if (reading.verses && Array.isArray(reading.verses) && reading.chapter) {
+    const versesRead = reading.verses.length
+    newChaptersRead = setChapterRead(newChaptersRead, reading.book, reading.chapter, 'partial', versesRead, source)
+    return newChaptersRead
+  }
+
+  return newChaptersRead
+}
+
+/**
  * Unmark thematic topic (remove all chapters/verses for this topic)
  *
  * Note: For now, this is disabled to prevent data loss. Users can unmark via Free Reading.
@@ -246,6 +296,21 @@ export const markThematicTopicComplete = (topic, chaptersRead, source = 'themati
  * @returns {Array} Unchanged chaptersRead array (function disabled)
  */
 export const unmarkThematicTopicComplete = (topic, chaptersRead) => {
+  // Disabled: Removing chapters could affect other plans
+  // Users should use Free Reading to unmark individual chapters
+  return chaptersRead
+}
+
+/**
+ * Unmark a single reading (disabled to prevent data loss)
+ *
+ * Note: Disabled to prevent data loss. Users can unmark via Free Reading.
+ *
+ * @param {Object} reading - Reading object
+ * @param {Array} chaptersRead - Current chaptersRead array
+ * @returns {Array} Unchanged chaptersRead array (function disabled)
+ */
+export const unmarkSingleReadingComplete = (reading, chaptersRead) => {
   // Disabled: Removing chapters could affect other plans
   // Users should use Free Reading to unmark individual chapters
   return chaptersRead

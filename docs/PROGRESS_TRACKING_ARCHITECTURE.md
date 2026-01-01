@@ -208,56 +208,129 @@ export const getOverallProgress = (chaptersRead, cache = null) => {
 
 ## 🎯 THEMATIC PLAN INTEGRATION
 
-### Verse Parsing Strategy
+### ⚠️ CRITICAL: Language-Independent Format
 
-**Input Formats to Support:**
+**Problem with current string-based format:**
 ```javascript
-"Genesis 6:9–9:19"          → Books 1, chapters 6-9
-"Ruth chapters 1-4"         → Book 8, chapters 1-4
-"1 Samuel chapter 17"       → Book 9, chapter 17
-"1 Samuel 25:2-35"          → Book 9, chapter 25 (partial)
-"Ephesians 5:28, 29, 33; 6:1-4" → Book 49, chapters 5-6 (partial)
+// ❌ CURRENT (Language-Dependent):
+verses: 'Genesis 6:9–9:19'  // Works only in English!
+// In German: '1. Mose 6:9–9:19'
+// In Spanish: 'Génesis 6:9–9:19'
 ```
 
-### Parser Function (New: `src/utils/thematicVersesParser.js`)
+**Solution: Book Number Format (Language-Independent):**
+```javascript
+// ✅ NEW FORMAT:
+readings: [
+  { book: 1, startChapter: 6, startVerse: 9, endChapter: 9, endVerse: 19 }
+]
+```
+
+### Thematic Topics Data Structure (UPDATED)
+
+```javascript
+// src/config/thematic-topics.js (NEW FORMAT)
+
+export const thematicTopics = [
+  // Full chapters
+  {
+    id: 1,
+    section: 'famous_people',
+    titleKey: 'thematic.noah',
+    readings: [
+      { book: 1, startChapter: 6, startVerse: 9, endChapter: 9, endVerse: 19 }
+    ]
+  },
+  {
+    id: 3,
+    section: 'famous_people',
+    titleKey: 'thematic.ruth',
+    readings: [
+      { book: 8, startChapter: 1, endChapter: 4 }  // Full chapters (no verse numbers)
+    ]
+  },
+
+  // Single chapter
+  {
+    id: 4,
+    section: 'famous_people',
+    titleKey: 'thematic.david_goliath',
+    readings: [
+      { book: 9, chapter: 17 }  // 1 Samuel 17 (full chapter)
+    ]
+  },
+
+  // Partial chapter
+  {
+    id: 5,
+    section: 'famous_people',
+    titleKey: 'thematic.abigail',
+    readings: [
+      { book: 9, chapter: 25, startVerse: 2, endVerse: 35 }
+    ]
+  },
+
+  // Multiple scattered verses
+  {
+    id: 8,
+    section: 'wisdom',
+    titleKey: 'thematic.family',
+    readings: [
+      { book: 49, chapter: 5, verses: [28, 29, 33] },        // Specific verses
+      { book: 49, chapter: 6, startVerse: 1, endVerse: 4 }  // Verse range
+    ]
+  },
+
+  // Multiple chapter ranges
+  {
+    id: 7,
+    section: 'famous_people',
+    titleKey: 'thematic.elizabeth_mary',
+    readings: [
+      { book: 42, startChapter: 1, endChapter: 2 }  // Luke 1-2
+    ]
+  }
+]
+```
+
+### Display Function (Language-Aware)
 
 ```javascript
 /**
- * Parse thematic verses string into chapter ranges
- * Returns array of { book, startChapter, endChapter, isPartial, verses? }
+ * Format reading for display in current language
  */
-export const parseThematicVerses = (versesString) => {
-  // Use existing parseReadingInput from readingParser.js
-  const result = parseMultipleVerses(versesString)
+export const formatReadingForDisplay = (reading, language) => {
+  const bibleBooks = getBibleBooks(language)
+  const bookName = bibleBooks.books[reading.book - 1]?.name
 
-  // Transform to chapter ranges
-  const ranges = []
-
-  result.forEach(({ book, chapter, startVerse, endVerse }) => {
-    if (!book || !chapter) return
-
-    // Check if it's a full chapter or partial
-    const totalVerses = getVerseCount(book.number, chapter)
-    const isFullChapter = !startVerse || (startVerse === 1 && endVerse === totalVerses)
-
-    if (isFullChapter) {
-      ranges.push({
-        book: book.number,
-        chapter,
-        isPartial: false
-      })
-    } else {
-      const versesRead = endVerse - startVerse + 1
-      ranges.push({
-        book: book.number,
-        chapter,
-        isPartial: true,
-        verses: versesRead
-      })
+  // Full chapters (e.g., "Genesis 1-3")
+  if (reading.startChapter && reading.endChapter && !reading.startVerse) {
+    if (reading.startChapter === reading.endChapter) {
+      return `${bookName} ${reading.startChapter}`
     }
-  })
+    return `${bookName} ${reading.startChapter}-${reading.endChapter}`
+  }
 
-  return ranges
+  // Single chapter (e.g., "1 Samuel 17")
+  if (reading.chapter && !reading.startVerse) {
+    return `${bookName} ${reading.chapter}`
+  }
+
+  // Verse range (e.g., "Genesis 6:9–9:19")
+  if (reading.startVerse && reading.endVerse) {
+    if (reading.startChapter === reading.endChapter || !reading.endChapter) {
+      const ch = reading.chapter || reading.startChapter
+      return `${bookName} ${ch}:${reading.startVerse}-${reading.endVerse}`
+    }
+    return `${bookName} ${reading.startChapter}:${reading.startVerse}–${reading.endChapter}:${reading.endVerse}`
+  }
+
+  // Scattered verses (e.g., "Ephesians 5:28, 29, 33")
+  if (reading.verses && Array.isArray(reading.verses)) {
+    return `${bookName} ${reading.chapter}:${reading.verses.join(', ')}`
+  }
+
+  return bookName
 }
 
 /**
@@ -265,25 +338,56 @@ export const parseThematicVerses = (versesString) => {
  */
 export const isThematicTopicComplete = (topicId, chaptersRead) => {
   const topic = thematicTopics.find(t => t.id === topicId)
-  if (!topic) return false
+  if (!topic || !topic.readings) return false
 
-  const ranges = parseThematicVerses(topic.verses)
   const index = buildChaptersIndex(chaptersRead)
 
-  // Check if ALL ranges are satisfied
-  for (const range of ranges) {
-    const chapterData = index.get(`${range.book}:${range.chapter}`)
+  // Check if ALL readings are satisfied
+  for (const reading of topic.readings) {
+    // Handle full chapters (e.g., Ruth 1-4)
+    if (reading.startChapter && reading.endChapter && !reading.startVerse) {
+      for (let ch = reading.startChapter; ch <= reading.endChapter; ch++) {
+        const chapterData = index.get(`${reading.book}:${ch}`)
+        if (!chapterData || chapterData.status !== 'complete') return false
+      }
+      continue
+    }
 
-    if (!chapterData) return false
+    // Handle single chapter (e.g., 1 Samuel 17)
+    if (reading.chapter && !reading.startVerse && !reading.verses) {
+      const chapterData = index.get(`${reading.book}:${reading.chapter}`)
+      if (!chapterData || chapterData.status !== 'complete') return false
+      continue
+    }
 
-    if (range.isPartial) {
-      // For partial, check if enough verses read
-      if (chapterData.status === 'complete') continue // Full chapter covers it
-      if (chapterData.status === 'partial' && chapterData.verses >= range.verses) continue
+    // Handle verse range (e.g., Genesis 6:9-9:19)
+    if (reading.startVerse && reading.endVerse) {
+      const ch = reading.chapter || reading.startChapter
+      const totalVerses = getVerseCount(reading.book, ch)
+      const versesNeeded = reading.endVerse - reading.startVerse + 1
+
+      const chapterData = index.get(`${reading.book}:${ch}`)
+      if (!chapterData) return false
+
+      // Full chapter covers it
+      if (chapterData.status === 'complete') continue
+
+      // Partial - check if enough verses
+      if (chapterData.status === 'partial' && chapterData.verses >= versesNeeded) continue
+
       return false
-    } else {
-      // For full chapter, must be complete
-      if (chapterData.status !== 'complete') return false
+    }
+
+    // Handle scattered verses (e.g., [28, 29, 33])
+    if (reading.verses && Array.isArray(reading.verses)) {
+      const versesNeeded = reading.verses.length
+      const chapterData = index.get(`${reading.book}:${reading.chapter}`)
+
+      if (!chapterData) return false
+      if (chapterData.status === 'complete') continue
+      if (chapterData.status === 'partial' && chapterData.verses >= versesNeeded) continue
+
+      return false
     }
   }
 
@@ -291,34 +395,41 @@ export const isThematicTopicComplete = (topicId, chaptersRead) => {
 }
 
 /**
- * Mark thematic topic as complete (adds all chapters to chaptersRead)
+ * Mark thematic topic as complete (adds all chapters/verses to chaptersRead)
  */
 export const markThematicTopicComplete = (chaptersRead, topicId) => {
   const topic = thematicTopics.find(t => t.id === topicId)
-  if (!topic) return chaptersRead
+  if (!topic || !topic.readings) return chaptersRead
 
-  const ranges = parseThematicVerses(topic.verses)
   let newChaptersRead = [...chaptersRead]
 
-  ranges.forEach(range => {
-    if (range.isPartial) {
-      newChaptersRead = setChapterRead(
-        newChaptersRead,
-        range.book,
-        range.chapter,
-        'partial',
-        range.verses,
-        'thematic'
-      )
-    } else {
-      newChaptersRead = setChapterRead(
-        newChaptersRead,
-        range.book,
-        range.chapter,
-        'complete',
-        null,
-        'thematic'
-      )
+  topic.readings.forEach(reading => {
+    // Full chapters
+    if (reading.startChapter && reading.endChapter && !reading.startVerse) {
+      for (let ch = reading.startChapter; ch <= reading.endChapter; ch++) {
+        newChaptersRead = setChapterRead(newChaptersRead, reading.book, ch, 'complete', null, 'thematic')
+      }
+      return
+    }
+
+    // Single chapter
+    if (reading.chapter && !reading.startVerse && !reading.verses) {
+      newChaptersRead = setChapterRead(newChaptersRead, reading.book, reading.chapter, 'complete', null, 'thematic')
+      return
+    }
+
+    // Verse range
+    if (reading.startVerse && reading.endVerse) {
+      const ch = reading.chapter || reading.startChapter
+      const versesRead = reading.endVerse - reading.startVerse + 1
+      newChaptersRead = setChapterRead(newChaptersRead, reading.book, ch, 'partial', versesRead, 'thematic')
+      return
+    }
+
+    // Scattered verses
+    if (reading.verses && Array.isArray(reading.verses)) {
+      const versesRead = reading.verses.length
+      newChaptersRead = setChapterRead(newChaptersRead, reading.book, reading.chapter, 'partial', versesRead, 'thematic')
     }
   })
 

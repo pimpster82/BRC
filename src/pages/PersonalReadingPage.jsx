@@ -574,10 +574,24 @@ export default function PersonalReadingPage() {
                 </div>
               </div>
 
-              {/* Active Days Info */}
-              {!isScrolled && bibleInOneYearStats.daysActive > 0 && (
-                <div className="text-xs text-gray-600 dark:text-gray-400 text-center">
-                  {bibleInOneYearStats.daysActive} {t('common.days')} {t('common.active')}
+              {/* On-Track Status: Days Ahead/Behind */}
+              {!isScrolled && bibleInOneYearStats.hasStarted && bibleInOneYearStats.isActive && (
+                <div className="text-xs text-center">
+                  {bibleInOneYearStats.isOnTrack && (
+                    <span className="text-green-600 dark:text-green-400 font-medium">
+                      ✓ {t('oneyear.on_track')}
+                    </span>
+                  )}
+                  {bibleInOneYearStats.daysAhead > 0 && (
+                    <span className="text-blue-600 dark:text-blue-400 font-medium">
+                      {bibleInOneYearStats.daysAhead} {t('oneyear.days_ahead')}
+                    </span>
+                  )}
+                  {bibleInOneYearStats.daysBehind > 0 && (
+                    <span className="text-orange-600 dark:text-orange-400 font-medium">
+                      {bibleInOneYearStats.daysBehind} {t('oneyear.days_behind')}
+                    </span>
+                  )}
                 </div>
               )}
             </div>

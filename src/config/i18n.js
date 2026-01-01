@@ -237,6 +237,9 @@ export const translations = {
     'oneyear.apostles_writings': 'Die Schriften der anderen Apostel und Jünger',
     'oneyear.readings_completed': 'Lesungen abgeschlossen',
     'oneyear.not_started': 'Beginne mit dem Lesen um deinen Fortschritt zu verfolgen',
+    'oneyear.on_track': 'Im Plan',
+    'oneyear.days_ahead': 'Tage voraus',
+    'oneyear.days_behind': 'Tage zurück',
 
     // Bible in One Year - Modal & State
     'bibleInOneYear.modal.title': 'Bestehender Plan gefunden',
@@ -490,6 +493,9 @@ export const translations = {
     'oneyear.apostles_writings': 'The Writings of the Other Apostles and Disciples',
     'oneyear.readings_completed': 'Readings Completed',
     'oneyear.not_started': 'Start reading to track your progress',
+    'oneyear.on_track': 'On Track',
+    'oneyear.days_ahead': 'days ahead',
+    'oneyear.days_behind': 'days behind',
 
     // Bible in One Year - Modal & State
     'bibleInOneYear.modal.title': 'Existing Plan Found',
@@ -743,6 +749,9 @@ export const translations = {
     'oneyear.apostles_writings': 'Los Escritos de los Demás Apóstoles y Discípulos',
     'oneyear.readings_completed': 'Lecturas Completadas',
     'oneyear.not_started': 'Comienza a leer para seguir tu progreso',
+    'oneyear.on_track': 'Al Día',
+    'oneyear.days_ahead': 'días adelantado',
+    'oneyear.days_behind': 'días atrasado',
 
     // Bible in One Year - Modal & State
     'bibleInOneYear.modal.title': 'Plan Existente Encontrado',
@@ -996,6 +1005,9 @@ export const translations = {
     'oneyear.apostles_writings': 'Gli Scritti degli Altri Apostoli e Discepoli',
     'oneyear.readings_completed': 'Letture Completate',
     'oneyear.not_started': 'Inizia a leggere per monitorare i tuoi progressi',
+    'oneyear.on_track': 'In Linea',
+    'oneyear.days_ahead': 'giorni avanti',
+    'oneyear.days_behind': 'giorni indietro',
 
     // Bible in One Year - Modal & State
     'bibleInOneYear.modal.title': 'Piano Esistente Trovato',
@@ -1231,6 +1243,9 @@ export const translations = {
     'oneyear.apostles_writings': 'Les Écrits des Autres Apôtres et Disciples',
     'oneyear.readings_completed': 'Lectures Complétées',
     'oneyear.not_started': 'Commencez à lire pour suivre vos progrès',
+    'oneyear.on_track': 'Sur la Bonne Voie',
+    'oneyear.days_ahead': 'jours d\'avance',
+    'oneyear.days_behind': 'jours de retard',
 
     // Bible in One Year - Modal & State
     'bibleInOneYear.modal.title': 'Plan Existant Trouvé',

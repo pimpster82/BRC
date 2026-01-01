@@ -229,6 +229,7 @@ export const markReadingComplete = (readingId, chaptersRead = []) => {
       newChaptersRead.push({
         book: reading.book,
         chapter: ch,
+        status: 'complete',  // Add status for Free Reading compatibility
         timestamp
       })
     }

@@ -89,6 +89,64 @@ docs/             # Architecture docs: GOALS.md, UI_UX.md, MULTI_DEVICE_SYNC_TES
 - **Bible Parsing:** `readingParser.js` - fuzzy matching. `jw-links.js` - link builder.
 - **Storage:** `storage.js` - localStorage wrapper with Firebase sync
 
+### Unified Progress Tracking Architecture
+
+**CRITICAL: Single Source of Truth for All Reading Plans**
+
+All personal reading plans (Free Reading, 1 Year Plan, Bible Overview, Thematic Plan) now use a **unified progress tracking system** based on a single `chaptersRead` array.
+
+**Core Principles:**
+1. **One Data Source**: `chaptersRead` array in `personalData` is the ONLY source of truth
+2. **Language-Independent**: Uses book numbers (1-66) instead of localized book names
+3. **Bi-Directional Sync**: Marking a chapter in ANY plan updates ALL plans automatically
+4. **Performance**: Uses `Map` for O(1) lookups via `chaptersIndex`
+
+**Key Components:**
+
+| Component | Purpose | Location |
+|-----------|---------|----------|
+| **ProgressContext** | Global state provider with memoized calculations | `src/context/ProgressContext.jsx` |
+| **buildChaptersIndex()** | Converts array to Map for O(1) lookups | `src/utils/progressTracking.js` |
+| **isReadingComplete()** | Check if reading is completed (unified) | `src/utils/progressTracking.js` |
+| **markReadingComplete()** | Mark reading as complete (unified) | `src/utils/progressTracking.js` |
+| **thematicHelpers.js** | Thematic-specific helpers using chaptersRead | `src/utils/thematicHelpers.js` |
+
+**Usage Pattern:**
+```javascript
+// In components:
+import { useProgress } from '../context/ProgressContext'
+
+const { chaptersRead, chaptersIndex, updateChaptersRead } = useProgress()
+
+// Check if reading is complete (O(1) lookup):
+const completed = isReadingComplete(reading, chaptersIndex)
+
+// Mark reading complete:
+markReadingComplete(reading, chaptersRead, updateChaptersRead)
+```
+
+**Data Structure:**
+```javascript
+// chaptersRead array (single source of truth):
+[
+  { book: 1, chapter: 1 },   // Genesis 1
+  { book: 1, chapter: 2 },   // Genesis 2
+  { book: 40, chapter: 5 }   // Matthew 5
+]
+
+// chaptersIndex Map (derived for performance):
+Map {
+  "1:1" => { book: 1, chapter: 1 },
+  "1:2" => { book: 1, chapter: 2 },
+  "40:5" => { book: 40, chapter: 5 }
+}
+```
+
+**Migration Notes:**
+- Old plan-specific functions (e.g., `markOneyearReadingComplete()`) are **deprecated**
+- Use unified functions from `progressTracking.js` instead
+- See deprecation warnings in `oneyear-readings.js` and `bible-overview-readings.js`
+
 ### Weekly Reading: Meeting Day Logic
 
 App shows reading for week containing user's **NEXT** meeting (not previous).
@@ -158,6 +216,9 @@ No automated tests. Manual testing via `ParserTestBench.jsx` (/test-parser). Rec
 | Weekly schedule | `data/weekly-reading-schedule.js` |
 | Auth context | `src/context/AuthContext.jsx` |
 | Theme context | `src/context/ThemeContext.jsx` |
+| **Progress tracking (unified)** | `src/context/ProgressContext.jsx`, `src/utils/progressTracking.js` |
+| **Thematic helpers** | `src/utils/thematicHelpers.js` |
+| **Reading plans config** | `src/config/oneyear-readings.js`, `bible-overview-readings.js`, `thematic-topics.js` |
 
 ## Deployment
 

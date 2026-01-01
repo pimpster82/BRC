@@ -1046,9 +1046,18 @@ export default function PersonalReadingPage() {
 
                         return (
                           <div key={topic.id} className={`border rounded-lg overflow-hidden transition-colors ${isCompleted ? 'border-purple-300 bg-purple-50 dark:bg-purple-900 dark:border-purple-700' : 'border-gray-100 dark:border-gray-800'}`}>
-                            {/* Topic Header (Clickable) */}
-                            <div className="flex items-center gap-2">
-                              <button
+                            {/* Topic Header - Checkbox + Expandable Title */}
+                            <button
+                              onClick={() => {
+                                setExpandedTopics(prev => ({
+                                  ...prev,
+                                  [topic.id]: !prev[topic.id]
+                                }))
+                              }}
+                              className={`w-full text-left px-3 py-2 flex items-center gap-2 transition-colors ${isCompleted ? 'bg-purple-100 dark:bg-purple-800 hover:bg-purple-150 dark:hover:bg-purple-700' : 'bg-gray-50 dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700'}`}
+                            >
+                              {/* Checkbox */}
+                              <div
                                 onClick={(e) => {
                                   e.stopPropagation()
                                   // Use unified thematicHelpers to mark/unmark
@@ -1061,32 +1070,24 @@ export default function PersonalReadingPage() {
                                   savePersonalReadingData(updated)
                                   setPersonalData(updated)
                                 }}
-                                className={`flex-shrink-0 w-6 h-6 rounded border-2 flex items-center justify-center transition-all ${
+                                className={`flex-shrink-0 w-6 h-6 rounded border-2 flex items-center justify-center transition-all cursor-pointer ${
                                   isCompleted
                                     ? 'bg-purple-600 dark:bg-purple-500 border-purple-600 dark:border-purple-500'
                                     : 'border-gray-300 dark:border-gray-600 hover:border-purple-400'
                                 }`}
                               >
                                 {isCompleted && <Check className="w-4 h-4 text-white" />}
-                              </button>
-                              <button
-                                onClick={() => {
-                                  setExpandedTopics(prev => ({
-                                    ...prev,
-                                    [topic.id]: !prev[topic.id]
-                                  }))
-                                }}
-                                className={`w-full text-left bg-gray-50 dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700 px-3 py-2 flex items-center gap-2 transition-colors ${isCompleted ? 'bg-purple-100 dark:bg-purple-800 hover:bg-purple-150 dark:hover:bg-purple-700' : ''}`}
-                              >
-                                <ChevronRight
-                                  size={18}
-                                  className={`text-gray-600 dark:text-gray-300 transition-transform flex-shrink-0 ${isTopicExpanded ? 'rotate-90' : 'rotate-0'}`}
-                                />
-                                <span className={`font-medium text-sm text-left flex-1 ${isCompleted ? 'text-purple-700 line-through' : 'text-gray-700 dark:text-gray-300'}`}>
-                                  {t(topic.titleKey)}
-                                </span>
-                              </button>
-                            </div>
+                              </div>
+
+                              {/* Chevron + Title */}
+                              <ChevronRight
+                                size={18}
+                                className={`text-gray-600 dark:text-gray-300 transition-transform flex-shrink-0 ${isTopicExpanded ? 'rotate-90' : 'rotate-0'}`}
+                              />
+                              <span className={`font-medium text-sm text-left flex-1 ${isCompleted ? 'text-purple-700 dark:text-purple-400 line-through' : 'text-gray-700 dark:text-gray-300'}`}>
+                                {t(topic.titleKey)}
+                              </span>
+                            </button>
 
                             {/* Topic Content - Scripture References */}
                             {isTopicExpanded && topic.readings && (
@@ -1094,18 +1095,33 @@ export default function PersonalReadingPage() {
                                 <div className="flex flex-wrap gap-2">
                                   {topic.readings.map((reading, idx) => {
                                     const formattedText = formatReadingForDisplay(reading, language)
-                                    const linkObj = buildLanguageSpecificWebLink(
-                                      reading.book,
-                                      reading.chapter || reading.startChapter,
-                                      reading.startVerse || 1,
-                                      reading.endVerse || null,
-                                      language
-                                    )
+
+                                    // Build proper JW.org link based on reading type
+                                    let linkObj
+                                    if (reading.chapter) {
+                                      // Single chapter or verse range in one chapter
+                                      linkObj = buildLanguageSpecificWebLink(
+                                        reading.book,
+                                        reading.chapter,
+                                        reading.startVerse || 1,
+                                        reading.endVerse || null,
+                                        language
+                                      )
+                                    } else if (reading.startChapter) {
+                                      // Chapter range - link to first chapter
+                                      linkObj = buildLanguageSpecificWebLink(
+                                        reading.book,
+                                        reading.startChapter,
+                                        reading.startVerse || 1,
+                                        reading.endVerse || null,
+                                        language
+                                      )
+                                    }
 
                                     return (
                                       <a
                                         key={idx}
-                                        href={linkObj.url}
+                                        href={linkObj?.url}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline font-medium transition-colors"

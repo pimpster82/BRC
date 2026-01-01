@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router-dom'
 import { t, getCurrentLanguage } from '../config/i18n'
 import { getPersonalReadingData } from '../utils/storage'
 import { getBibleBooks } from '../config/languages'
-import { thematicTopics } from '../config/thematic-topics'
+import { getBibleInOneYearState } from '../utils/bibleInOneYearState'
+import { getNextReading } from '../utils/nextReadingFinder'
 import { parseMultipleVerses } from '../utils/versesLinksBuilder'
 import { buildBibleLink } from '../../data/bible-link-builder'
 
@@ -34,74 +35,55 @@ export default function PersonalReadingCard() {
       free: 'reading.plan_free',
       chronological: 'reading.plan_chronological',
       oneyear: 'reading.plan_oneyear',
-      thematic: 'reading.plan_thematic'
+      thematic: 'reading.plan_thematic',
+      bible_overview: 'reading.plan_bible_overview'
     }
     setPlanName(t(plans[savedPlan] || 'reading.plan_free'))
 
-    // Calculate next reading based on plan type
-    if (savedPlan === 'thematic') {
-      // For thematic plan, show the next unread topic
-      const completedTopics = data.thematicTopicsRead || []
-      const nextUnreadTopic = thematicTopics.find(topic => !completedTopics.includes(topic.id))
+    // Get Bible in One Year state if applicable
+    const bibleInOneYearState = savedPlan === 'oneyear' ? getBibleInOneYearState() : null
 
-      if (nextUnreadTopic) {
-        setNextReading({
-          topicId: nextUnreadTopic.id,
-          displayText: t(nextUnreadTopic.titleKey),
-          isThematic: true
-        })
-      } else {
-        // All topics complete
-        setNextReading({
-          topicId: null,
-          displayText: '✅ Alle Themen abgeschlossen!',
-          isThematic: true
-        })
-      }
-    } else {
-      // For free/other plans, show next chapter
-      if (data.chaptersRead && data.chaptersRead.length > 0) {
-        // Sort by book and chapter to find the next one
-        const sorted = [...data.chaptersRead].sort(
-          (a, b) => a.book !== b.book ? a.book - b.book : a.chapter - b.chapter
-        )
+    // Calculate next reading using centralized logic
+    const next = getNextReading(savedPlan, data, bibleInOneYearState, bibleBooks)
 
-        const lastRead = sorted[sorted.length - 1]
-        const book = bibleBooks.books[lastRead.book - 1]
+    if (!next) {
+      // All complete
+      setNextReading({
+        displayText: '✅ ' + t('reading.complete'),
+        isThematic: savedPlan === 'thematic'
+      })
+      return
+    }
 
-        if (book) {
-          let nextChapter = lastRead.chapter + 1
-          let nextBook = lastRead.book
+    // Format display based on reading type
+    if (next.type === 'topic') {
+      setNextReading({
+        topicId: next.topicId,
+        displayText: t(next.titleKey),
+        isThematic: true
+      })
+    } else if (next.type === 'chapter') {
+      setNextReading({
+        book: next.bookName,
+        chapter: next.chapter,
+        bookNumber: next.book,
+        displayText: `${next.bookName} ${next.chapter}`,
+        isThematic: false
+      })
+    } else if (next.type === 'oneyear_reading' || next.type === 'bible_overview_reading') {
+      // For plan-specific readings, show book and chapter range
+      const bookData = bibleBooks.books[next.book - 1]
+      const displayText = next.startChapter === next.endChapter
+        ? `${bookData.name} ${next.startChapter}`
+        : `${bookData.name} ${next.startChapter}-${next.endChapter}`
 
-          // If we've finished all chapters in a book, move to next book
-          if (nextChapter > book.chapters) {
-            nextBook = lastRead.book + 1
-            nextChapter = 1
-          }
-
-          // Check if there's a next book
-          if (nextBook <= 66) {
-            const nextBookData = bibleBooks.books[nextBook - 1]
-            setNextReading({
-              book: nextBookData.name,
-              chapter: nextChapter,
-              bookNumber: nextBook,
-              displayText: `${nextBookData.name} ${nextChapter}`,
-              isThematic: false
-            })
-          }
-        }
-      } else {
-        // No reading yet, suggest Genesis 1
-        const genesisBook = bibleBooks.books[0]
-        setNextReading({
-          book: genesisBook.name,
-          chapter: 1,
-          bookNumber: 1,
-          displayText: `${genesisBook.name} 1`,
-          isThematic: false
-        })
-      }
+      setNextReading({
+        book: bookData.name,
+        chapter: next.startChapter,
+        bookNumber: next.book,
+        displayText: displayText,
+        isThematic: false
+      })
     }
   }, [language, bibleBooks, t])
 

@@ -261,11 +261,45 @@ export const calculateStats = (state) => {
       daysActive: 0,
       startDate: null,
       pauseDate: null,
-      isActive: false
+      isActive: false,
+      daysAhead: 0,
+      daysBehind: 0,
+      isOnTrack: true,
+      expectedReadings: 0,
+      hasStarted: false
     }
   }
 
   const progress = Math.round((state.completedReadings.length / 365) * 100)
+  const actualReadings = state.completedReadings.length
+
+  // Calculate on-track status (1 reading per day expected)
+  let daysAhead = 0
+  let daysBehind = 0
+  let isOnTrack = true
+  let expectedReadings = 0
+
+  if (state.startDate && state.active) {
+    const start = new Date(state.startDate)
+    const today = new Date()
+    const daysSinceStart = Math.floor((today - start) / (1000 * 60 * 60 * 24)) + 1 // +1 to include start day
+
+    // Expected: 1 reading per day
+    expectedReadings = Math.min(daysSinceStart, 365)
+
+    // Calculate difference (positive = ahead, negative = behind)
+    const difference = actualReadings - expectedReadings
+
+    if (difference > 0) {
+      daysAhead = difference
+      isOnTrack = false
+    } else if (difference < 0) {
+      daysBehind = Math.abs(difference)
+      isOnTrack = false
+    } else {
+      isOnTrack = true
+    }
+  }
 
   return {
     progress,
@@ -275,6 +309,11 @@ export const calculateStats = (state) => {
     startDate: state.startDate,
     pauseDate: state.pauseDate,
     isActive: state.active,
-    attempt: state.attempt
+    attempt: state.attempt,
+    daysAhead,
+    daysBehind,
+    isOnTrack,
+    expectedReadings,
+    hasStarted: true
   }
 }

@@ -69,9 +69,9 @@ export default function LoadingSpinner({
           {/* Icon */}
           <div className={`relative ${config.icon} flex items-center justify-center animate-pulse`}>
             <img
-              src="/icons/open-bible-icon.svg"
+              src="/icons/book-loading.jpg"
               alt="Loading..."
-              className={`${config.iconImg} drop-shadow-lg`}
+              className={`${config.iconImg} rounded-full object-cover drop-shadow-lg`}
             />
           </div>
         </div>

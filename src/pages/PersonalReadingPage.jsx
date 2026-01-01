@@ -7,6 +7,7 @@ import { useProgress } from '../context/ProgressContext'
 import { setChapterRead, removeChapter, isReadingComplete, markReadingComplete as markReadingCompleteUnified, unmarkReading } from '../utils/progressTracking'
 import { isThematicTopicComplete as isThematicTopicCompleteUnified, markThematicTopicComplete as markThematicTopicCompleteUnified, unmarkThematicTopicComplete as unmarkThematicTopicCompleteUnified, formatReadingForDisplay, isReadingSatisfied, markSingleReadingComplete, unmarkSingleReadingComplete } from '../utils/thematicHelpers'
 import { getBibleInOneYearState, initializeBibleInOneYear, saveBibleInOneYearState, markReadingComplete as markBibleInOneYearReading, unmarkReading as unmarkBibleInOneYearReading, calculateStats, resumePlan, archiveCurrentAttempt, clearCurrentPlan } from '../utils/bibleInOneYearState'
+import { getNextReading, getSectionForNextReading } from '../utils/nextReadingFinder'
 import BibleInOneYearModal from '../components/BibleInOneYearModal'
 import LoadingSpinner from '../components/LoadingSpinner'
 import { t, getCurrentLanguage } from '../config/i18n'
@@ -134,26 +135,20 @@ export default function PersonalReadingPage() {
     }
   }, [selectedPlan])
 
-  // Initialize expandedSections to show only the section with next unread reading
+  // Initialize expandedSections to show only the section with next reading
   useEffect(() => {
     if (!personalData || !chaptersIndex) return
 
-    let nextSection = null
-
-    if (selectedPlan === 'bible_overview') {
-      nextSection = getNextUnreadBibleOverviewSection()
-    } else if (selectedPlan === 'oneyear') {
-      nextSection = getNextUnreadOneyearSection()
-    } else if (selectedPlan === 'thematic') {
-      nextSection = getNextUnreadThematicSection()
-    }
+    // Find next reading using centralized logic
+    const nextReading = getNextReading(selectedPlan, personalData, bibleInOneYearState, bibleBooks)
+    const nextSection = getSectionForNextReading(selectedPlan, nextReading)
 
     if (nextSection) {
       setExpandedSections({ [nextSection]: true })
     } else {
       setExpandedSections({}) // All closed if no next section found
     }
-  }, [selectedPlan, personalData, chaptersIndex, bibleInOneYearState])
+  }, [selectedPlan, personalData, chaptersIndex, bibleInOneYearState, bibleBooks])
 
   // Find the category ID of the last-read chapter (for Free plan)
   const getLastReadCategoryId = () => {
@@ -200,62 +195,6 @@ export default function PersonalReadingPage() {
     }
 
     return null
-  }
-
-  // Find the section with the next unread reading for Bible Overview Plan
-  const getNextUnreadBibleOverviewSection = () => {
-    for (const section of bibleOverviewSections) {
-      const readingsInSection = getBibleOverviewReadingsInSection(section.key)
-
-      // Check if any reading in this section is incomplete
-      for (const reading of readingsInSection) {
-        if (!isReadingComplete(reading.book, reading.startChapter, reading.endChapter, chaptersIndex)) {
-          return section.key
-        }
-      }
-    }
-
-    // All complete or no sections - return first section
-    return bibleOverviewSections[0]?.key || null
-  }
-
-  // Find the section with the next unread reading for One Year Plan
-  const getNextUnreadOneyearSection = () => {
-    if (!bibleInOneYearState) {
-      // No state yet - return first section
-      return oneyearSections[0]?.key || null
-    }
-
-    for (const section of oneyearSections) {
-      const readingsInSection = getOneyearReadingsInSection(section.key)
-
-      // Check if any reading in this section is incomplete
-      for (const reading of readingsInSection) {
-        if (!bibleInOneYearState.completedReadings?.includes(reading.id)) {
-          return section.key
-        }
-      }
-    }
-
-    // All complete or no sections - return first section
-    return oneyearSections[0]?.key || null
-  }
-
-  // Find the section with the next unread topic for Thematic Plan
-  const getNextUnreadThematicSection = () => {
-    for (const section of getThematicSections()) {
-      const topicsInSection = getTopicsInSection(section.key)
-
-      // Check if any topic in this section is incomplete
-      for (const topic of topicsInSection) {
-        if (!isThematicTopicCompleteUnified(topic.id, chaptersIndex)) {
-          return section.key
-        }
-      }
-    }
-
-    // All complete or no sections - return first section
-    return getThematicSections()[0]?.key || null
   }
 
   // Load data on mount

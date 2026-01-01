@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useLoading } from '../context/LoadingContext'
 import { useAuth } from '../context/AuthContext'
 import { useProgress } from '../context/ProgressContext'
+import { setChapterRead, removeChapter } from '../utils/progressTracking'
 import LoadingSpinner from '../components/LoadingSpinner'
 import { t, getCurrentLanguage } from '../config/i18n'
 import { getBibleBooks } from '../config/languages'
@@ -45,7 +46,7 @@ export default function PersonalReadingPage() {
   const [searchParams] = useSearchParams()
   const { showLoading, hideLoading } = useLoading()
   const { currentUser } = useAuth()
-  const { overallProgress, oneyearProgress, bibleOverviewProgress, thematicProgress } = useProgress()
+  const { overallProgress, oneyearProgress, bibleOverviewProgress, thematicProgress, chaptersRead, updateChaptersRead } = useProgress()
   const language = getCurrentLanguage()
   const bibleBooks = getBibleBooks(language)
 
@@ -271,79 +272,40 @@ export default function PersonalReadingPage() {
     return found?.verses || 0
   }
 
-  // Toggle chapter to complete status
+  // Toggle chapter to complete status (using unified progressTracking)
   const markChapterComplete = (bookNumber, chapter) => {
-    const updated = { ...personalData }
-    const index = updated.chaptersRead.findIndex(
-      ch => ch.book === bookNumber && ch.chapter === chapter
-    )
+    const newChaptersRead = setChapterRead(chaptersRead, bookNumber, chapter, 'complete', null, 'free')
+    updateChaptersRead(newChaptersRead)
 
-    if (index > -1) {
-      // Already exists, update to complete
-      updated.chaptersRead[index] = {
-        book: bookNumber,
-        chapter: chapter,
-        status: 'complete',
-        timestamp: Date.now()
-      }
-    } else {
-      // Add new complete chapter
-      updated.chaptersRead.push({
-        book: bookNumber,
-        chapter: chapter,
-        status: 'complete',
-        timestamp: Date.now()
-      })
-    }
-
-    saveAndSync(updated)
+    // Update local state for immediate UI update
+    const updated = { ...personalData, chaptersRead: newChaptersRead }
     setPersonalData(updated)
-    window.dispatchEvent(new Event('personalReadingUpdated'))
+    saveAndSync(updated)
   }
 
-  // Mark chapter as unread
+  // Mark chapter as unread (using unified progressTracking)
   const unmarkChapter = (bookNumber, chapter) => {
-    const updated = { ...personalData }
-    updated.chaptersRead = updated.chaptersRead.filter(
-      ch => !(ch.book === bookNumber && ch.chapter === chapter)
-    )
+    const newChaptersRead = removeChapter(chaptersRead, bookNumber, chapter)
+    updateChaptersRead(newChaptersRead)
 
-    saveAndSync(updated)
+    // Update local state for immediate UI update
+    const updated = { ...personalData, chaptersRead: newChaptersRead }
     setPersonalData(updated)
-    window.dispatchEvent(new Event('personalReadingUpdated'))
+    saveAndSync(updated)
   }
 
-  // Mark chapter as partial with verse count
+  // Mark chapter as partial with verse count (using unified progressTracking)
   const markChapterPartial = (bookNumber, chapter, verses) => {
-    const updated = { ...personalData }
-    const index = updated.chaptersRead.findIndex(
-      ch => ch.book === bookNumber && ch.chapter === chapter
-    )
-
     const verseCount = getVerseCount(bookNumber, chapter)
     if (verses > verseCount) return // Validation
 
-    if (index > -1) {
-      updated.chaptersRead[index] = {
-        book: bookNumber,
-        chapter: chapter,
-        status: 'partial',
-        verses: verses,
-        timestamp: Date.now()
-      }
-    } else {
-      updated.chaptersRead.push({
-        book: bookNumber,
-        chapter: chapter,
-        status: 'partial',
-        verses: verses,
-        timestamp: Date.now()
-      })
-    }
+    const newChaptersRead = setChapterRead(chaptersRead, bookNumber, chapter, 'partial', verses, 'free')
+    updateChaptersRead(newChaptersRead)
 
-    saveAndSync(updated)
+    // Update local state for immediate UI update
+    const updated = { ...personalData, chaptersRead: newChaptersRead }
     setPersonalData(updated)
-    window.dispatchEvent(new Event('personalReadingUpdated'))
+    saveAndSync(updated)
   }
 
   // Handle manual progress input with parser
@@ -388,36 +350,19 @@ export default function PersonalReadingPage() {
       return
     }
 
-    // Process chapters: mark complete or partial
-    const updated = { ...personalData }
+    // Process chapters: mark complete or partial (using unified progressTracking)
+    let newChaptersRead = [...chaptersRead]
 
     result.chapters.forEach(parsedChapter => {
       const { chapter, status, verses } = parsedChapter
-
-      // Find or create chapter entry
-      const index = updated.chaptersRead.findIndex(
-        ch => ch.book === bookNumber && ch.chapter === chapter
-      )
-
-      const newEntry = {
-        book: bookNumber,
-        chapter: chapter,
-        status: status,
-        ...(status === 'partial' && { verses }),
-        timestamp: Date.now()
-      }
-
-      if (index > -1) {
-        updated.chaptersRead[index] = newEntry
-      } else {
-        updated.chaptersRead.push(newEntry)
-      }
+      newChaptersRead = setChapterRead(newChaptersRead, bookNumber, chapter, status, verses, 'free')
     })
 
-    // Save and reset
-    saveAndSync(updated)
+    // Update context and persist
+    updateChaptersRead(newChaptersRead)
+    const updated = { ...personalData, chaptersRead: newChaptersRead }
     setPersonalData(updated)
-    window.dispatchEvent(new Event('personalReadingUpdated'))
+    saveAndSync(updated)
 
     // Reset form
     setProgressInputText('')
@@ -1232,13 +1177,18 @@ export default function PersonalReadingPage() {
                   </button>
                   <button
                     onClick={() => {
-                      const updated = { ...personalData }
-                      updated.chaptersRead = updated.chaptersRead.filter(ch => !(ch.book === selectedBook && selectedChapters.has(ch.chapter)))
-                      saveAndSync(updated)
+                      // Batch unmark using unified progressTracking
+                      let newChaptersRead = [...chaptersRead]
+                      selectedChapters.forEach(chapter => {
+                        newChaptersRead = removeChapter(newChaptersRead, selectedBook, chapter)
+                      })
+
+                      updateChaptersRead(newChaptersRead)
+                      const updated = { ...personalData, chaptersRead: newChaptersRead }
                       setPersonalData(updated)
+                      saveAndSync(updated)
                       setSelectedChapters(new Set())
                       setIsSelectMode(false)
-                      window.dispatchEvent(new Event('personalReadingUpdated'))
                     }}
                     disabled={selectedChapters.size === 0}
                     className="flex-1 py-2 px-3 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-100 rounded font-medium hover:bg-red-200 dark:hover:bg-red-800 disabled:opacity-50 disabled:cursor-not-allowed text-sm"

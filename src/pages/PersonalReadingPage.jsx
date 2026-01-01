@@ -6,6 +6,8 @@ import { useAuth } from '../context/AuthContext'
 import { useProgress } from '../context/ProgressContext'
 import { setChapterRead, removeChapter, isReadingComplete, markReadingComplete as markReadingCompleteUnified, unmarkReading } from '../utils/progressTracking'
 import { isThematicTopicComplete as isThematicTopicCompleteUnified, markThematicTopicComplete as markThematicTopicCompleteUnified, unmarkThematicTopicComplete as unmarkThematicTopicCompleteUnified, formatReadingForDisplay, isReadingSatisfied, markSingleReadingComplete, unmarkSingleReadingComplete } from '../utils/thematicHelpers'
+import { getBibleInOneYearState, initializeBibleInOneYear, saveBibleInOneYearState, markReadingComplete as markBibleInOneYearReading, unmarkReading as unmarkBibleInOneYearReading, calculateStats, resumePlan, archiveCurrentAttempt, clearCurrentPlan } from '../utils/bibleInOneYearState'
+import BibleInOneYearModal from '../components/BibleInOneYearModal'
 import LoadingSpinner from '../components/LoadingSpinner'
 import { t, getCurrentLanguage } from '../config/i18n'
 import { getBibleBooks } from '../config/languages'
@@ -69,6 +71,11 @@ export default function PersonalReadingPage() {
   const [selectedChapters, setSelectedChapters] = useState(new Set()) // Selected chapters for batch operations
   const [isScrolled, setIsScrolled] = useState(false) // Track scroll state for progress bar collapse
 
+  // Bible in One Year - Separate State
+  const [bibleInOneYearState, setBibleInOneYearState] = useState(null)
+  const [showBibleInOneYearModal, setShowBibleInOneYearModal] = useState(false)
+  const [bibleInOneYearStats, setBibleInOneYearStats] = useState(null)
+
   // Reading Plans Store (needed for custom plans display)
   const [availablePlans, setAvailablePlans] = useState([]) // Custom plans from Firebase
   const [installedPlans, setInstalledPlans] = useState([]) // User's installed plans
@@ -102,6 +109,30 @@ export default function PersonalReadingPage() {
 
     loadPlans()
   }, [currentUser])
+
+  // Bible in One Year - Load state and show modal if existing attempt found
+  useEffect(() => {
+    if (selectedPlan === 'oneyear') {
+      const state = getBibleInOneYearState()
+
+      if (state) {
+        // Existing attempt found - show modal to resume or restart
+        const stats = calculateStats(state)
+        setBibleInOneYearState(state)
+        setBibleInOneYearStats(stats)
+
+        // Only show modal if plan is paused (not active)
+        if (!state.active) {
+          setShowBibleInOneYearModal(true)
+        }
+      } else {
+        // No existing attempt - initialize new one
+        const newState = initializeBibleInOneYear(1)
+        setBibleInOneYearState(newState)
+        setBibleInOneYearStats(calculateStats(newState))
+      }
+    }
+  }, [selectedPlan])
 
   // Find the category ID of the last-read chapter (for Free plan)
   const getLastReadCategoryId = () => {
@@ -409,6 +440,32 @@ export default function PersonalReadingPage() {
     }
   }
 
+  // Bible in One Year - Modal Handlers
+  const handleBibleInOneYearResume = () => {
+    // Resume existing attempt
+    const updatedState = resumePlan(bibleInOneYearState)
+    setBibleInOneYearState(updatedState)
+    setBibleInOneYearStats(calculateStats(updatedState))
+    setShowBibleInOneYearModal(false)
+  }
+
+  const handleBibleInOneYearRestart = () => {
+    // Archive current attempt and start new one
+    archiveCurrentAttempt(bibleInOneYearState)
+    clearCurrentPlan()
+
+    const newAttempt = bibleInOneYearState.attempt + 1
+    const newState = initializeBibleInOneYear(newAttempt)
+    setBibleInOneYearState(newState)
+    setBibleInOneYearStats(calculateStats(newState))
+    setShowBibleInOneYearModal(false)
+  }
+
+  const handleBibleInOneYearCancel = () => {
+    // Close modal and stay on paused plan
+    setShowBibleInOneYearModal(false)
+  }
+
   if (!personalData) return <div className="p-4 text-center">Laden...</div>
 
   const totalProgress = calculateTotalProgress()
@@ -498,66 +555,33 @@ export default function PersonalReadingPage() {
             </div>
           )}
 
-          {/* 1 Year Plan - Overall Bible Progress + On Track Meter */}
-          {selectedPlan === 'oneyear' && (() => {
-            const chaptersRead = personalData?.chaptersRead || []
-            const onTrack = getOnTrackStatus(chaptersRead)
-            const MAX_THRESHOLD = 30
-            let position = 0
-            if (onTrack.hasStarted) {
-              const difference = onTrack.daysAhead - onTrack.daysBehind
-              const clampedDiff = Math.max(-MAX_THRESHOLD, Math.min(MAX_THRESHOLD, difference))
-              position = (clampedDiff / MAX_THRESHOLD) * 100
-            }
-
-            return (
-              <div className="space-y-2">
-                {/* Overall Bible Progress */}
-                <div>
-                  {!isScrolled && (
-                    <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
-                      <span>{t('reading.overall_progress')}</span>
-                      <span>{overallProgress.percentage}%</span>
-                    </div>
-                  )}
-                  <div className="w-full bg-blue-200 dark:bg-blue-700 rounded-full h-2 overflow-hidden">
-                    <div
-                      className="bg-blue-600 dark:bg-blue-500 h-full transition-all"
-                      style={{ width: `${overallProgress.percentage}%` }}
-                    />
+          {/* Bible in One Year - Separate Progress Tracking */}
+          {selectedPlan === 'oneyear' && bibleInOneYearStats && (
+            <div className="space-y-2">
+              {/* Bible in One Year Progress */}
+              <div>
+                {!isScrolled && (
+                  <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
+                    <span>{t('reading.plan_oneyear')}</span>
+                    <span>{bibleInOneYearStats.readingsCompleted}/{bibleInOneYearStats.totalReadings} ({bibleInOneYearStats.progress}%)</span>
                   </div>
-                </div>
-
-                {/* 1 Year Plan - On Track Meter */}
-                <div>
-                  {!isScrolled && (
-                    <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
-                      <span>{t('reading.plan_oneyear')}</span>
-                      <span>{onTrack.actualReadings}/{oneyearReadings.length}</span>
-                    </div>
-                  )}
-                  {onTrack.hasStarted ? (
-                    <div className="w-full h-8 bg-gradient-to-r from-red-100 via-yellow-100 to-green-100 dark:from-red-900 dark:via-yellow-900 dark:to-green-900 rounded-lg relative">
-                      <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-gray-400 dark:bg-gray-500"></div>
-                      <div
-                        className="absolute top-1/2 w-1 h-10 bg-gray-800 dark:bg-gray-200 rounded-full transition-all duration-500 shadow-lg"
-                        style={{
-                          left: `calc(50% + ${position}% * 0.4)`,
-                          transform: 'translate(-50%, -50%)'
-                        }}
-                      >
-                        <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-gray-800 dark:border-b-gray-200"></div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="text-center py-2 text-sm text-gray-600 dark:text-gray-400">
-                      {t('oneyear.not_started')}
-                    </div>
-                  )}
+                )}
+                <div className="w-full bg-green-200 dark:bg-green-700 rounded-full h-2 overflow-hidden">
+                  <div
+                    className="bg-green-600 dark:bg-green-500 h-full transition-all"
+                    style={{ width: `${bibleInOneYearStats.progress}%` }}
+                  />
                 </div>
               </div>
-            )
-          })()}
+
+              {/* Active Days Info */}
+              {!isScrolled && bibleInOneYearStats.daysActive > 0 && (
+                <div className="text-xs text-gray-600 dark:text-gray-400 text-center">
+                  {bibleInOneYearStats.daysActive} {t('common.days')} {t('common.active')}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Bible Overview - Overall Bible Progress + Bible Overview Progress */}
           {selectedPlan === 'bible_overview' && (
@@ -931,8 +955,8 @@ export default function PersonalReadingPage() {
                   {isExpanded && (
                     <div className="p-4 bg-white dark:bg-slate-800 space-y-2">
                       {readingsInSection.map((reading) => {
-                        // Use unified progressTracking with chaptersIndex for O(1) lookup
-                        const isCompleted = isReadingComplete(reading.book, reading.startChapter, reading.endChapter, chaptersIndex)
+                        // BIBLE IN ONE YEAR: Use separate state (not chaptersRead)
+                        const isCompleted = bibleInOneYearState?.completedReadings?.includes(reading.id) || false
                         const book = bibleBooks.books[reading.book - 1]
                         const bookName = book?.name || `Book ${reading.book}`
 
@@ -963,15 +987,13 @@ export default function PersonalReadingPage() {
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation()
-                                  // Use unified progressTracking functions
-                                  const newChaptersRead = isCompleted
-                                    ? unmarkReading(chaptersRead, reading.book, reading.startChapter, reading.endChapter)
-                                    : markReadingCompleteUnified(chaptersRead, reading.book, reading.startChapter, reading.endChapter, 'oneyear')
+                                  // BIBLE IN ONE YEAR: Mark/unmark in separate state
+                                  const newState = isCompleted
+                                    ? unmarkBibleInOneYearReading(bibleInOneYearState, reading.id)
+                                    : markBibleInOneYearReading(bibleInOneYearState, reading.id)
 
-                                  updateChaptersRead(newChaptersRead)
-                                  const updated = { ...personalData, chaptersRead: newChaptersRead }
-                                  savePersonalReadingData(updated)
-                                  setPersonalData(updated)
+                                  setBibleInOneYearState(newState)
+                                  setBibleInOneYearStats(calculateStats(newState))
                                 }}
                                 className={`flex-shrink-0 w-6 h-6 rounded border-2 flex items-center justify-center transition-all ${
                                   isCompleted
@@ -1420,6 +1442,16 @@ export default function PersonalReadingPage() {
           </div>
         )}
       </div>
+
+      {/* Bible in One Year - Resume/Restart Modal */}
+      {showBibleInOneYearModal && bibleInOneYearStats && (
+        <BibleInOneYearModal
+          stats={bibleInOneYearStats}
+          onResume={handleBibleInOneYearResume}
+          onRestart={handleBibleInOneYearRestart}
+          onCancel={handleBibleInOneYearCancel}
+        />
+      )}
     </div>
   )
 }

@@ -192,43 +192,86 @@ const saveCompletedReadings = (completedReadings) => {
 }
 
 /**
- * Check if a reading is completed
+ * Check if a reading is completed by checking if all its chapters are in chaptersRead
  * @param {number} readingId - Reading ID
+ * @param {Array} chaptersRead - Global chaptersRead array from personalData
  */
-export const isReadingCompleted = (readingId) => {
-  const completed = getCompletedReadings()
-  return completed.includes(readingId)
-}
+export const isReadingCompleted = (readingId, chaptersRead = []) => {
+  const reading = bibleOverviewReadings.find(r => r.id === readingId)
+  if (!reading) return false
 
-/**
- * Mark a reading as completed
- * @param {number} readingId - Reading ID
- */
-export const markReadingComplete = (readingId) => {
-  const completed = getCompletedReadings()
-  if (!completed.includes(readingId)) {
-    completed.push(readingId)
-    saveCompletedReadings(completed)
+  // Check if ALL chapters from startChapter to endChapter are in chaptersRead
+  for (let ch = reading.startChapter; ch <= reading.endChapter; ch++) {
+    const found = chaptersRead.find(c => c.book === reading.book && c.chapter === ch)
+    if (!found) return false
   }
+
+  return true
 }
 
 /**
- * Unmark a reading as completed
+ * Mark a reading as completed by adding all its chapters to chaptersRead
  * @param {number} readingId - Reading ID
+ * @param {Array} chaptersRead - Current chaptersRead array
+ * @returns {Array} Updated chaptersRead array
  */
-export const unmarkReadingComplete = (readingId) => {
-  const completed = getCompletedReadings()
-  const filtered = completed.filter(id => id !== readingId)
-  saveCompletedReadings(filtered)
+export const markReadingComplete = (readingId, chaptersRead = []) => {
+  const reading = bibleOverviewReadings.find(r => r.id === readingId)
+  if (!reading) return chaptersRead
+
+  const newChaptersRead = [...chaptersRead]
+  const timestamp = new Date().toISOString()
+
+  // Add all chapters from this reading to chaptersRead
+  for (let ch = reading.startChapter; ch <= reading.endChapter; ch++) {
+    const exists = newChaptersRead.find(c => c.book === reading.book && c.chapter === ch)
+    if (!exists) {
+      newChaptersRead.push({
+        book: reading.book,
+        chapter: ch,
+        timestamp
+      })
+    }
+  }
+
+  return newChaptersRead
+}
+
+/**
+ * Unmark a reading as completed by removing all its chapters from chaptersRead
+ * @param {number} readingId - Reading ID
+ * @param {Array} chaptersRead - Current chaptersRead array
+ * @returns {Array} Updated chaptersRead array
+ */
+export const unmarkReadingComplete = (readingId, chaptersRead = []) => {
+  const reading = bibleOverviewReadings.find(r => r.id === readingId)
+  if (!reading) return chaptersRead
+
+  // Remove all chapters from this reading from chaptersRead
+  const newChaptersRead = chaptersRead.filter(c => {
+    if (c.book !== reading.book) return true
+    if (c.chapter < reading.startChapter || c.chapter > reading.endChapter) return true
+    return false
+  })
+
+  return newChaptersRead
 }
 
 /**
  * Get progress for Bible Overview plan
+ * @param {Array} chaptersRead - Global chaptersRead array
  */
-export const getBibleOverviewProgress = () => {
-  const completedReadings = getCompletedReadings()
+export const getBibleOverviewProgress = (chaptersRead = []) => {
   const total = bibleOverviewReadings.length
-  const completed = completedReadings.length
+  let completed = 0
+
+  // Count how many readings are completed based on chaptersRead
+  for (const reading of bibleOverviewReadings) {
+    if (isReadingCompleted(reading.id, chaptersRead)) {
+      completed++
+    }
+  }
+
   const percentage = total > 0 ? Math.round((completed / total) * 100) : 0
 
   return {

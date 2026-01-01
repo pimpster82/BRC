@@ -567,8 +567,9 @@ export default function PersonalReadingPage() {
 
           {/* 1 Year Plan - Overall Bible Progress + On Track Meter */}
           {selectedPlan === 'oneyear' && (() => {
-            const onTrack = getOnTrackStatus()
-            const versesRead = personalData ? calculateAllVersesRead(personalData.chaptersRead || []) : 0
+            const chaptersRead = personalData?.chaptersRead || []
+            const onTrack = getOnTrackStatus(chaptersRead)
+            const versesRead = calculateAllVersesRead(chaptersRead)
             const totalVerses = calculateTotalBibleVerses()
             const overallPercentage = totalVerses > 0 ? Math.round((versesRead / totalVerses) * 100) : 0
             const MAX_THRESHOLD = 30
@@ -630,8 +631,9 @@ export default function PersonalReadingPage() {
 
           {/* Bible Overview - Overall Bible Progress + Bible Overview Progress */}
           {selectedPlan === 'bible_overview' && (() => {
-            const progress = getBibleOverviewProgress()
-            const versesRead = personalData ? calculateAllVersesRead(personalData.chaptersRead || []) : 0
+            const chaptersRead = personalData?.chaptersRead || []
+            const progress = getBibleOverviewProgress(chaptersRead)
+            const versesRead = calculateAllVersesRead(chaptersRead)
             const totalVerses = calculateTotalBibleVerses()
             const overallPercentage = totalVerses > 0 ? Math.round((versesRead / totalVerses) * 100) : 0
 
@@ -894,7 +896,8 @@ export default function PersonalReadingPage() {
                   {isExpanded && (
                     <div className="p-4 bg-white dark:bg-slate-800 space-y-2">
                       {readingsInSection.map((reading) => {
-                        const isCompleted = isBibleOverviewReadingCompleted(reading.id)
+                        const chaptersRead = personalData?.chaptersRead || []
+                        const isCompleted = isBibleOverviewReadingCompleted(reading.id, chaptersRead)
                         const book = bibleBooks.books[reading.book - 1]
                         const bookName = book?.name || `Book ${reading.book}`
 
@@ -922,12 +925,12 @@ export default function PersonalReadingPage() {
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation()
-                                  if (isCompleted) {
-                                    unmarkBibleOverviewReadingComplete(reading.id)
-                                  } else {
-                                    markBibleOverviewReadingComplete(reading.id)
-                                  }
-                                  setPersonalData(getPersonalReadingData())
+                                  const newChaptersRead = isCompleted
+                                    ? unmarkBibleOverviewReadingComplete(reading.id, chaptersRead)
+                                    : markBibleOverviewReadingComplete(reading.id, chaptersRead)
+                                  const updated = { ...personalData, chaptersRead: newChaptersRead }
+                                  savePersonalReadingData(updated)
+                                  setPersonalData(updated)
                                   window.dispatchEvent(new Event('personalReadingUpdated'))
                                 }}
                                 className={`flex-shrink-0 w-6 h-6 rounded border-2 flex items-center justify-center transition-all ${
@@ -1004,7 +1007,8 @@ export default function PersonalReadingPage() {
                   {isExpanded && (
                     <div className="p-4 bg-white dark:bg-slate-800 space-y-2">
                       {readingsInSection.map((reading) => {
-                        const isCompleted = isOneyearReadingCompleted(reading.id)
+                        const chaptersRead = personalData?.chaptersRead || []
+                        const isCompleted = isOneyearReadingCompleted(reading.id, chaptersRead)
                         const book = bibleBooks.books[reading.book - 1]
                         const bookName = book?.name || `Book ${reading.book}`
 
@@ -1035,12 +1039,12 @@ export default function PersonalReadingPage() {
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation()
-                                  if (isCompleted) {
-                                    unmarkOneyearReadingComplete(reading.id)
-                                  } else {
-                                    markOneyearReadingComplete(reading.id)
-                                  }
-                                  setPersonalData(getPersonalReadingData())
+                                  const newChaptersRead = isCompleted
+                                    ? unmarkOneyearReadingComplete(reading.id, chaptersRead)
+                                    : markOneyearReadingComplete(reading.id, chaptersRead)
+                                  const updated = { ...personalData, chaptersRead: newChaptersRead }
+                                  savePersonalReadingData(updated)
+                                  setPersonalData(updated)
                                   window.dispatchEvent(new Event('personalReadingUpdated'))
                                 }}
                                 className={`flex-shrink-0 w-6 h-6 rounded border-2 flex items-center justify-center transition-all ${

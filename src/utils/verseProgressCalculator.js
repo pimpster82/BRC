@@ -148,3 +148,40 @@ export const areAllChaptersComplete = (chaptersRead, expectedChapters) => {
 export const formatProgressText = (versesRead, totalVerses, percentage) => {
   return `${versesRead}/${totalVerses} ${totalVerses === 1 ? 'verse' : 'verses'} (${Math.round(percentage)}%)`
 }
+
+/**
+ * Calculate total verses in the entire Bible (all 66 books)
+ * @returns {number} Total verses in the Bible
+ */
+export const calculateTotalBibleVerses = () => {
+  let total = 0
+  // Loop through all 66 books
+  for (let bookNum = 1; bookNum <= 66; bookNum++) {
+    const bookChapters = BIBLE_VERSE_COUNTS[bookNum]
+    if (bookChapters) {
+      // Sum all verses in all chapters of this book
+      Object.values(bookChapters).forEach(verseCount => {
+        total += verseCount
+      })
+    }
+  }
+  return total
+}
+
+/**
+ * Calculate total verses read across all books
+ * @param {Array} chaptersRead - Array of chapter objects: { book, chapter, timestamp }
+ * @returns {number} Total verses read from all books
+ */
+export const calculateAllVersesRead = (chaptersRead) => {
+  if (!chaptersRead || chaptersRead.length === 0) return 0
+
+  let total = 0
+  chaptersRead.forEach(({ book, chapter }) => {
+    if (book && chapter) {
+      total += getVerseCount(book, chapter)
+    }
+  })
+
+  return total
+}

@@ -21,6 +21,8 @@ import {
   calculateVersesRead,
   calculateVerseProgress,
   getVerseCount,
+  calculateTotalBibleVerses,
+  calculateAllVersesRead,
 } from '../utils/verseProgressCalculator'
 
 /**
@@ -496,28 +498,34 @@ export default function PersonalReadingPage() {
         {/* Progress Bars - Plan-Specific */}
         <div className="px-4 pb-4">
           {/* Free Reading */}
-          {selectedPlan === 'free' && (
-            <div className="space-y-2">
-              {!isScrolled && (
-                <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400">
-                  <span>{t('reading.overall_progress')}</span>
-                  <span>{totalProgress.percentage}%</span>
+          {selectedPlan === 'free' && (() => {
+            const versesRead = personalData ? calculateAllVersesRead(personalData.chaptersRead || []) : 0
+            const totalVerses = calculateTotalBibleVerses()
+            const overallPercentage = totalVerses > 0 ? Math.round((versesRead / totalVerses) * 100) : 0
+
+            return (
+              <div className="space-y-2">
+                {!isScrolled && (
+                  <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400">
+                    <span>{t('reading.overall_progress')}</span>
+                    <span>{overallPercentage}%</span>
+                  </div>
+                )}
+                <div className="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-2 overflow-hidden">
+                  <div
+                    className="bg-blue-600 dark:bg-blue-500 h-full transition-all"
+                    style={{ width: `${overallPercentage}%` }}
+                  />
                 </div>
-              )}
-              <div className="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-2 overflow-hidden">
-                <div
-                  className="bg-blue-600 dark:bg-blue-500 h-full transition-all"
-                  style={{ width: `${totalProgress.percentage}%` }}
-                />
               </div>
-            </div>
-          )}
+            )
+          })()}
 
           {/* Thematic Plan - Dual Bars */}
           {selectedPlan === 'thematic' && (() => {
             const thematicProgress = getThematicProgress()
-            const versesRead = personalData ? calculateVersesRead(personalData.chaptersRead || []) : 0
-            const totalVerses = getTotalVerses()
+            const versesRead = personalData ? calculateAllVersesRead(personalData.chaptersRead || []) : 0
+            const totalVerses = calculateTotalBibleVerses()
             const overallPercentage = totalVerses > 0 ? Math.round((versesRead / totalVerses) * 100) : 0
 
             return (
@@ -559,9 +567,10 @@ export default function PersonalReadingPage() {
 
           {/* 1 Year Plan - Overall Bible Progress + On Track Meter */}
           {selectedPlan === 'oneyear' && (() => {
-            const onTrack = getOnTrackStatus()
-            const versesRead = personalData ? calculateVersesRead(personalData.chaptersRead || []) : 0
-            const totalVerses = getTotalVerses()
+            const chaptersRead = personalData?.chaptersRead || []
+            const onTrack = getOnTrackStatus(chaptersRead)
+            const versesRead = calculateAllVersesRead(chaptersRead)
+            const totalVerses = calculateTotalBibleVerses()
             const overallPercentage = totalVerses > 0 ? Math.round((versesRead / totalVerses) * 100) : 0
             const MAX_THRESHOLD = 30
             let position = 0
@@ -622,9 +631,10 @@ export default function PersonalReadingPage() {
 
           {/* Bible Overview - Overall Bible Progress + Bible Overview Progress */}
           {selectedPlan === 'bible_overview' && (() => {
-            const progress = getBibleOverviewProgress()
-            const versesRead = personalData ? calculateVersesRead(personalData.chaptersRead || []) : 0
-            const totalVerses = getTotalVerses()
+            const chaptersRead = personalData?.chaptersRead || []
+            const progress = getBibleOverviewProgress(chaptersRead)
+            const versesRead = calculateAllVersesRead(chaptersRead)
+            const totalVerses = calculateTotalBibleVerses()
             const overallPercentage = totalVerses > 0 ? Math.round((versesRead / totalVerses) * 100) : 0
 
             return (
@@ -856,26 +866,6 @@ export default function PersonalReadingPage() {
 
         {selectedPlan === 'bible_overview' && (
           <div className="space-y-6">
-            {/* Bible Overview Progress */}
-            {(() => {
-              const progress = getBibleOverviewProgress()
-              return (
-                <div className="sticky top-0 z-10 bg-gradient-to-r from-blue-50 dark:from-blue-900 to-indigo-50 dark:to-indigo-900 rounded-lg p-4 border border-blue-100 dark:border-blue-800 shadow-md">
-                  <div className="flex justify-between text-sm text-gray-700 dark:text-gray-300 mb-2">
-                    <span className="font-medium">{t('reading.plan_bible_overview')}</span>
-                    <span className="font-semibold">{progress.completed}/{progress.total} {t('bible_overview.readings_completed')}</span>
-                  </div>
-                  <div className="w-full bg-blue-200 dark:bg-blue-700 rounded-full h-2 overflow-hidden">
-                    <div
-                      className="bg-blue-600 dark:bg-blue-500 h-full transition-all"
-                      style={{ width: `${progress.percentage}%` }}
-                    />
-                  </div>
-                  <div className="text-xs text-gray-600 dark:text-gray-400 dark:text-gray-300 mt-2">{progress.percentage}% {t('reading.complete')}</div>
-                </div>
-              )
-            })()}
-
             {/* Bible Overview Sections */}
             {bibleOverviewSections.map((section) => {
               const isExpanded = expandedSections[section.key] !== false // Default to expanded
@@ -906,7 +896,8 @@ export default function PersonalReadingPage() {
                   {isExpanded && (
                     <div className="p-4 bg-white dark:bg-slate-800 space-y-2">
                       {readingsInSection.map((reading) => {
-                        const isCompleted = isBibleOverviewReadingCompleted(reading.id)
+                        const chaptersRead = personalData?.chaptersRead || []
+                        const isCompleted = isBibleOverviewReadingCompleted(reading.id, chaptersRead)
                         const book = bibleBooks.books[reading.book - 1]
                         const bookName = book?.name || `Book ${reading.book}`
 
@@ -934,12 +925,12 @@ export default function PersonalReadingPage() {
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation()
-                                  if (isCompleted) {
-                                    unmarkBibleOverviewReadingComplete(reading.id)
-                                  } else {
-                                    markBibleOverviewReadingComplete(reading.id)
-                                  }
-                                  setPersonalData(getPersonalReadingData())
+                                  const newChaptersRead = isCompleted
+                                    ? unmarkBibleOverviewReadingComplete(reading.id, chaptersRead)
+                                    : markBibleOverviewReadingComplete(reading.id, chaptersRead)
+                                  const updated = { ...personalData, chaptersRead: newChaptersRead }
+                                  savePersonalReadingData(updated)
+                                  setPersonalData(updated)
                                   window.dispatchEvent(new Event('personalReadingUpdated'))
                                 }}
                                 className={`flex-shrink-0 w-6 h-6 rounded border-2 flex items-center justify-center transition-all ${
@@ -986,65 +977,6 @@ export default function PersonalReadingPage() {
 
         {selectedPlan === 'oneyear' && (
           <div className="space-y-6">
-            {/* One Year Plan On Track Meter */}
-            {(() => {
-              const onTrack = getOnTrackStatus()
-              const MAX_THRESHOLD = 30 // Maximum days shown on scale
-
-              // Calculate position (-100 to +100, where 0 is center)
-              let position = 0
-              if (onTrack.hasStarted) {
-                const difference = onTrack.daysAhead - onTrack.daysBehind
-                // Clamp to threshold
-                const clampedDiff = Math.max(-MAX_THRESHOLD, Math.min(MAX_THRESHOLD, difference))
-                // Convert to percentage (-100 to +100)
-                position = (clampedDiff / MAX_THRESHOLD) * 100
-              }
-
-              return (
-                <div className="sticky top-0 z-10 bg-gradient-to-r from-green-50 dark:from-green-900 to-lime-50 dark:to-lime-900 rounded-lg p-4 border border-green-100 dark:border-green-800 shadow-md">
-                  <div className="flex justify-between text-sm text-gray-700 dark:text-gray-300 mb-3">
-                    <span className="font-medium">{t('reading.plan_oneyear')}</span>
-                    <span className="font-semibold">{onTrack.actualReadings}/{oneyearReadings.length}</span>
-                  </div>
-
-                  {/* On Track Meter */}
-                  {onTrack.hasStarted ? (
-                    <div className="relative">
-                      {/* Scale background */}
-                      <div className="w-full h-8 bg-gradient-to-r from-red-100 via-yellow-100 to-green-100 dark:from-red-900 dark:via-yellow-900 dark:to-green-900 rounded-lg relative overflow-hidden">
-                        {/* Center line */}
-                        <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-gray-400 dark:bg-gray-500"></div>
-
-                        {/* Sliding indicator */}
-                        <div
-                          className="absolute top-1/2 w-1 h-10 bg-gray-800 dark:bg-gray-200 rounded-full transition-all duration-500 shadow-lg"
-                          style={{
-                            left: `calc(50% + ${position}% * 0.4)`, // 0.4 factor to keep it within bounds
-                            transform: 'translate(-50%, -50%)'
-                          }}
-                        >
-                          {/* Arrow tip */}
-                          <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-gray-800 dark:border-b-gray-200"></div>
-                        </div>
-                      </div>
-
-                      {/* Scale labels (hidden text, only visual) */}
-                      <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1 px-1">
-                        <span>←</span>
-                        <span>•</span>
-                        <span>→</span>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="text-center py-2 text-sm text-gray-600 dark:text-gray-400">
-                      {t('oneyear.not_started')}
-                    </div>
-                  )}
-                </div>
-              )
-            })()}
-
             {/* One Year Sections */}
             {oneyearSections.map((section) => {
               const isExpanded = expandedSections[section.key] !== false // Default to expanded
@@ -1075,7 +1007,8 @@ export default function PersonalReadingPage() {
                   {isExpanded && (
                     <div className="p-4 bg-white dark:bg-slate-800 space-y-2">
                       {readingsInSection.map((reading) => {
-                        const isCompleted = isOneyearReadingCompleted(reading.id)
+                        const chaptersRead = personalData?.chaptersRead || []
+                        const isCompleted = isOneyearReadingCompleted(reading.id, chaptersRead)
                         const book = bibleBooks.books[reading.book - 1]
                         const bookName = book?.name || `Book ${reading.book}`
 
@@ -1106,12 +1039,12 @@ export default function PersonalReadingPage() {
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation()
-                                  if (isCompleted) {
-                                    unmarkOneyearReadingComplete(reading.id)
-                                  } else {
-                                    markOneyearReadingComplete(reading.id)
-                                  }
-                                  setPersonalData(getPersonalReadingData())
+                                  const newChaptersRead = isCompleted
+                                    ? unmarkOneyearReadingComplete(reading.id, chaptersRead)
+                                    : markOneyearReadingComplete(reading.id, chaptersRead)
+                                  const updated = { ...personalData, chaptersRead: newChaptersRead }
+                                  savePersonalReadingData(updated)
+                                  setPersonalData(updated)
                                   window.dispatchEvent(new Event('personalReadingUpdated'))
                                 }}
                                 className={`flex-shrink-0 w-6 h-6 rounded border-2 flex items-center justify-center transition-all ${
@@ -1151,48 +1084,6 @@ export default function PersonalReadingPage() {
 
         {selectedPlan === 'thematic' && (
           <div className="space-y-6">
-            {/* Dual Progress Bars: Overall Bible + Thematic Plan */}
-            {(() => {
-              const thematicProgress = getThematicProgress()
-              const totalVerses = getTotalVerses()
-              const versesRead = personalData ? calculateVersesRead(personalData.chaptersRead || []) : 0
-              const overallPercentage = totalVerses > 0 ? Math.round((versesRead / totalVerses) * 100) : 0
-
-              return (
-                <div className="sticky top-0 z-10 space-y-4 pb-4 bg-white dark:bg-slate-900">
-                  {/* Overall Bible Progress */}
-                  <div className="bg-gradient-to-r from-blue-50 dark:from-blue-900 to-indigo-50 dark:to-indigo-900 rounded-lg p-4 border border-blue-100 dark:border-blue-800">
-                    <div className="flex justify-between text-sm text-gray-700 dark:text-gray-300 mb-2">
-                      <span className="font-medium">{t('reading.overall_progress')}</span>
-                      <span className="font-semibold">{versesRead.toLocaleString()}/{totalVerses.toLocaleString()} {t('reading.verses')}</span>
-                    </div>
-                    <div className="w-full bg-blue-200 dark:bg-blue-700 rounded-full h-2 overflow-hidden">
-                      <div
-                        className="bg-blue-600 dark:bg-blue-500 h-full transition-all"
-                        style={{ width: `${overallPercentage}%` }}
-                      />
-                    </div>
-                    <div className="text-xs text-gray-600 dark:text-gray-400 dark:text-gray-300 mt-2">{overallPercentage}% {t('reading.complete')}</div>
-                  </div>
-
-                  {/* Thematic Plan Progress */}
-                  <div className="bg-gradient-to-r from-purple-50 dark:from-purple-900 to-pink-50 dark:to-pink-900 rounded-lg p-4 border border-purple-100 dark:border-purple-800">
-                    <div className="flex justify-between text-sm text-gray-700 dark:text-gray-300 mb-2">
-                      <span className="font-medium">{t('reading.plan_thematic')}</span>
-                      <span className="font-semibold">{thematicProgress.completed}/{thematicProgress.total} {t('reading.topics_completed')}</span>
-                    </div>
-                    <div className="w-full bg-purple-200 dark:bg-purple-700 rounded-full h-2 overflow-hidden">
-                      <div
-                        className="bg-purple-600 dark:bg-purple-500 h-full transition-all"
-                        style={{ width: `${thematicProgress.percentage}%` }}
-                      />
-                    </div>
-                    <div className="text-xs text-gray-600 dark:text-gray-400 dark:text-gray-300 mt-2">{thematicProgress.percentage}% {t('reading.complete')}</div>
-                  </div>
-                </div>
-              )
-            })()}
-
             {/* Thematic Sections */}
             {getThematicSections().map((section) => {
               const isExpanded = expandedSections[section.key] !== false // Default to expanded

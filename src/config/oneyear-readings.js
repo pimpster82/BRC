@@ -425,7 +425,12 @@ const getCompletedReadings = () => {
  */
 const saveCompletedReadings = (completedReadings) => {
   try {
+    // Load existing data to preserve startDate and freezeHistory
+    const stored = localStorage.getItem('bibleCompanion_oneyear')
+    const existingData = stored ? JSON.parse(stored) : {}
+
     const data = {
+      ...existingData,
       completedReadings,
       lastUpdated: new Date().toISOString()
     }

@@ -236,6 +236,22 @@ export const markThematicTopicComplete = (topic, chaptersRead, source = 'themati
 }
 
 /**
+ * Unmark thematic topic (remove all chapters/verses for this topic)
+ *
+ * Note: For now, this is disabled to prevent data loss. Users can unmark via Free Reading.
+ * A proper implementation would need to track which source added each chapter to handle overlapping topics.
+ *
+ * @param {Object} topic - Topic object with readings array
+ * @param {Array} chaptersRead - Current chaptersRead array
+ * @returns {Array} Unchanged chaptersRead array (function disabled)
+ */
+export const unmarkThematicTopicComplete = (topic, chaptersRead) => {
+  // Disabled: Removing chapters could affect other plans
+  // Users should use Free Reading to unmark individual chapters
+  return chaptersRead
+}
+
+/**
  * Get progress for all thematic topics
  *
  * @param {Array} topics - Array of thematic topic objects

@@ -15,6 +15,7 @@ import { getThematicProgress } from '../utils/thematicHelpers'
 import { calculateAllVersesRead, calculateTotalBibleVerses } from '../utils/verseProgressCalculator'
 import { getOneyearProgress, oneyearReadings } from '../config/oneyear-readings'
 import { getBibleOverviewProgress, bibleOverviewReadings } from '../config/bible-overview-readings'
+import { thematicTopics } from '../config/thematic-topics'
 import { getPersonalReadingData, savePersonalReadingData } from '../utils/storage'
 
 const ProgressContext = createContext(null)
@@ -90,13 +91,7 @@ export const ProgressProvider = ({ children }) => {
   // Calculate Thematic Plan Progress
   // Memoized: recomputes only when length changes
   const thematicProgress = useMemo(() => {
-    // TODO: Replace with actual thematic topics array when available
-    // For now, return placeholder
-    return {
-      total: 0,
-      completed: 0,
-      percentage: 0
-    }
+    return getThematicProgress(thematicTopics, chaptersRead)
   }, [lastLength]) // eslint-disable-line react-hooks/exhaustive-deps
 
   /**

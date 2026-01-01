@@ -5,6 +5,7 @@ import { useLoading } from '../context/LoadingContext'
 import { useAuth } from '../context/AuthContext'
 import { useProgress } from '../context/ProgressContext'
 import { setChapterRead, removeChapter, isReadingComplete, markReadingComplete as markReadingCompleteUnified, unmarkReading } from '../utils/progressTracking'
+import { isThematicTopicComplete as isThematicTopicCompleteUnified, markThematicTopicComplete as markThematicTopicCompleteUnified, unmarkThematicTopicComplete as unmarkThematicTopicCompleteUnified, formatReadingForDisplay } from '../utils/thematicHelpers'
 import LoadingSpinner from '../components/LoadingSpinner'
 import { t, getCurrentLanguage } from '../config/i18n'
 import { getBibleBooks } from '../config/languages'
@@ -12,7 +13,7 @@ import { readingCategories, getBooksInCategory } from '../config/reading-categor
 import { thematicTopics, getThematicSections, getTopicsInSection } from '../config/thematic-topics'
 import { bibleOverviewReadings, bibleOverviewSections, getReadingsInSection as getBibleOverviewReadingsInSection } from '../config/bible-overview-readings'
 import { oneyearReadings, oneyearSections, getReadingsInSection as getOneyearReadingsInSection, getOnTrackStatus } from '../config/oneyear-readings'
-import { getPersonalReadingData, savePersonalReadingData, syncPersonalReadingToFirebase, markThematicTopicComplete, unmarkThematicTopicComplete, isThematicTopicComplete, getThematicProgress } from '../utils/storage'
+import { getPersonalReadingData, savePersonalReadingData, syncPersonalReadingToFirebase } from '../utils/storage'
 import { buildLanguageSpecificWebLink } from '../../data/bible-link-builder'
 import { auth } from '../config/firebase'
 import { parseReadingInput } from '../utils/readingParser'
@@ -1040,7 +1041,8 @@ export default function PersonalReadingPage() {
                     <div className="p-4 bg-white dark:bg-slate-800 space-y-2">
                       {topicsInSection.map((topic) => {
                         const isTopicExpanded = expandedTopics[topic.id]
-                        const isCompleted = isThematicTopicComplete(topic.id)
+                        // Use unified thematicHelpers with chaptersIndex
+                        const isCompleted = isThematicTopicCompleteUnified(topic, chaptersIndex)
 
                         return (
                           <div key={topic.id} className={`border rounded-lg overflow-hidden transition-colors ${isCompleted ? 'border-purple-300 bg-purple-50 dark:bg-purple-900 dark:border-purple-700' : 'border-gray-100 dark:border-gray-800'}`}>
@@ -1049,13 +1051,15 @@ export default function PersonalReadingPage() {
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation()
-                                  if (isCompleted) {
-                                    unmarkThematicTopicComplete(topic.id)
-                                  } else {
-                                    markThematicTopicComplete(topic.id)
-                                  }
-                                  setPersonalData(getPersonalReadingData())
-                                  window.dispatchEvent(new Event('personalReadingUpdated'))
+                                  // Use unified thematicHelpers to mark/unmark
+                                  const newChaptersRead = isCompleted
+                                    ? unmarkThematicTopicCompleteUnified(topic, chaptersRead)
+                                    : markThematicTopicCompleteUnified(topic, chaptersRead, 'thematic')
+
+                                  updateChaptersRead(newChaptersRead)
+                                  const updated = { ...personalData, chaptersRead: newChaptersRead }
+                                  savePersonalReadingData(updated)
+                                  setPersonalData(updated)
                                 }}
                                 className={`flex-shrink-0 w-6 h-6 rounded border-2 flex items-center justify-center transition-all ${
                                   isCompleted
@@ -1085,28 +1089,34 @@ export default function PersonalReadingPage() {
                             </div>
 
                             {/* Topic Content - Scripture References */}
-                            {isTopicExpanded && (
+                            {isTopicExpanded && topic.readings && (
                               <div className={`border-t p-3 ${isCompleted ? 'border-purple-200 dark:border-purple-600 bg-purple-50 dark:bg-purple-900' : 'border-gray-100 dark:border-gray-800 bg-white dark:bg-slate-800'}`}>
-                                {(() => {
-                                  const versesLinks = parseMultipleVerses(topic.verses, language)
-                                  return (
-                                    <div className="flex flex-wrap gap-2">
-                                      {versesLinks.map((link, idx) => (
-                                        <a
-                                          key={idx}
-                                          href={link.url}
-                                          target="_blank"
-                                          rel="noopener noreferrer"
-                                          className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 dark:text-blue-100 hover:underline font-medium transition-colors"
-                                          title={`Open ${link.book} on JW.org`}
-                                        >
-                                          {link.text}
-                                          <ExternalLink className="inline w-3 h-3 ml-1" />
-                                        </a>
-                                      ))}
-                                    </div>
-                                  )
-                                })()}
+                                <div className="flex flex-wrap gap-2">
+                                  {topic.readings.map((reading, idx) => {
+                                    const formattedText = formatReadingForDisplay(reading, language)
+                                    const linkObj = buildLanguageSpecificWebLink(
+                                      reading.book,
+                                      reading.chapter || reading.startChapter,
+                                      reading.startVerse || 1,
+                                      reading.endVerse || null,
+                                      language
+                                    )
+
+                                    return (
+                                      <a
+                                        key={idx}
+                                        href={linkObj.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline font-medium transition-colors"
+                                        title={`Open ${formattedText} on JW.org`}
+                                      >
+                                        {formattedText}
+                                        <ExternalLink className="inline w-3 h-3 ml-1" />
+                                      </a>
+                                    )
+                                  })}
+                                </div>
                               </div>
                             )}
                           </div>

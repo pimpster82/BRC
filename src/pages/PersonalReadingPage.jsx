@@ -4,14 +4,14 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useLoading } from '../context/LoadingContext'
 import { useAuth } from '../context/AuthContext'
 import { useProgress } from '../context/ProgressContext'
-import { setChapterRead, removeChapter } from '../utils/progressTracking'
+import { setChapterRead, removeChapter, isReadingComplete, markReadingComplete as markReadingCompleteUnified, unmarkReading } from '../utils/progressTracking'
 import LoadingSpinner from '../components/LoadingSpinner'
 import { t, getCurrentLanguage } from '../config/i18n'
 import { getBibleBooks } from '../config/languages'
 import { readingCategories, getBooksInCategory } from '../config/reading-categories'
 import { thematicTopics, getThematicSections, getTopicsInSection } from '../config/thematic-topics'
-import { bibleOverviewReadings, bibleOverviewSections, getReadingsInSection as getBibleOverviewReadingsInSection, isReadingCompleted as isBibleOverviewReadingCompleted, markReadingComplete as markBibleOverviewReadingComplete, unmarkReadingComplete as unmarkBibleOverviewReadingComplete } from '../config/bible-overview-readings'
-import { oneyearReadings, oneyearSections, getReadingsInSection as getOneyearReadingsInSection, isReadingCompleted as isOneyearReadingCompleted, markReadingComplete as markOneyearReadingComplete, unmarkReadingComplete as unmarkOneyearReadingComplete, getOnTrackStatus } from '../config/oneyear-readings'
+import { bibleOverviewReadings, bibleOverviewSections, getReadingsInSection as getBibleOverviewReadingsInSection } from '../config/bible-overview-readings'
+import { oneyearReadings, oneyearSections, getReadingsInSection as getOneyearReadingsInSection, getOnTrackStatus } from '../config/oneyear-readings'
 import { getPersonalReadingData, savePersonalReadingData, syncPersonalReadingToFirebase, markThematicTopicComplete, unmarkThematicTopicComplete, isThematicTopicComplete, getThematicProgress } from '../utils/storage'
 import { buildLanguageSpecificWebLink } from '../../data/bible-link-builder'
 import { auth } from '../config/firebase'
@@ -46,7 +46,7 @@ export default function PersonalReadingPage() {
   const [searchParams] = useSearchParams()
   const { showLoading, hideLoading } = useLoading()
   const { currentUser } = useAuth()
-  const { overallProgress, oneyearProgress, bibleOverviewProgress, thematicProgress, chaptersRead, updateChaptersRead } = useProgress()
+  const { overallProgress, oneyearProgress, bibleOverviewProgress, thematicProgress, chaptersRead, chaptersIndex, updateChaptersRead } = useProgress()
   const language = getCurrentLanguage()
   const bibleBooks = getBibleBooks(language)
 
@@ -817,8 +817,8 @@ export default function PersonalReadingPage() {
                   {isExpanded && (
                     <div className="p-4 bg-white dark:bg-slate-800 space-y-2">
                       {readingsInSection.map((reading) => {
-                        const chaptersRead = personalData?.chaptersRead || []
-                        const isCompleted = isBibleOverviewReadingCompleted(reading.id, chaptersRead)
+                        // Use unified progressTracking with chaptersIndex for O(1) lookup
+                        const isCompleted = isReadingComplete(reading.book, reading.startChapter, reading.endChapter, chaptersIndex)
                         const book = bibleBooks.books[reading.book - 1]
                         const bookName = book?.name || `Book ${reading.book}`
 
@@ -846,13 +846,15 @@ export default function PersonalReadingPage() {
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation()
+                                  // Use unified progressTracking functions
                                   const newChaptersRead = isCompleted
-                                    ? unmarkBibleOverviewReadingComplete(reading.id, chaptersRead)
-                                    : markBibleOverviewReadingComplete(reading.id, chaptersRead)
+                                    ? unmarkReading(chaptersRead, reading.book, reading.startChapter, reading.endChapter)
+                                    : markReadingCompleteUnified(chaptersRead, reading.book, reading.startChapter, reading.endChapter, 'bible_overview')
+
+                                  updateChaptersRead(newChaptersRead)
                                   const updated = { ...personalData, chaptersRead: newChaptersRead }
                                   savePersonalReadingData(updated)
                                   setPersonalData(updated)
-                                  window.dispatchEvent(new Event('personalReadingUpdated'))
                                 }}
                                 className={`flex-shrink-0 w-6 h-6 rounded border-2 flex items-center justify-center transition-all ${
                                   isCompleted
@@ -928,8 +930,8 @@ export default function PersonalReadingPage() {
                   {isExpanded && (
                     <div className="p-4 bg-white dark:bg-slate-800 space-y-2">
                       {readingsInSection.map((reading) => {
-                        const chaptersRead = personalData?.chaptersRead || []
-                        const isCompleted = isOneyearReadingCompleted(reading.id, chaptersRead)
+                        // Use unified progressTracking with chaptersIndex for O(1) lookup
+                        const isCompleted = isReadingComplete(reading.book, reading.startChapter, reading.endChapter, chaptersIndex)
                         const book = bibleBooks.books[reading.book - 1]
                         const bookName = book?.name || `Book ${reading.book}`
 
@@ -960,13 +962,15 @@ export default function PersonalReadingPage() {
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation()
+                                  // Use unified progressTracking functions
                                   const newChaptersRead = isCompleted
-                                    ? unmarkOneyearReadingComplete(reading.id, chaptersRead)
-                                    : markOneyearReadingComplete(reading.id, chaptersRead)
+                                    ? unmarkReading(chaptersRead, reading.book, reading.startChapter, reading.endChapter)
+                                    : markReadingCompleteUnified(chaptersRead, reading.book, reading.startChapter, reading.endChapter, 'oneyear')
+
+                                  updateChaptersRead(newChaptersRead)
                                   const updated = { ...personalData, chaptersRead: newChaptersRead }
                                   savePersonalReadingData(updated)
                                   setPersonalData(updated)
-                                  window.dispatchEvent(new Event('personalReadingUpdated'))
                                 }}
                                 className={`flex-shrink-0 w-6 h-6 rounded border-2 flex items-center justify-center transition-all ${
                                   isCompleted

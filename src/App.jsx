@@ -5,6 +5,7 @@ import { useAuth } from './context/AuthContext'
 import { AdminProvider } from './context/AdminContext'
 import { ThemeProvider } from './context/ThemeContext'
 import { LoadingProvider } from './context/LoadingContext'
+import { ProgressProvider } from './context/ProgressContext'
 import LoadingSpinner from './components/LoadingSpinner'
 import HomePage from './pages/HomePage'
 import WeeklyReadingPage from './pages/WeeklyReadingPage'
@@ -95,11 +96,13 @@ function App() {
     <ThemeProvider>
       <AuthProvider>
         <AdminProvider>
-          <LoadingProvider>
-            <Router basename="">
-              <AppContent />
-            </Router>
-          </LoadingProvider>
+          <ProgressProvider>
+            <LoadingProvider>
+              <Router basename="">
+                <AppContent />
+              </Router>
+            </LoadingProvider>
+          </ProgressProvider>
         </AdminProvider>
       </AuthProvider>
     </ThemeProvider>

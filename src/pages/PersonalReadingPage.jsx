@@ -562,7 +562,7 @@ export default function PersonalReadingPage() {
               <div>
                 {!isScrolled && (
                   <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
-                    <span>{t('bibleInOneYear.planName')}</span>
+                    <span>{t('reading.plan_oneyear')}</span>
                     <span>{bibleInOneYearStats.readingsCompleted}/{bibleInOneYearStats.totalReadings} ({bibleInOneYearStats.progress}%)</span>
                   </div>
                 )}

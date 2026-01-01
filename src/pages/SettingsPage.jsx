@@ -448,7 +448,7 @@ const SettingsPage = () => {
     { value: 'bible_overview', label: t('reading.plan_bible_overview'), available: true },
     { value: 'thematic', label: t('reading.plan_thematic'), available: true },
     { value: 'chronological', label: t('reading.plan_chronological'), available: false },
-    { value: 'oneyear', label: t('bibleInOneYear.planName'), available: true }
+    { value: 'oneyear', label: t('reading.plan_oneyear'), available: true }
   ]
 
   const readingPlans = allReadingPlans.filter(plan => plan.available || isAdminMode)

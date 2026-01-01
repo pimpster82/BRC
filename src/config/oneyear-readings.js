@@ -442,10 +442,13 @@ const saveCompletedReadings = (completedReadings) => {
 
 /**
  * Check if a reading is completed by checking if all its chapters are in chaptersRead
+ * @deprecated Use isReadingComplete() from utils/progressTracking.js instead
  * @param {number} readingId - Reading ID
  * @param {Array} chaptersRead - Global chaptersRead array from personalData
  */
 export const isReadingCompleted = (readingId, chaptersRead = []) => {
+  console.warn('[DEPRECATED] isReadingCompleted() is deprecated. Use isReadingComplete() from utils/progressTracking.js')
+
   const reading = oneyearReadings.find(r => r.id === readingId)
   if (!reading) return false
 
@@ -459,12 +462,14 @@ export const isReadingCompleted = (readingId, chaptersRead = []) => {
 }
 
 /**
+ * @deprecated Use markReadingComplete() from utils/progressTracking.js instead
  * Mark a reading as completed by adding all its chapters to chaptersRead
  * @param {number} readingId - Reading ID
  * @param {Array} chaptersRead - Current chaptersRead array
  * @returns {Array} Updated chaptersRead array
  */
 export const markReadingComplete = (readingId, chaptersRead = []) => {
+  console.warn('[DEPRECATED] markReadingComplete() is deprecated. Use markReadingComplete() from utils/progressTracking.js')
   const reading = oneyearReadings.find(r => r.id === readingId)
   if (!reading) return chaptersRead
 
@@ -491,12 +496,14 @@ export const markReadingComplete = (readingId, chaptersRead = []) => {
 }
 
 /**
+ * @deprecated Use unmarkReading() from utils/progressTracking.js instead
  * Unmark a reading as completed by removing all its chapters from chaptersRead
  * @param {number} readingId - Reading ID
  * @param {Array} chaptersRead - Current chaptersRead array
  * @returns {Array} Updated chaptersRead array
  */
 export const unmarkReadingComplete = (readingId, chaptersRead = []) => {
+  console.warn('[DEPRECATED] unmarkReadingComplete() is deprecated. Use unmarkReading() from utils/progressTracking.js')
   const reading = oneyearReadings.find(r => r.id === readingId)
   if (!reading) return chaptersRead
 

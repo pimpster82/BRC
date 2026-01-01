@@ -9,7 +9,7 @@ import { getBibleBooks } from '../config/languages'
 import { readingCategories, getBooksInCategory } from '../config/reading-categories'
 import { thematicTopics, getThematicSections, getTopicsInSection } from '../config/thematic-topics'
 import { bibleOverviewReadings, bibleOverviewSections, getReadingsInSection as getBibleOverviewReadingsInSection, getBibleOverviewProgress, isReadingCompleted as isBibleOverviewReadingCompleted, markReadingComplete as markBibleOverviewReadingComplete, unmarkReadingComplete as unmarkBibleOverviewReadingComplete } from '../config/bible-overview-readings'
-import { oneyearReadings, oneyearSections, getReadingsInSection as getOneyearReadingsInSection, getOneyearProgress, isReadingCompleted as isOneyearReadingCompleted, markReadingComplete as markOneyearReadingComplete, unmarkReadingComplete as unmarkOneyearReadingComplete } from '../config/oneyear-readings'
+import { oneyearReadings, oneyearSections, getReadingsInSection as getOneyearReadingsInSection, getOneyearProgress, isReadingCompleted as isOneyearReadingCompleted, markReadingComplete as markOneyearReadingComplete, unmarkReadingComplete as unmarkOneyearReadingComplete, getOnTrackStatus } from '../config/oneyear-readings'
 import { getPersonalReadingData, savePersonalReadingData, syncPersonalReadingToFirebase, markThematicTopicComplete, unmarkThematicTopicComplete, isThematicTopicComplete, getThematicProgress } from '../utils/storage'
 import { buildLanguageSpecificWebLink } from '../../data/bible-link-builder'
 import { auth } from '../config/firebase'
@@ -731,7 +731,6 @@ export default function PersonalReadingPage() {
                         className={`text-blue-600 transition-transform ${isExpanded ? 'rotate-0' : '-rotate-90'}`}
                       />
                       <h3 className="font-bold text-gray-800 dark:text-gray-300">{t(section.titleKey)}</h3>
-                      <span className="text-sm text-gray-600 dark:text-gray-400">({section.count} readings)</span>
                     </div>
                   </button>
 
@@ -798,9 +797,6 @@ export default function PersonalReadingPage() {
                                 {referenceText}
                                 <ExternalLink className="inline w-3 h-3 ml-1" />
                               </a>
-
-                              {/* Reading ID */}
-                              <span className="text-xs text-gray-500 dark:text-gray-400 flex-shrink-0">#{reading.id}</span>
                             </div>
                           </div>
                         )
@@ -822,22 +818,61 @@ export default function PersonalReadingPage() {
 
         {selectedPlan === 'oneyear' && (
           <div className="space-y-6">
-            {/* One Year Plan Progress */}
+            {/* One Year Plan On Track Meter */}
             {(() => {
-              const progress = getOneyearProgress()
+              const onTrack = getOnTrackStatus()
+              const MAX_THRESHOLD = 30 // Maximum days shown on scale
+
+              // Calculate position (-100 to +100, where 0 is center)
+              let position = 0
+              if (onTrack.hasStarted) {
+                const difference = onTrack.daysAhead - onTrack.daysBehind
+                // Clamp to threshold
+                const clampedDiff = Math.max(-MAX_THRESHOLD, Math.min(MAX_THRESHOLD, difference))
+                // Convert to percentage (-100 to +100)
+                position = (clampedDiff / MAX_THRESHOLD) * 100
+              }
+
               return (
                 <div className="bg-gradient-to-r from-green-50 dark:from-green-900 to-lime-50 dark:to-lime-900 rounded-lg p-4 border border-green-100 dark:border-green-800">
-                  <div className="flex justify-between text-sm text-gray-700 dark:text-gray-300 mb-2">
+                  <div className="flex justify-between text-sm text-gray-700 dark:text-gray-300 mb-3">
                     <span className="font-medium">{t('reading.plan_oneyear')}</span>
-                    <span className="font-semibold">{progress.completed}/{progress.total} {t('oneyear.readings_completed')}</span>
+                    <span className="font-semibold">{onTrack.actualReadings}/{oneyearReadings.length}</span>
                   </div>
-                  <div className="w-full bg-green-200 dark:bg-green-700 rounded-full h-2 overflow-hidden">
-                    <div
-                      className="bg-green-600 dark:bg-green-500 h-full transition-all"
-                      style={{ width: `${progress.percentage}%` }}
-                    />
-                  </div>
-                  <div className="text-xs text-gray-600 dark:text-gray-400 dark:text-gray-300 mt-2">{progress.percentage}% {t('reading.complete')}</div>
+
+                  {/* On Track Meter */}
+                  {onTrack.hasStarted ? (
+                    <div className="relative">
+                      {/* Scale background */}
+                      <div className="w-full h-8 bg-gradient-to-r from-red-100 via-yellow-100 to-green-100 dark:from-red-900 dark:via-yellow-900 dark:to-green-900 rounded-lg relative overflow-hidden">
+                        {/* Center line */}
+                        <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-gray-400 dark:bg-gray-500"></div>
+
+                        {/* Sliding indicator */}
+                        <div
+                          className="absolute top-1/2 w-1 h-10 bg-gray-800 dark:bg-gray-200 rounded-full transition-all duration-500 shadow-lg"
+                          style={{
+                            left: `calc(50% + ${position}% * 0.4)`, // 0.4 factor to keep it within bounds
+                            transform: 'translate(-50%, -50%)'
+                          }}
+                        >
+                          {/* Arrow tip */}
+                          <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-gray-800 dark:border-b-gray-200"></div>
+                        </div>
+                      </div>
+
+                      {/* Scale labels (hidden text, only visual) */}
+                      <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1 px-1">
+                        <span>←</span>
+                        <span>•</span>
+                        <span>→</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-2 text-sm text-gray-600 dark:text-gray-400">
+                      {t('oneyear.not_started')}
+                    </div>
+                  )}
                 </div>
               )
             })()}
@@ -865,7 +900,6 @@ export default function PersonalReadingPage() {
                         className={`text-green-600 transition-transform ${isExpanded ? 'rotate-0' : '-rotate-90'}`}
                       />
                       <h3 className="font-bold text-gray-800 dark:text-gray-300">{t(section.titleKey)}</h3>
-                      <span className="text-sm text-gray-600 dark:text-gray-400">({section.count} days)</span>
                     </div>
                   </button>
 
@@ -935,9 +969,6 @@ export default function PersonalReadingPage() {
                                 {referenceText}
                                 <ExternalLink className="inline w-3 h-3 ml-1" />
                               </a>
-
-                              {/* Day Number */}
-                              <span className="text-xs text-gray-500 dark:text-gray-400 flex-shrink-0">Day {Math.floor(reading.id)}</span>
                             </div>
                           </div>
                         )
@@ -952,22 +983,44 @@ export default function PersonalReadingPage() {
 
         {selectedPlan === 'thematic' && (
           <div className="space-y-6">
-            {/* Thematic Plan Progress */}
+            {/* Dual Progress Bars: Overall Bible + Thematic Plan */}
             {(() => {
-              const progress = getThematicProgress()
+              const thematicProgress = getThematicProgress()
+              const totalVerses = getTotalVerses()
+              const versesRead = personalData ? calculateVersesRead(personalData.chaptersRead || []) : 0
+              const overallPercentage = totalVerses > 0 ? Math.round((versesRead / totalVerses) * 100) : 0
+
               return (
-                <div className="bg-gradient-to-r from-purple-50 dark:from-purple-900 to-pink-50 dark:to-pink-900 rounded-lg p-4 border border-purple-100 dark:border-purple-800">
-                  <div className="flex justify-between text-sm text-gray-700 dark:text-gray-300 mb-2">
-                    <span className="font-medium">{t('reading.plan_thematic')}</span>
-                    <span className="font-semibold">{progress.completed}/{progress.total} {t('reading.topics_completed')}</span>
+                <div className="space-y-4">
+                  {/* Overall Bible Progress */}
+                  <div className="bg-gradient-to-r from-blue-50 dark:from-blue-900 to-indigo-50 dark:to-indigo-900 rounded-lg p-4 border border-blue-100 dark:border-blue-800">
+                    <div className="flex justify-between text-sm text-gray-700 dark:text-gray-300 mb-2">
+                      <span className="font-medium">{t('reading.overall_progress')}</span>
+                      <span className="font-semibold">{versesRead.toLocaleString()}/{totalVerses.toLocaleString()} {t('reading.verses')}</span>
+                    </div>
+                    <div className="w-full bg-blue-200 dark:bg-blue-700 rounded-full h-2 overflow-hidden">
+                      <div
+                        className="bg-blue-600 dark:bg-blue-500 h-full transition-all"
+                        style={{ width: `${overallPercentage}%` }}
+                      />
+                    </div>
+                    <div className="text-xs text-gray-600 dark:text-gray-400 dark:text-gray-300 mt-2">{overallPercentage}% {t('reading.complete')}</div>
                   </div>
-                  <div className="w-full bg-purple-200 dark:bg-purple-700 rounded-full h-2 overflow-hidden">
-                    <div
-                      className="bg-purple-600 dark:bg-purple-500 h-full transition-all"
-                      style={{ width: `${progress.percentage}%` }}
-                    />
+
+                  {/* Thematic Plan Progress */}
+                  <div className="bg-gradient-to-r from-purple-50 dark:from-purple-900 to-pink-50 dark:to-pink-900 rounded-lg p-4 border border-purple-100 dark:border-purple-800">
+                    <div className="flex justify-between text-sm text-gray-700 dark:text-gray-300 mb-2">
+                      <span className="font-medium">{t('reading.plan_thematic')}</span>
+                      <span className="font-semibold">{thematicProgress.completed}/{thematicProgress.total} {t('reading.topics_completed')}</span>
+                    </div>
+                    <div className="w-full bg-purple-200 dark:bg-purple-700 rounded-full h-2 overflow-hidden">
+                      <div
+                        className="bg-purple-600 dark:bg-purple-500 h-full transition-all"
+                        style={{ width: `${thematicProgress.percentage}%` }}
+                      />
+                    </div>
+                    <div className="text-xs text-gray-600 dark:text-gray-400 dark:text-gray-300 mt-2">{thematicProgress.percentage}% {t('reading.complete')}</div>
                   </div>
-                  <div className="text-xs text-gray-600 dark:text-gray-400 dark:text-gray-300 mt-2">{progress.percentage}% {t('reading.complete')}</div>
                 </div>
               )
             })()}

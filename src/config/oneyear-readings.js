@@ -453,6 +453,8 @@ export const markReadingComplete = (readingId) => {
   if (!completed.includes(readingId)) {
     completed.push(readingId)
     saveCompletedReadings(completed)
+    // Initialize start date if this is the first reading
+    initializeStartDateIfNeeded()
   }
 }
 
@@ -480,4 +482,172 @@ export const getOneyearProgress = () => {
     completed,
     percentage
   }
+}
+
+/**
+ * Get or initialize the start date for One Year Plan
+ */
+const getStartDate = () => {
+  try {
+    const stored = localStorage.getItem('bibleCompanion_oneyear')
+    if (!stored) return null
+    const data = JSON.parse(stored)
+    return data.startDate || null
+  } catch (error) {
+    console.error('Failed to load One Year start date:', error)
+    return null
+  }
+}
+
+/**
+ * Set the start date for One Year Plan (called on first reading)
+ */
+const setStartDate = (date) => {
+  try {
+    const stored = localStorage.getItem('bibleCompanion_oneyear')
+    const data = stored ? JSON.parse(stored) : { completedReadings: [] }
+    data.startDate = date
+    localStorage.setItem('bibleCompanion_oneyear', JSON.stringify(data))
+  } catch (error) {
+    console.error('Failed to save One Year start date:', error)
+  }
+}
+
+/**
+ * Get freeze/resume history for One Year Plan
+ * Returns array of { startDate, endDate, daysActive }
+ */
+const getFreezeHistory = () => {
+  try {
+    const stored = localStorage.getItem('bibleCompanion_oneyear')
+    if (!stored) return []
+    const data = JSON.parse(stored)
+    return data.freezeHistory || []
+  } catch (error) {
+    console.error('Failed to load freeze history:', error)
+    return []
+  }
+}
+
+/**
+ * Calculate On Track status for One Year Plan
+ * Returns { daysAhead, daysBehind, isOnTrack, expectedReadings, actualReadings }
+ */
+export const getOnTrackStatus = () => {
+  const startDate = getStartDate()
+  const completedReadings = getCompletedReadings()
+  const actualReadings = completedReadings.length
+
+  // If no start date, plan hasn't started yet
+  if (!startDate) {
+    return {
+      daysAhead: 0,
+      daysBehind: 0,
+      isOnTrack: true,
+      expectedReadings: 0,
+      actualReadings: 0,
+      hasStarted: false
+    }
+  }
+
+  // Calculate days since start
+  const start = new Date(startDate)
+  const today = new Date()
+  const daysSinceStart = Math.floor((today - start) / (1000 * 60 * 60 * 24)) + 1 // +1 to include start day
+
+  // Expected: 1 reading per day
+  const expectedReadings = Math.min(daysSinceStart, oneyearReadings.length)
+
+  // Calculate difference (positive = ahead, negative = behind)
+  const difference = actualReadings - expectedReadings
+
+  return {
+    daysAhead: difference > 0 ? difference : 0,
+    daysBehind: difference < 0 ? Math.abs(difference) : 0,
+    isOnTrack: difference === 0,
+    expectedReadings,
+    actualReadings,
+    daysSinceStart,
+    hasStarted: true
+  }
+}
+
+/**
+ * Initialize start date if this is the first reading
+ */
+export const initializeStartDateIfNeeded = () => {
+  const startDate = getStartDate()
+  const completedReadings = getCompletedReadings()
+
+  // If no start date but has readings, this is the first reading
+  if (!startDate && completedReadings.length > 0) {
+    setStartDate(new Date().toISOString())
+  }
+}
+
+/**
+ * Freeze the One Year Plan (user paused)
+ * Saves current period to freeze history
+ */
+export const freezeOneyearPlan = () => {
+  try {
+    const startDate = getStartDate()
+    if (!startDate) return
+
+    const stored = localStorage.getItem('bibleCompanion_oneyear')
+    const data = stored ? JSON.parse(stored) : { completedReadings: [] }
+
+    const freezeHistory = data.freezeHistory || []
+    const today = new Date().toISOString()
+    const start = new Date(startDate)
+    const end = new Date(today)
+    const daysActive = Math.floor((end - start) / (1000 * 60 * 60 * 24)) + 1
+
+    // Add current period to history
+    freezeHistory.push({
+      startDate: startDate,
+      endDate: today,
+      daysActive
+    })
+
+    data.freezeHistory = freezeHistory
+    data.startDate = null // Clear start date (plan is frozen)
+
+    localStorage.setItem('bibleCompanion_oneyear', JSON.stringify(data))
+  } catch (error) {
+    console.error('Failed to freeze One Year plan:', error)
+  }
+}
+
+/**
+ * Resume the One Year Plan (user resumed)
+ * Starts a new period
+ */
+export const resumeOneyearPlan = () => {
+  setStartDate(new Date().toISOString())
+}
+
+/**
+ * Get total active days across all periods
+ */
+export const getTotalActiveDays = () => {
+  const freezeHistory = getFreezeHistory()
+  const currentStartDate = getStartDate()
+
+  let totalDays = 0
+
+  // Sum up all completed periods
+  for (const period of freezeHistory) {
+    totalDays += period.daysActive
+  }
+
+  // Add current period if active
+  if (currentStartDate) {
+    const start = new Date(currentStartDate)
+    const today = new Date()
+    const currentDays = Math.floor((today - start) / (1000 * 60 * 60 * 24)) + 1
+    totalDays += currentDays
+  }
+
+  return totalDays
 }

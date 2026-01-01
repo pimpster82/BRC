@@ -235,6 +235,19 @@ export const translations = {
     'oneyear.apostles_writings': 'Die Schriften der anderen Apostel und Jünger',
     'oneyear.readings_completed': 'Lesungen abgeschlossen',
     'oneyear.not_started': 'Beginne mit dem Lesen um deinen Fortschritt zu verfolgen',
+
+    // Bible in One Year - Modal & State
+    'bibleInOneYear.modal.title': 'Bestehender Plan gefunden',
+    'bibleInOneYear.modal.attemptNumber': 'Versuch #{number}',
+    'bibleInOneYear.modal.started': 'Gestartet',
+    'bibleInOneYear.modal.paused': 'Pausiert',
+    'bibleInOneYear.modal.progress': 'Fortschritt',
+    'bibleInOneYear.modal.daysActive': 'Aktive Tage',
+    'bibleInOneYear.modal.question': 'Möchtest du fortfahren?',
+    'bibleInOneYear.modal.resume': 'Weitermachen',
+    'bibleInOneYear.modal.restart': 'Neu starten',
+    'bibleInOneYear.planName': 'Bibel in einem Jahr',
+
     'thematic.noah': 'Noah und die Sintflut',
     'thematic.moses': 'Moses am Roten Meer',
     'thematic.ruth': 'Ruth und Noomi',
@@ -469,6 +482,19 @@ export const translations = {
     'oneyear.apostles_writings': 'The Writings of the Other Apostles and Disciples',
     'oneyear.readings_completed': 'Readings Completed',
     'oneyear.not_started': 'Start reading to track your progress',
+
+    // Bible in One Year - Modal & State
+    'bibleInOneYear.modal.title': 'Existing Plan Found',
+    'bibleInOneYear.modal.attemptNumber': 'Attempt #{number}',
+    'bibleInOneYear.modal.started': 'Started',
+    'bibleInOneYear.modal.paused': 'Paused',
+    'bibleInOneYear.modal.progress': 'Progress',
+    'bibleInOneYear.modal.daysActive': 'Active Days',
+    'bibleInOneYear.modal.question': 'Would you like to continue?',
+    'bibleInOneYear.modal.resume': 'Resume',
+    'bibleInOneYear.modal.restart': 'Restart',
+    'bibleInOneYear.planName': 'Bible in One Year',
+
     'thematic.noah': 'Noah and the Flood',
     'thematic.moses': 'Moses at the Red Sea',
     'thematic.ruth': 'Ruth and Naomi',
@@ -703,6 +729,19 @@ export const translations = {
     'oneyear.apostles_writings': 'Los Escritos de los Demás Apóstoles y Discípulos',
     'oneyear.readings_completed': 'Lecturas Completadas',
     'oneyear.not_started': 'Comienza a leer para seguir tu progreso',
+
+    // Bible in One Year - Modal & State
+    'bibleInOneYear.modal.title': 'Plan Existente Encontrado',
+    'bibleInOneYear.modal.attemptNumber': 'Intento #{number}',
+    'bibleInOneYear.modal.started': 'Iniciado',
+    'bibleInOneYear.modal.paused': 'Pausado',
+    'bibleInOneYear.modal.progress': 'Progreso',
+    'bibleInOneYear.modal.daysActive': 'Días Activos',
+    'bibleInOneYear.modal.question': '¿Deseas continuar?',
+    'bibleInOneYear.modal.resume': 'Continuar',
+    'bibleInOneYear.modal.restart': 'Reiniciar',
+    'bibleInOneYear.planName': 'Biblia en Un Año',
+
     'thematic.noah': 'Noé y el Diluvio',
     'thematic.moses': 'Moisés en el mar Rojo',
     'thematic.ruth': 'Rut y Noemí',
@@ -937,6 +976,19 @@ export const translations = {
     'oneyear.apostles_writings': 'Gli Scritti degli Altri Apostoli e Discepoli',
     'oneyear.readings_completed': 'Letture Completate',
     'oneyear.not_started': 'Inizia a leggere per monitorare i tuoi progressi',
+
+    // Bible in One Year - Modal & State
+    'bibleInOneYear.modal.title': 'Piano Esistente Trovato',
+    'bibleInOneYear.modal.attemptNumber': 'Tentativo #{number}',
+    'bibleInOneYear.modal.started': 'Iniziato',
+    'bibleInOneYear.modal.paused': 'In Pausa',
+    'bibleInOneYear.modal.progress': 'Progresso',
+    'bibleInOneYear.modal.daysActive': 'Giorni Attivi',
+    'bibleInOneYear.modal.question': 'Vuoi continuare?',
+    'bibleInOneYear.modal.resume': 'Riprendi',
+    'bibleInOneYear.modal.restart': 'Ricomincia',
+    'bibleInOneYear.planName': 'Bibbia in Un Anno',
+
     'thematic.noah': 'Noè e il diluvio',
     'thematic.moses': 'Mosè al Mar Rosso',
     'thematic.ruth': 'Rut e Naomi',
@@ -1155,6 +1207,18 @@ export const translations = {
     'oneyear.apostles_writings': 'Les Écrits des Autres Apôtres et Disciples',
     'oneyear.readings_completed': 'Lectures Complétées',
     'oneyear.not_started': 'Commencez à lire pour suivre vos progrès',
+
+    // Bible in One Year - Modal & State
+    'bibleInOneYear.modal.title': 'Plan Existant Trouvé',
+    'bibleInOneYear.modal.attemptNumber': 'Tentative #{number}',
+    'bibleInOneYear.modal.started': 'Commencé',
+    'bibleInOneYear.modal.paused': 'En Pause',
+    'bibleInOneYear.modal.progress': 'Progrès',
+    'bibleInOneYear.modal.daysActive': 'Jours Actifs',
+    'bibleInOneYear.modal.question': 'Voulez-vous continuer?',
+    'bibleInOneYear.modal.resume': 'Reprendre',
+    'bibleInOneYear.modal.restart': 'Redémarrer',
+    'bibleInOneYear.planName': 'Bible en Un An',
 
     'thematic.noah': 'Noé et le Déluge',
     'thematic.moses': 'Moïse et la traversée de la mer Rouge',

@@ -983,22 +983,44 @@ export default function PersonalReadingPage() {
 
         {selectedPlan === 'thematic' && (
           <div className="space-y-6">
-            {/* Thematic Plan Progress */}
+            {/* Dual Progress Bars: Overall Bible + Thematic Plan */}
             {(() => {
-              const progress = getThematicProgress()
+              const thematicProgress = getThematicProgress()
+              const totalVerses = getTotalVerses()
+              const versesRead = personalData ? calculateVersesRead(personalData.chaptersRead || []) : 0
+              const overallPercentage = totalVerses > 0 ? Math.round((versesRead / totalVerses) * 100) : 0
+
               return (
-                <div className="bg-gradient-to-r from-purple-50 dark:from-purple-900 to-pink-50 dark:to-pink-900 rounded-lg p-4 border border-purple-100 dark:border-purple-800">
-                  <div className="flex justify-between text-sm text-gray-700 dark:text-gray-300 mb-2">
-                    <span className="font-medium">{t('reading.plan_thematic')}</span>
-                    <span className="font-semibold">{progress.completed}/{progress.total} {t('reading.topics_completed')}</span>
+                <div className="space-y-4">
+                  {/* Overall Bible Progress */}
+                  <div className="bg-gradient-to-r from-blue-50 dark:from-blue-900 to-indigo-50 dark:to-indigo-900 rounded-lg p-4 border border-blue-100 dark:border-blue-800">
+                    <div className="flex justify-between text-sm text-gray-700 dark:text-gray-300 mb-2">
+                      <span className="font-medium">{t('reading.overall_progress')}</span>
+                      <span className="font-semibold">{versesRead.toLocaleString()}/{totalVerses.toLocaleString()} {t('reading.verses')}</span>
+                    </div>
+                    <div className="w-full bg-blue-200 dark:bg-blue-700 rounded-full h-2 overflow-hidden">
+                      <div
+                        className="bg-blue-600 dark:bg-blue-500 h-full transition-all"
+                        style={{ width: `${overallPercentage}%` }}
+                      />
+                    </div>
+                    <div className="text-xs text-gray-600 dark:text-gray-400 dark:text-gray-300 mt-2">{overallPercentage}% {t('reading.complete')}</div>
                   </div>
-                  <div className="w-full bg-purple-200 dark:bg-purple-700 rounded-full h-2 overflow-hidden">
-                    <div
-                      className="bg-purple-600 dark:bg-purple-500 h-full transition-all"
-                      style={{ width: `${progress.percentage}%` }}
-                    />
+
+                  {/* Thematic Plan Progress */}
+                  <div className="bg-gradient-to-r from-purple-50 dark:from-purple-900 to-pink-50 dark:to-pink-900 rounded-lg p-4 border border-purple-100 dark:border-purple-800">
+                    <div className="flex justify-between text-sm text-gray-700 dark:text-gray-300 mb-2">
+                      <span className="font-medium">{t('reading.plan_thematic')}</span>
+                      <span className="font-semibold">{thematicProgress.completed}/{thematicProgress.total} {t('reading.topics_completed')}</span>
+                    </div>
+                    <div className="w-full bg-purple-200 dark:bg-purple-700 rounded-full h-2 overflow-hidden">
+                      <div
+                        className="bg-purple-600 dark:bg-purple-500 h-full transition-all"
+                        style={{ width: `${thematicProgress.percentage}%` }}
+                      />
+                    </div>
+                    <div className="text-xs text-gray-600 dark:text-gray-400 dark:text-gray-300 mt-2">{thematicProgress.percentage}% {t('reading.complete')}</div>
                   </div>
-                  <div className="text-xs text-gray-600 dark:text-gray-400 dark:text-gray-300 mt-2">{progress.percentage}% {t('reading.complete')}</div>
                 </div>
               )
             })()}

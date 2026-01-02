@@ -69,11 +69,34 @@ export const getRandomMessage = async (notificationType, language) => {
   const templates = await getMessageTemplates(notificationType, language)
 
   if (!templates || templates.length === 0) {
-    return `[${notificationType}]`
+    return null // Return null to use fallback in notification service
   }
 
   const randomIndex = Math.floor(Math.random() * templates.length)
   return templates[randomIndex]
+}
+
+/**
+ * Get a random message with parameter substitution
+ * @param {string} notificationType - Type of notification
+ * @param {string} language - Language code
+ * @param {Object} params - Parameters to substitute (e.g., {days: 5, reading: 'Genesis 1'})
+ * @returns {Promise<string>} Random message template with substituted parameters
+ */
+export const getRandomMessageWithParams = async (notificationType, language, params = {}) => {
+  let message = await getRandomMessage(notificationType, language)
+
+  if (!message) {
+    return null
+  }
+
+  // Replace parameters
+  Object.keys(params).forEach((key) => {
+    const regex = new RegExp(`\\{${key}\\}`, 'g')
+    message = message.replace(regex, params[key])
+  })
+
+  return message
 }
 
 /**

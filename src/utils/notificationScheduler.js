@@ -9,6 +9,8 @@
  * - Integrates with Service Worker for background notifications
  */
 
+import { t } from '../config/i18n'
+
 /**
  * Get enabled notification settings
  * @returns {Object} Notification settings from localStorage
@@ -261,8 +263,8 @@ export const checkAndShowNotifications = async () => {
   // Daily Text Reminder
   if (settings.dailyText.enabled && currentTime === settings.dailyText.time) {
     showLocalNotification({
-      title: 'notification.daily_text_title',
-      body: 'notification.daily_text_body',
+      title: t('notification.daily_text_title'),
+      body: t('notification.daily_text_body'),
       tag: 'daily_text',
       data: { type: 'daily_text', deeplink: '' }
     })
@@ -272,8 +274,8 @@ export const checkAndShowNotifications = async () => {
   if (settings.streakPreservation.enabled && currentTime === settings.streakPreservation.time) {
     if (shouldShowStreakReminder()) {
       showLocalNotification({
-        title: 'notification.streak_title',
-        body: 'notification.streak_body',
+        title: t('notification.streak_title'),
+        body: t('notification.streak_body'),
         tag: 'streak_preservation',
         data: { type: 'streak_preservation', deeplink: '' }
       })

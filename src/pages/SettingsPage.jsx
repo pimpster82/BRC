@@ -18,6 +18,7 @@ import { useTheme } from '../context/ThemeContext'
 import bibleBooks from '../../data/bible-books-en.json'
 import { requestNotificationPermission, getNotificationPermission, testNotification } from '../utils/reminderService'
 import { showLocalNotification } from '../utils/notificationScheduler'
+import { restartNotificationService } from '../utils/notificationService'
 
 const SettingsPage = () => {
   const navigate = useNavigate()
@@ -325,45 +326,61 @@ const SettingsPage = () => {
     const newValue = !notificationMasterSwitch
     setNotificationMasterSwitch(newValue)
     localStorage.setItem('settings_notificationMasterSwitch', newValue.toString())
+    // Restart notification service to apply new settings
+    restartNotificationService()
   }
 
   const handleDailyTextToggle = () => {
     const newValue = !dailyTextEnabled
     setDailyTextEnabled(newValue)
     localStorage.setItem('settings_notification_dailyText', newValue.toString())
+    // Restart notification service
+    restartNotificationService()
   }
 
   const handleDailyTextTimeChange = (time) => {
     setDailyTextTime(time)
     localStorage.setItem('settings_notification_dailyTextTime', time)
+    // Restart notification service with new time
+    restartNotificationService()
   }
 
   const handleWeeklyReadingToggle = () => {
     const newValue = !weeklyReadingEnabled
     setWeeklyReadingEnabled(newValue)
     localStorage.setItem('settings_notification_weeklyReading', newValue.toString())
+    // Restart notification service
+    restartNotificationService()
   }
 
   const handleWeeklyReadingTimeChange = (time) => {
     setWeeklyReadingTime(time)
     localStorage.setItem('settings_notification_weeklyReadingTime', time)
+    // Restart notification service with new time
+    restartNotificationService()
   }
 
   const handlePersonalReadingToggle = () => {
     const newValue = !personalReadingEnabled
     setPersonalReadingEnabled(newValue)
     localStorage.setItem('settings_notification_personalReading', newValue.toString())
+    // Restart notification service
+    restartNotificationService()
   }
 
   const handlePersonalReadingTimeChange = (time) => {
     setPersonalReadingTime(time)
     localStorage.setItem('settings_notification_personalReadingTime', time)
+    // Restart notification service with new time
+    restartNotificationService()
   }
 
   const handleStreakToggle = () => {
     const newValue = !streakEnabled
     setStreakEnabled(newValue)
     localStorage.setItem('settings_notification_streakPreservation', newValue.toString())
+    // Restart notification service
+    restartNotificationService()
   }
 
   const handleRequestPermission = async () => {

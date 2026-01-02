@@ -6,14 +6,13 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      strategies: 'injectManifest',
-      injectManifest: {
-        swSrc: 'public/sw.js',
-        swDest: 'dist/sw.js'
-      },
+      strategies: 'generateSW',
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg}']
-      }
+        globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+        cleanupOutdatedCaches: true
+      },
+      // Note: Custom sw.js logic will be handled by service worker listeners
+      // Manifest injection removed - using generateSW strategy instead
     })
   ],
   base: '/', // Vercel deploys to root. For GitHub Pages, change to '/BRC/'

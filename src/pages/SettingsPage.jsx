@@ -17,6 +17,7 @@ import { APP_VERSION, BUILD_INFO, LINKED_PRODUCTION_VERSION } from '../config/ve
 import { useTheme } from '../context/ThemeContext'
 import bibleBooks from '../../data/bible-books-en.json'
 import { requestNotificationPermission, getNotificationPermission, testNotification } from '../utils/reminderService'
+import { showLocalNotification } from '../utils/notificationScheduler'
 
 const SettingsPage = () => {
   const navigate = useNavigate()
@@ -55,15 +56,51 @@ const SettingsPage = () => {
   const [showBibleInOneYearWarning, setShowBibleInOneYearWarning] = useState(false)
   const [pendingPlan, setPendingPlan] = useState(null)
 
-  // Notifications
+  // Notifications - Master Switch
+  const [notificationMasterSwitch, setNotificationMasterSwitch] = useState(
+    localStorage.getItem('settings_notificationMasterSwitch') !== 'false'
+  )
+
+  // Notifications - Daily Text
+  const [dailyTextEnabled, setDailyTextEnabled] = useState(
+    localStorage.getItem('settings_notification_dailyText') !== 'false'
+  )
+  const [dailyTextTime, setDailyTextTime] = useState(
+    localStorage.getItem('settings_notification_dailyTextTime') || '08:00'
+  )
+
+  // Notifications - Weekly Reading
+  const [weeklyReadingEnabled, setWeeklyReadingEnabled] = useState(
+    localStorage.getItem('settings_notification_weeklyReading') !== 'false'
+  )
+  const [weeklyReadingTime, setWeeklyReadingTime] = useState(
+    localStorage.getItem('settings_notification_weeklyReadingTime') || '10:00'
+  )
+
+  // Notifications - Personal Reading
+  const [personalReadingEnabled, setPersonalReadingEnabled] = useState(
+    localStorage.getItem('settings_notification_personalReading') !== 'false'
+  )
+  const [personalReadingTime, setPersonalReadingTime] = useState(
+    localStorage.getItem('settings_notification_personalReadingTime') || '12:00'
+  )
+
+  // Notifications - Streak Preservation (fixed time: 18:00)
+  const [streakEnabled, setStreakEnabled] = useState(
+    localStorage.getItem('settings_notification_streakPreservation') !== 'false'
+  )
+
+  // Notifications - Permission Status
+  const [notificationPermission, setNotificationPermission] = useState(
+    getNotificationPermission()
+  )
+
+  // Legacy notification states (kept for backward compatibility)
   const [dailyReminder, setDailyReminder] = useState(
     localStorage.getItem('settings_dailyReminder') === 'true'
   )
   const [reminderTime, setReminderTime] = useState(
     localStorage.getItem('settings_reminderTime') || '08:00'
-  )
-  const [notificationPermission, setNotificationPermission] = useState(
-    getNotificationPermission()
   )
   const [permissionLoading, setPermissionLoading] = useState(false)
 
@@ -280,6 +317,79 @@ const SettingsPage = () => {
     if (!success) {
       alert('⚠️ Benachrichtigung konnte nicht gesendet werden. Bitte aktivieren Sie Benachrichtigungen in den Browser-Einstellungen.')
     }
+  }
+
+  // NEW NOTIFICATION HANDLERS
+
+  const handleMasterSwitchToggle = () => {
+    const newValue = !notificationMasterSwitch
+    setNotificationMasterSwitch(newValue)
+    localStorage.setItem('settings_notificationMasterSwitch', newValue.toString())
+  }
+
+  const handleDailyTextToggle = () => {
+    const newValue = !dailyTextEnabled
+    setDailyTextEnabled(newValue)
+    localStorage.setItem('settings_notification_dailyText', newValue.toString())
+  }
+
+  const handleDailyTextTimeChange = (time) => {
+    setDailyTextTime(time)
+    localStorage.setItem('settings_notification_dailyTextTime', time)
+  }
+
+  const handleWeeklyReadingToggle = () => {
+    const newValue = !weeklyReadingEnabled
+    setWeeklyReadingEnabled(newValue)
+    localStorage.setItem('settings_notification_weeklyReading', newValue.toString())
+  }
+
+  const handleWeeklyReadingTimeChange = (time) => {
+    setWeeklyReadingTime(time)
+    localStorage.setItem('settings_notification_weeklyReadingTime', time)
+  }
+
+  const handlePersonalReadingToggle = () => {
+    const newValue = !personalReadingEnabled
+    setPersonalReadingEnabled(newValue)
+    localStorage.setItem('settings_notification_personalReading', newValue.toString())
+  }
+
+  const handlePersonalReadingTimeChange = (time) => {
+    setPersonalReadingTime(time)
+    localStorage.setItem('settings_notification_personalReadingTime', time)
+  }
+
+  const handleStreakToggle = () => {
+    const newValue = !streakEnabled
+    setStreakEnabled(newValue)
+    localStorage.setItem('settings_notification_streakPreservation', newValue.toString())
+  }
+
+  const handleRequestPermission = async () => {
+    setPermissionLoading(true)
+    try {
+      const permission = await requestNotificationPermission()
+      setNotificationPermission(permission)
+    } catch (error) {
+      console.error('Error requesting notification permission:', error)
+    } finally {
+      setPermissionLoading(false)
+    }
+  }
+
+  const handleNewTestNotification = () => {
+    if (notificationPermission !== 'granted') {
+      alert(t('settings.notification_permission_required'))
+      return
+    }
+
+    showLocalNotification({
+      title: t('notification.daily_text_title'),
+      body: t('notification.daily_text_body'),
+      tag: 'test',
+      data: { type: 'test' }
+    })
   }
 
   const handleFetchSchedule = async () => {
@@ -1061,68 +1171,229 @@ const SettingsPage = () => {
           )}
         </div>
 
-        {/* Notifications */}
+        {/* Notifications - NEW NOTIFICATION SETTINGS UI */}
         <div className="card bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-700 mb-3">
           <button
             onClick={() => toggleSection('notifications')}
-            className="w-full flex items-center justify-between"
+            className="w-full flex items-center justify-between p-4"
           >
             <div className="flex items-center gap-2">
               <Bell className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-              <h2 className="font-semibold text-gray-800 dark:text-gray-300">{t('settings.notifications')}</h2>
+              <h2 className="font-semibold text-gray-800 dark:text-gray-300">
+                {t('settings.notifications_title')}
+              </h2>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-300">
-                {dailyReminder ? `An (${reminderTime})` : 'Aus'}
+              <span className="text-sm text-gray-600 dark:text-gray-400">
+                {notificationMasterSwitch ? t('common.active') : 'Stumm'}
               </span>
               {expandedSection === 'notifications' ? (
-                <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
+                <ChevronDown className="w-5 h-5 text-gray-400" />
               ) : (
-                <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
+                <ChevronRight className="w-5 h-5 text-gray-400" />
               )}
             </div>
           </button>
 
           {expandedSection === 'notifications' && (
-            <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-              {/* Daily Reminder Toggle */}
-              <div className="flex items-center justify-between mb-3">
-                <div>
-                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('settings.daily_reminder')}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-300">{t('settings.for_daily_text')}</p>
-                </div>
-                <button
-                  onClick={handleDailyReminderToggle}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    dailyReminder ? 'bg-blue-600 dark:bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
-                  }`}
-                >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                      dailyReminder ? 'translate-x-6' : 'translate-x-1'
-                    }`}
-                  />
-                </button>
-              </div>
+            <div className="px-4 pb-4 pt-2 space-y-4 border-t border-gray-200 dark:border-gray-700">
 
-              {/* Reminder Time */}
-              {dailyReminder && (
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {t('settings.reminder_time')}
-                  </label>
-                  <input
-                    type="time"
-                    value={reminderTime}
-                    onChange={(e) => handleReminderTimeChange(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
+              {/* Permission Status Indicator */}
+              {notificationPermission !== 'granted' && (
+                <div className={`p-3 rounded-lg border flex items-start gap-2 ${
+                  notificationPermission === 'denied'
+                    ? 'bg-red-50 dark:bg-red-900/20 border-red-300 dark:border-red-700'
+                    : 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-300 dark:border-yellow-700'
+                }`}>
+                  <AlertCircle className="w-4 h-4 mt-0.5 text-yellow-600 dark:text-yellow-400 flex-shrink-0" />
+                  <div className="flex-1">
+                    <p className="text-xs text-yellow-700 dark:text-yellow-300">
+                      {t('settings.notification_permission_required')}
+                    </p>
+                    {notificationPermission !== 'denied' && (
+                      <button
+                        onClick={handleRequestPermission}
+                        disabled={permissionLoading}
+                        className="mt-2 text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                      >
+                        {t('settings.notification_enable_permission')}
+                      </button>
+                    )}
+                  </div>
                 </div>
               )}
 
-              <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-300">
-                {t('settings.reminders_coming')}
-              </p>
+              {/* Master Mute Switch */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium text-gray-800 dark:text-gray-300">
+                    {t('settings.notifications_master')}
+                  </p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {t('settings.notifications_master_mute')}
+                  </p>
+                </div>
+                <button
+                  onClick={handleMasterSwitchToggle}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    notificationMasterSwitch
+                      ? 'bg-blue-600 dark:bg-blue-500'
+                      : 'bg-gray-300 dark:bg-gray-600'
+                  }`}
+                >
+                  <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    notificationMasterSwitch ? 'translate-x-6' : 'translate-x-1'
+                  }`} />
+                </button>
+              </div>
+
+              {/* Divider */}
+              <div className="border-t border-gray-200 dark:border-gray-700" />
+
+              {/* Daily Text Reminder */}
+              <div className={notificationMasterSwitch ? '' : 'opacity-50 pointer-events-none'}>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="font-medium text-gray-800 dark:text-gray-300">
+                    {t('settings.notification_daily_text')}
+                  </p>
+                  <button
+                    onClick={handleDailyTextToggle}
+                    disabled={!notificationMasterSwitch}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                      dailyTextEnabled
+                        ? 'bg-blue-600 dark:bg-blue-500'
+                        : 'bg-gray-300 dark:bg-gray-600'
+                    }`}
+                  >
+                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      dailyTextEnabled ? 'translate-x-6' : 'translate-x-1'
+                    }`} />
+                  </button>
+                </div>
+                {dailyTextEnabled && (
+                  <div className="ml-4">
+                    <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">
+                      {t('settings.notification_time')}
+                    </label>
+                    <input
+                      type="time"
+                      value={dailyTextTime}
+                      onChange={(e) => handleDailyTextTimeChange(e.target.value)}
+                      disabled={!notificationMasterSwitch}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Weekly Reading Reminder */}
+              <div className={notificationMasterSwitch ? '' : 'opacity-50 pointer-events-none'}>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="font-medium text-gray-800 dark:text-gray-300">
+                    {t('settings.notification_weekly_reading')}
+                  </p>
+                  <button
+                    onClick={handleWeeklyReadingToggle}
+                    disabled={!notificationMasterSwitch}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                      weeklyReadingEnabled
+                        ? 'bg-blue-600 dark:bg-blue-500'
+                        : 'bg-gray-300 dark:bg-gray-600'
+                    }`}
+                  >
+                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      weeklyReadingEnabled ? 'translate-x-6' : 'translate-x-1'
+                    }`} />
+                  </button>
+                </div>
+                {weeklyReadingEnabled && (
+                  <div className="ml-4">
+                    <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">
+                      {t('settings.notification_time')}
+                    </label>
+                    <input
+                      type="time"
+                      value={weeklyReadingTime}
+                      onChange={(e) => handleWeeklyReadingTimeChange(e.target.value)}
+                      disabled={!notificationMasterSwitch}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Personal Reading Reminder */}
+              <div className={notificationMasterSwitch ? '' : 'opacity-50 pointer-events-none'}>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="font-medium text-gray-800 dark:text-gray-300">
+                    {t('settings.notification_personal_reading')}
+                  </p>
+                  <button
+                    onClick={handlePersonalReadingToggle}
+                    disabled={!notificationMasterSwitch}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                      personalReadingEnabled
+                        ? 'bg-blue-600 dark:bg-blue-500'
+                        : 'bg-gray-300 dark:bg-gray-600'
+                    }`}
+                  >
+                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      personalReadingEnabled ? 'translate-x-6' : 'translate-x-1'
+                    }`} />
+                  </button>
+                </div>
+                {personalReadingEnabled && (
+                  <div className="ml-4">
+                    <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">
+                      {t('settings.notification_time')}
+                    </label>
+                    <input
+                      type="time"
+                      value={personalReadingTime}
+                      onChange={(e) => handlePersonalReadingTimeChange(e.target.value)}
+                      disabled={!notificationMasterSwitch}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Streak Preservation Reminder */}
+              <div className={notificationMasterSwitch ? '' : 'opacity-50 pointer-events-none'}>
+                <div className="flex items-center justify-between mb-2">
+                  <div>
+                    <p className="font-medium text-gray-800 dark:text-gray-300">
+                      {t('settings.notification_streak')}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      18:00 (Fixed)
+                    </p>
+                  </div>
+                  <button
+                    onClick={handleStreakToggle}
+                    disabled={!notificationMasterSwitch}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                      streakEnabled
+                        ? 'bg-blue-600 dark:bg-blue-500'
+                        : 'bg-gray-300 dark:bg-gray-600'
+                    }`}
+                  >
+                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      streakEnabled ? 'translate-x-6' : 'translate-x-1'
+                    }`} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Test Notification Button */}
+              {notificationPermission === 'granted' && (
+                <button
+                  onClick={handleNewTestNotification}
+                  className="w-full mt-4 px-4 py-2 bg-gray-200 dark:bg-slate-700 text-gray-800 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors"
+                >
+                  {t('settings.notification_test')}
+                </button>
+              )}
             </div>
           )}
         </div>

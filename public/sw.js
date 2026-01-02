@@ -6,6 +6,9 @@
 const CACHE_NAME = 'brc-v1'
 const NOTIFICATION_STORE = 'brc_notifications'
 
+// Workbox manifest injection point (required by vite-plugin-pwa)
+self.__WB_MANIFEST;
+
 // Install event - precache essential files
 self.addEventListener('install', (event) => {
   console.log('[SW] Installing...')

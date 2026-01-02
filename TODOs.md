@@ -20,63 +20,29 @@ master (PRODUCTION) ❌ DO NOT WORK HERE
   ├── Current Version: **1.1.0** (Admin Access System released)
   └── Tagged Releases: v1.0.0, v1.0.1, v1.1.0, etc.
 
-development (CURRENT WORK) ✅ WORK HERE
-  ├── Version: dev0.2.0, dev0.2.1, dev0.2.2, etc.
-  ├── Status: EXPERIMENTAL & UNDER DEVELOPMENT
-  ├── Testers Use: NO (internal testing only)
-  ├── Deployment: NOT pushed to Vercel production
-  └── LINKED_PRODUCTION_VERSION: Tracks which prod is live
 ```
 
 ### Safety Rules
 
-1. **ALWAYS work on `development` branch:**
+1. **Currently working on `master` branch (PRODUCTION):**
+   - All new features being committed directly to master
+   - Version: 1.1.0+ (currently live at https://brc-liard.vercel.app)
+   - All changes are production-ready
    ```bash
-   git checkout development  # ✅ CORRECT
-   git checkout master       # ❌ NEVER do this to work
+   git checkout master      # ✅ Current working branch
+   git push origin master   # ✅ Direct pushes to production
    ```
 
-2. **NEVER push directly to master:**
+2. **Version Management:**
+   - Bump version in `package.json` and `src/config/version.js` when releasing
+   - Format: `1.0.0`, `1.0.1`, `1.1.0`, `2.0.0`, etc.
+   - Commit: `git add . && git commit -m "Release v1.1.1: feature description"`
+   - Tag: `git tag v1.1.1 && git push origin master --tags`
+
+3. **Verification:**
    ```bash
-   git push origin development  # ✅ CORRECT
-   git push origin master       # ❌ ONLY for releases
-   ```
-
-3. **ONLY merge to master when:**
-   - Feature is complete AND tested
-   - Code reviewed
-   - Ready for production release
-   - Version number bumped (1.0.1, 1.1.0, etc.)
-
-4. **Release Workflow (when feature ready):**
-   ```bash
-   # 1. Finalize on development
-   git checkout development
-   git add . && git commit -m "..."
-   git push origin development
-
-   # 2. Switch to master for release
-   git checkout master
-
-   # 3. Bump version in package.json & src/config/version.js
-   # Edit: version = "1.0.1" or "1.1.0"
-
-   # 4. Commit & tag release
-   git add . && git commit -m "Release v1.0.1: ..."
-   git tag v1.0.1
-   git push origin master && git push origin v1.0.1
-
-   # 5. Back to development with updated baseline
-   git checkout development
-   # Update LINKED_PRODUCTION_VERSION = "1.0.1"
-   git add src/config/version.js
-   git commit -m "Update linked prod version to 1.0.1"
-   # Increment dev version: dev0.2.1 → dev0.2.2
-   ```
-
-5. **Check Current Branch:**
-   ```bash
-   git branch -v  # Shows: * development (current) or * master
+   git branch -v  # Shows: * master (current)
+   git log --oneline -5  # Show recent commits
    ```
 
 ### Rollback Safety

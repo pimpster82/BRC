@@ -1480,6 +1480,7 @@ const SettingsPage = () => {
       {/* Bible in One Year Warning Modal - Show when user tries to switch away from active plan */}
       {showBibleInOneYearWarning && (
         <BibleInOneYearWarningModal
+          planName={t('reading.plan_oneyear')}
           onConfirm={handleConfirmPause}
           onCancel={handleCancelPause}
         />

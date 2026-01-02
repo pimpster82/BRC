@@ -9,17 +9,17 @@
     <!-- PWA Manifest (cache busted with version) -->
     <link rel="manifest" href="/manifest.json?v=1.1.1" />
 
-    <!-- Favicon & App Icons (Browser) -->
-    <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-light-192.png" />
-    <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-light-512.png" />
+    <!-- Favicon & App Icons (Browser) - Silver Design -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-silver-light-192.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-silver-light-512.png" />
     <link rel="icon" type="image/svg+xml" href="/icons/open-bible-icon.svg" />
 
     <!-- Dark mode favicon support (prefers-color-scheme) -->
-    <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-dark-192.png" media="(prefers-color-scheme: dark)" />
-    <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-dark-512.png" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-silver-dark-192.png" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-silver-dark-512.png" media="(prefers-color-scheme: dark)" />
 
-    <!-- iOS App Icons (iOS 25+ - Light Mode primary) -->
-    <link rel="apple-touch-icon" href="/icons/icon-light-1024.png" />
+    <!-- iOS App Icons (iOS 25+ - Silver Design) -->
+    <link rel="apple-touch-icon" href="/icons/icon-silver-light-1024.png" />
     <link rel="apple-touch-icon" sizes="120x120" href="/icons/icon-ios-120x120.png" />
     <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-ios-152x152.png" />
     <link rel="apple-touch-icon" sizes="167x167" href="/icons/icon-ios-167x167.png" />
@@ -60,14 +60,14 @@
           // Replace all icon references with dark versions for Dev environment
           const iconLinks = document.querySelectorAll('link[rel*="icon"]')
           iconLinks.forEach(link => {
-            if (link.href.includes('icon-light')) {
-              link.href = link.href.replace('icon-light', 'icon-dark')
+            if (link.href.includes('icon-silver-light')) {
+              link.href = link.href.replace('icon-silver-light', 'icon-silver-dark')
             }
-            if (link.href.includes('apple-touch-icon') && link.href.includes('icon-light')) {
-              link.href = link.href.replace('icon-light', 'icon-dark')
+            if (link.href.includes('apple-touch-icon') && link.href.includes('icon-silver-light')) {
+              link.href = link.href.replace('icon-silver-light', 'icon-silver-dark')
             }
           })
-          console.log('🔧 [DEV MODE] Using dark icons for visual distinction')
+          console.log('🔧 [DEV MODE] Using dark silver icons for visual distinction')
         }
       })()
     </script>

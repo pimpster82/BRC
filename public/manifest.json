@@ -12,58 +12,58 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/icons/icon-light-1024.png",
+      "src": "/icons/icon-silver-light-1024.png",
       "sizes": "1024x1024",
       "type": "image/png",
       "purpose": "any maskable",
       "form_factor": "any"
     },
     {
-      "src": "/icons/icon-dark-1024.png",
+      "src": "/icons/icon-silver-dark-1024.png",
       "sizes": "1024x1024",
       "type": "image/png",
       "purpose": "any maskable",
       "form_factor": "any"
     },
     {
-      "src": "/icons/icon-tinted-1024.png",
+      "src": "/icons/icon-silver-tinted-1024.png",
       "sizes": "1024x1024",
       "type": "image/png",
       "purpose": "monochrome",
       "form_factor": "any"
     },
     {
-      "src": "/icons/icon-light-512.png",
+      "src": "/icons/icon-silver-light-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/icons/icon-dark-512.png",
+      "src": "/icons/icon-silver-dark-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/icons/icon-tinted-512.png",
+      "src": "/icons/icon-silver-tinted-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "monochrome"
     },
     {
-      "src": "/icons/icon-light-192.png",
+      "src": "/icons/icon-silver-light-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/icons/icon-dark-192.png",
+      "src": "/icons/icon-silver-dark-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/icons/icon-tinted-192.png",
+      "src": "/icons/icon-silver-tinted-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "monochrome"

@@ -61,18 +61,22 @@ export default function LoadingSpinner({
       <div className="text-center px-4">
         {/* Pulsing Icon Container */}
         <div className={`flex justify-center ${config.mb}`}>
-          {/* Outer pulse ring */}
-          <div
-            className={`absolute ${config.ring} bg-indigo-400 rounded-full opacity-20 animate-pulse dark:bg-blue-400`}
-          ></div>
+          {/* Positioned Container for absolute ring */}
+          <div className="relative">
+            {/* Outer pulse ring */}
+            <div
+              className={`absolute ${config.ring} bg-indigo-400 rounded-full opacity-20 animate-pulse dark:bg-blue-400`}
+              style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
+            ></div>
 
-          {/* Icon */}
-          <div className={`relative ${config.icon} flex items-center justify-center animate-pulse`}>
-            <img
-              src="/icons/book-loading.png"
-              alt="Loading..."
-              className={`${config.iconImg} rounded-full object-cover drop-shadow-lg`}
-            />
+            {/* Icon - Animated GIF */}
+            <div className={`relative ${config.icon} flex items-center justify-center animate-pulse`}>
+              <img
+                src="/icons/book-loading.gif"
+                alt="Loading..."
+                className={`${config.iconImg} object-contain drop-shadow-lg`}
+              />
+            </div>
           </div>
         </div>
 
@@ -104,12 +108,12 @@ export default function LoadingSpinner({
       <style>{`
         @keyframes pulse-smooth {
           0%, 100% {
-            opacity: 1;
             transform: scale(1);
+            opacity: 0.9;
           }
           50% {
-            opacity: 0.8;
-            transform: scale(1.05);
+            transform: scale(1.03);
+            opacity: 1;
           }
         }
 

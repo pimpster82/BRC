@@ -69,7 +69,7 @@ export default function LoadingSpinner({
           {/* Icon */}
           <div className={`relative ${config.icon} flex items-center justify-center animate-pulse`}>
             <img
-              src="/icons/book-loading.png"
+              src="/icons/book-loading.svg"
               alt="Loading... file not found 404"
               className={`${config.iconImg} rounded-full object-cover drop-shadow-lg`}
             />

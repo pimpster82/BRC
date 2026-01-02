@@ -44,20 +44,32 @@ const isDailyTextCompletedToday = () => {
 
 /**
  * Check if Personal Reading was done today
- * @returns {boolean} True if any chapter was read today
+ * Checks BOTH standard plans (Free, Bible Overview, Thematic) AND One Year Plan
+ * @returns {boolean} True if any chapter was read today in any plan
  */
 const isPersonalReadingDoneToday = () => {
   try {
-    const personalData = JSON.parse(localStorage.getItem('bibleCompanion_personalReading') || '{}')
-    const chaptersRead = personalData.chaptersRead || []
     const today = new Date().toISOString().split('T')[0]
 
-    // Check if any chapter was marked today
-    return chaptersRead.some((chapter) => {
+    // Check standard plans (Free, Bible Overview, Thematic) - they have timestamps
+    const personalData = JSON.parse(localStorage.getItem('bibleCompanion_personalReading') || '{}')
+    const chaptersRead = personalData.chaptersRead || []
+
+    const readTodayInStandardPlans = chaptersRead.some((chapter) => {
       if (!chapter.timestamp) return false
       const chapterDate = new Date(chapter.timestamp).toISOString().split('T')[0]
       return chapterDate === today
     })
+
+    if (readTodayInStandardPlans) return true
+
+    // Check One Year Plan - has lastReadingDate field
+    const oneYearData = JSON.parse(localStorage.getItem('bibleCompanion_bibleInOneYear') || 'null')
+    if (oneYearData && oneYearData.active && oneYearData.lastReadingDate === today) {
+      return true
+    }
+
+    return false
   } catch (error) {
     console.error('[NotificationService] Error checking personal reading completion:', error)
     return false

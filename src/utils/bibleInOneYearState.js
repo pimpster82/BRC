@@ -301,11 +301,19 @@ export const calculateStats = (state) => {
     }
   }
 
+  // Calculate actual days active (startDate to pauseDate or today)
+  let actualDaysActive = 0
+  if (state.startDate) {
+    const start = new Date(state.startDate)
+    const end = state.pauseDate ? new Date(state.pauseDate) : new Date()
+    actualDaysActive = Math.floor((end - start) / (1000 * 60 * 60 * 24)) + 1 // +1 to include start day
+  }
+
   return {
     progress,
     readingsCompleted: state.completedReadings.length,
     totalReadings: 365,
-    daysActive: state.daysActive,
+    daysActive: actualDaysActive,
     startDate: state.startDate,
     pauseDate: state.pauseDate,
     isActive: state.active,

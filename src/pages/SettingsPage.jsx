@@ -5,7 +5,9 @@ import { useLoading } from '../context/LoadingContext'
 import { useAdmin } from '../context/AdminContext'
 import { useAuth } from '../context/AuthContext'
 import ReadingPlanCreator from '../components/ReadingPlanCreator'
+import BibleInOneYearWarningModal from '../components/BibleInOneYearWarningModal'
 import { uploadReadingPlan, getAvailableReadingPlans, installReadingPlan, uninstallReadingPlan, getInstalledPlans } from '../utils/firebaseReadingPlans'
+import { getBibleInOneYearState, pausePlan } from '../utils/bibleInOneYearState'
 import { SUPPORTED_LANGUAGES, getCurrentLanguage, setCurrentLanguage } from '../config/languages'
 import { fetchScheduleFromWOL, fetchYeartextFromWOL } from '../utils/scheduleUpdater'
 import { saveScheduleToFirebase, saveYeartextToFirebase } from '../utils/firebaseSchedules'
@@ -48,6 +50,10 @@ const SettingsPage = () => {
   const [readingPlan, setReadingPlan] = useState(
     localStorage.getItem('settings_readingPlan') || 'free'
   )
+
+  // Bible in One Year Warning Modal - Show when user tries to switch away from active One Year plan
+  const [showBibleInOneYearWarning, setShowBibleInOneYearWarning] = useState(false)
+  const [pendingPlan, setPendingPlan] = useState(null)
 
   // Notifications
   const [dailyReminder, setDailyReminder] = useState(
@@ -135,10 +141,51 @@ const SettingsPage = () => {
     localStorage.setItem('settings_meetingDay', day)
   }
 
-  const handleReadingPlanChange = (plan) => {
-    setReadingPlan(plan)
-    localStorage.setItem('settings_readingPlan', plan)
+  const handleReadingPlanChange = (newPlan) => {
+    const currentPlan = readingPlan
+
+    // If switching AWAY from active One Year plan, show warning
+    if (currentPlan === 'oneyear' && newPlan !== 'oneyear') {
+      const bibleInOneYearState = getBibleInOneYearState()
+
+      // Only warn if plan is active
+      if (bibleInOneYearState && bibleInOneYearState.active) {
+        setPendingPlan(newPlan)
+        setShowBibleInOneYearWarning(true)
+        setExpandedReadingPlanDropdown(false)
+        return // Block the switch
+      }
+    }
+
+    // Normal plan switch
+    setReadingPlan(newPlan)
+    localStorage.setItem('settings_readingPlan', newPlan)
     setExpandedReadingPlanDropdown(false)
+  }
+
+  // Confirm pausing One Year plan and switch to new plan
+  const handleConfirmPause = () => {
+    if (!pendingPlan) return
+
+    // Pause the One Year plan
+    const state = getBibleInOneYearState()
+    if (state) {
+      pausePlan(state)
+    }
+
+    // Switch to the new plan
+    setReadingPlan(pendingPlan)
+    localStorage.setItem('settings_readingPlan', pendingPlan)
+
+    // Close modal
+    setShowBibleInOneYearWarning(false)
+    setPendingPlan(null)
+  }
+
+  // Cancel pausing - stay on One Year plan
+  const handleCancelPause = () => {
+    setShowBibleInOneYearWarning(false)
+    setPendingPlan(null)
   }
 
   // Show plan info modal for installation
@@ -1428,6 +1475,14 @@ const SettingsPage = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Bible in One Year Warning Modal - Show when user tries to switch away from active plan */}
+      {showBibleInOneYearWarning && (
+        <BibleInOneYearWarningModal
+          onConfirm={handleConfirmPause}
+          onCancel={handleCancelPause}
+        />
       )}
     </div>
   )

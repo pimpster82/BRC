@@ -243,7 +243,7 @@ export const translations = {
 
     // Bible in One Year - Modal & State
     'bibleInOneYear.modal.title': 'Bestehender Plan gefunden',
-    'bibleInOneYear.modal.attemptNumber': 'Versuch #{number}',
+    'bibleInOneYear.modal.attemptNumber': 'Versuch {number}',
     'bibleInOneYear.modal.started': 'Gestartet',
     'bibleInOneYear.modal.paused': 'Pausiert',
     'bibleInOneYear.modal.progress': 'Fortschritt',
@@ -499,7 +499,7 @@ export const translations = {
 
     // Bible in One Year - Modal & State
     'bibleInOneYear.modal.title': 'Existing Plan Found',
-    'bibleInOneYear.modal.attemptNumber': 'Attempt #{number}',
+    'bibleInOneYear.modal.attemptNumber': 'Attempt {number}',
     'bibleInOneYear.modal.started': 'Started',
     'bibleInOneYear.modal.paused': 'Paused',
     'bibleInOneYear.modal.progress': 'Progress',
@@ -755,7 +755,7 @@ export const translations = {
 
     // Bible in One Year - Modal & State
     'bibleInOneYear.modal.title': 'Plan Existente Encontrado',
-    'bibleInOneYear.modal.attemptNumber': 'Intento #{number}',
+    'bibleInOneYear.modal.attemptNumber': 'Intento {number}',
     'bibleInOneYear.modal.started': 'Iniciado',
     'bibleInOneYear.modal.paused': 'Pausado',
     'bibleInOneYear.modal.progress': 'Progreso',
@@ -1011,7 +1011,7 @@ export const translations = {
 
     // Bible in One Year - Modal & State
     'bibleInOneYear.modal.title': 'Piano Esistente Trovato',
-    'bibleInOneYear.modal.attemptNumber': 'Tentativo #{number}',
+    'bibleInOneYear.modal.attemptNumber': 'Tentativo {number}',
     'bibleInOneYear.modal.started': 'Iniziato',
     'bibleInOneYear.modal.paused': 'In Pausa',
     'bibleInOneYear.modal.progress': 'Progresso',
@@ -1249,7 +1249,7 @@ export const translations = {
 
     // Bible in One Year - Modal & State
     'bibleInOneYear.modal.title': 'Plan Existant Trouvé',
-    'bibleInOneYear.modal.attemptNumber': 'Tentative #{number}',
+    'bibleInOneYear.modal.attemptNumber': 'Tentative {number}',
     'bibleInOneYear.modal.started': 'Commencé',
     'bibleInOneYear.modal.paused': 'En Pause',
     'bibleInOneYear.modal.progress': 'Progrès',

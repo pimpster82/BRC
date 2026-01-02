@@ -652,7 +652,7 @@ const SettingsPage = () => {
         <div className="card bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-700 mb-3">
           <button
             onClick={() => toggleSection('language')}
-            className="w-full flex items-center justify-between"
+            className="w-full flex items-center justify-between p-4"
           >
             <div className="flex items-center gap-2">
               <Globe className="w-5 h-5 text-blue-600 dark:text-blue-400" />
@@ -700,7 +700,7 @@ const SettingsPage = () => {
         <div className="card bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-700 mb-3">
           <button
             onClick={() => toggleSection('display')}
-            className="w-full flex items-center justify-between"
+            className="w-full flex items-center justify-between p-4"
           >
             <div className="flex items-center gap-2">
               <Eye className="w-5 h-5 text-blue-600 dark:text-blue-400" />
@@ -770,7 +770,7 @@ const SettingsPage = () => {
           <div className="card bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-300 dark:border-indigo-700 mb-3">
             <button
               onClick={() => toggleSection('admin')}
-              className="w-full flex items-center justify-between"
+              className="w-full flex items-center justify-between p-4"
             >
               <div className="flex items-center gap-2">
                 <Lock className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
@@ -1008,7 +1008,7 @@ const SettingsPage = () => {
         <div className="card bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-700 mb-3">
           <button
             onClick={() => toggleSection('weekly')}
-            className="w-full flex items-center justify-between"
+            className="w-full flex items-center justify-between p-4"
           >
             <div className="flex items-center gap-2">
               <Calendar className="w-5 h-5 text-blue-600 dark:text-blue-400" />
@@ -1054,7 +1054,7 @@ const SettingsPage = () => {
         <div className="card bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-700 mb-3">
           <button
             onClick={() => toggleSection('personal')}
-            className="w-full flex items-center justify-between"
+            className="w-full flex items-center justify-between p-4"
           >
             <div className="flex items-center gap-2">
               <BookOpen className="w-5 h-5 text-blue-600 dark:text-blue-400" />
@@ -1241,12 +1241,12 @@ const SettingsPage = () => {
               )}
 
               {/* Master Mute Switch */}
-              <div className="flex items-center justify-between">
+              <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="font-medium text-gray-800 dark:text-gray-300">
+                  <p className="text-sm font-medium text-gray-800 dark:text-gray-300">
                     {t('settings.notifications_master')}
                   </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-xs text-gray-600 dark:text-gray-400">
                     {t('settings.notifications_master_mute')}
                   </p>
                 </div>
@@ -1269,8 +1269,8 @@ const SettingsPage = () => {
 
               {/* Daily Text Reminder */}
               <div className={notificationMasterSwitch ? '' : 'opacity-50 pointer-events-none'}>
-                <div className="flex items-center justify-between mb-2">
-                  <p className="font-medium text-gray-800 dark:text-gray-300">
+                <div className="flex items-start justify-between gap-3 mb-2">
+                  <p className="text-sm font-medium text-gray-800 dark:text-gray-300">
                     {t('settings.notification_daily_text')}
                   </p>
                   <button
@@ -1289,9 +1289,6 @@ const SettingsPage = () => {
                 </div>
                 {dailyTextEnabled && (
                   <div className="ml-4">
-                    <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">
-                      {t('settings.notification_time')}
-                    </label>
                     <input
                       type="time"
                       value={dailyTextTime}
@@ -1305,8 +1302,8 @@ const SettingsPage = () => {
 
               {/* Weekly Reading Reminder */}
               <div className={notificationMasterSwitch ? '' : 'opacity-50 pointer-events-none'}>
-                <div className="flex items-center justify-between mb-2">
-                  <p className="font-medium text-gray-800 dark:text-gray-300">
+                <div className="flex items-start justify-between gap-3 mb-2">
+                  <p className="text-sm font-medium text-gray-800 dark:text-gray-300">
                     {t('settings.notification_weekly_reading')}
                   </p>
                   <button
@@ -1325,9 +1322,6 @@ const SettingsPage = () => {
                 </div>
                 {weeklyReadingEnabled && (
                   <div className="ml-4">
-                    <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">
-                      {t('settings.notification_time')}
-                    </label>
                     <input
                       type="time"
                       value={weeklyReadingTime}
@@ -1341,8 +1335,8 @@ const SettingsPage = () => {
 
               {/* Personal Reading Reminder */}
               <div className={notificationMasterSwitch ? '' : 'opacity-50 pointer-events-none'}>
-                <div className="flex items-center justify-between mb-2">
-                  <p className="font-medium text-gray-800 dark:text-gray-300">
+                <div className="flex items-start justify-between gap-3 mb-2">
+                  <p className="text-sm font-medium text-gray-800 dark:text-gray-300">
                     {t('settings.notification_personal_reading')}
                   </p>
                   <button
@@ -1361,9 +1355,6 @@ const SettingsPage = () => {
                 </div>
                 {personalReadingEnabled && (
                   <div className="ml-4">
-                    <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">
-                      {t('settings.notification_time')}
-                    </label>
                     <input
                       type="time"
                       value={personalReadingTime}
@@ -1377,13 +1368,13 @@ const SettingsPage = () => {
 
               {/* Streak Preservation Reminder */}
               <div className={notificationMasterSwitch ? '' : 'opacity-50 pointer-events-none'}>
-                <div className="flex items-center justify-between mb-2">
+                <div className="flex items-start justify-between gap-3 mb-2">
                   <div>
-                    <p className="font-medium text-gray-800 dark:text-gray-300">
+                    <p className="text-sm font-medium text-gray-800 dark:text-gray-300">
                       {t('settings.notification_streak')}
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                      18:00 (Fixed)
+                      18:00
                     </p>
                   </div>
                   <button
@@ -1422,7 +1413,7 @@ const SettingsPage = () => {
         <div className="card bg-white dark:bg-slate-900 border border-red-200 dark:border-red-700 mb-4">
           <button
             onClick={() => toggleSection('reset')}
-            className="w-full flex items-center justify-between"
+            className="w-full flex items-center justify-between p-4"
           >
             <div className="flex items-center gap-2">
               <RotateCcw className="w-5 h-5 text-red-600 dark:text-red-400" />
@@ -1488,7 +1479,7 @@ const SettingsPage = () => {
         <div className="card bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-700 mb-4">
           <button
             onClick={() => toggleSection('device')}
-            className="w-full flex items-center justify-between"
+            className="w-full flex items-center justify-between p-4"
           >
             <div className="flex items-center gap-2">
               <Smartphone className="w-5 h-5 text-blue-600 dark:text-blue-400" />
@@ -1576,7 +1567,7 @@ const SettingsPage = () => {
         <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 mt-6 mb-4">
           <button
             onClick={() => setExpandedVersionInfo(!expandedVersionInfo)}
-            className="w-full flex items-center justify-between"
+            className="w-full flex items-center justify-between p-4"
           >
             <div className="flex items-center gap-2">
               <Info
@@ -1586,11 +1577,11 @@ const SettingsPage = () => {
                   setExpandedVersionInfo(!expandedVersionInfo)
                 }}
               />
-              <h2 className="font-semibold text-gray-800 dark:text-gray-300">{t('settings.version') || 'Version'}</h2>
+              <h2 className="font-semibold text-gray-800 dark:text-gray-300">BRC</h2>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-sm text-gray-600 dark:text-gray-400">
-                {APP_VERSION} ({new Date().toISOString().split('T')[0]})
+                v{APP_VERSION}
               </span>
             </div>
           </button>
@@ -1599,7 +1590,7 @@ const SettingsPage = () => {
             <div className="mt-0 pt-4 px-4 pb-4 border-t border-slate-200 dark:border-slate-700 space-y-3">
               {/* Build Code - With Copy Button */}
               <div>
-                <p className="text-xs text-gray-600 dark:text-gray-400 font-medium mb-2">BUILD CODE</p>
+                <p className="text-xs text-gray-600 dark:text-gray-400 font-medium mb-1">Build</p>
                 <div className="flex items-center gap-2">
                   <p className="text-xs font-mono text-gray-900 dark:text-gray-200 flex-1 break-all bg-gray-50 dark:bg-slate-800 p-2 rounded border border-gray-200 dark:border-slate-700">
                     {BUILD_INFO}
@@ -1619,7 +1610,7 @@ const SettingsPage = () => {
 
               {/* Production Version Link */}
               <div>
-                <p className="text-xs text-gray-600 dark:text-gray-400 font-medium mb-2">LINKED PRODUCTION</p>
+                <p className="text-xs text-gray-600 dark:text-gray-400 font-medium mb-1">Production</p>
                 <p className="text-sm font-mono text-gray-900 dark:text-gray-200 bg-gray-50 dark:bg-slate-800 p-2 rounded border border-gray-200 dark:border-slate-700">
                   v{LINKED_PRODUCTION_VERSION}
                 </p>

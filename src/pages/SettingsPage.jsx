@@ -652,18 +652,18 @@ const SettingsPage = () => {
         <div className="card bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-700 mb-3">
           <button
             onClick={() => toggleSection('language')}
-            className="w-full flex items-center justify-between p-4"
+            className="w-full flex items-center justify-between p-3"
           >
             <div className="flex items-center gap-2">
-              <Globe className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <Globe className="w-4 h-4 text-blue-600 dark:text-blue-400" />
               <h2 className="font-semibold text-gray-800 dark:text-gray-300">{t('settings.language')}</h2>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-300">{getLanguageName()}</span>
+              <span className="text-sm text-gray-600 dark:text-gray-400">{getLanguageName()}</span>
               {expandedSection === 'language' ? (
-                <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
+                <ChevronDown className="w-4 h-4 text-gray-400 dark:text-gray-500" />
               ) : (
-                <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
+                <ChevronRight className="w-4 h-4 text-gray-400 dark:text-gray-500" />
               )}
             </div>
           </button>
@@ -700,16 +700,16 @@ const SettingsPage = () => {
         <div className="card bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-700 mb-3">
           <button
             onClick={() => toggleSection('display')}
-            className="w-full flex items-center justify-between p-4"
+            className="w-full flex items-center justify-between p-3"
           >
             <div className="flex items-center gap-2">
-              <Eye className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <Eye className="w-4 h-4 text-blue-600 dark:text-blue-400" />
               <h2 className="font-semibold text-gray-800 dark:text-gray-300">{t('settings.display')}</h2>
             </div>
             {expandedSection === 'display' ? (
-              <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
+              <ChevronDown className="w-4 h-4 text-gray-400 dark:text-gray-500" />
             ) : (
-              <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
+              <ChevronRight className="w-4 h-4 text-gray-400 dark:text-gray-500" />
             )}
           </button>
 
@@ -718,8 +718,8 @@ const SettingsPage = () => {
               {/* Show Yeartext Toggle */}
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('settings.show_yeartext')}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-300">{t('settings.show_yeartext_note')}</p>
+                  <p className="font-medium text-gray-700 dark:text-gray-300">{t('settings.show_yeartext')}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{t('settings.show_yeartext_note')}</p>
                 </div>
                 <button
                   onClick={handleShowYeartext}
@@ -770,16 +770,16 @@ const SettingsPage = () => {
           <div className="card bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-300 dark:border-indigo-700 mb-3">
             <button
               onClick={() => toggleSection('admin')}
-              className="w-full flex items-center justify-between p-4"
+              className="w-full flex items-center justify-between p-3"
             >
               <div className="flex items-center gap-2">
-                <Lock className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                <Lock className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                 <h2 className="font-semibold text-gray-800 dark:text-gray-300">⚙️ ADMIN SETTINGS</h2>
               </div>
               {expandedSection === 'admin' ? (
-                <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
+                <ChevronDown className="w-4 h-4 text-gray-400 dark:text-gray-500" />
               ) : (
-                <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
+                <ChevronRight className="w-4 h-4 text-gray-400 dark:text-gray-500" />
               )}
             </button>
 
@@ -1008,18 +1008,18 @@ const SettingsPage = () => {
         <div className="card bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-700 mb-3">
           <button
             onClick={() => toggleSection('weekly')}
-            className="w-full flex items-center justify-between p-4"
+            className="w-full flex items-center justify-between p-3"
           >
             <div className="flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <Calendar className="w-4 h-4 text-blue-600 dark:text-blue-400" />
               <h2 className="font-semibold text-gray-800 dark:text-gray-300">{t('settings.weekly_reading')}</h2>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-300">{getMeetingDayName()}</span>
               {expandedSection === 'weekly' ? (
-                <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
+                <ChevronDown className="w-4 h-4 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
               ) : (
-                <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
+                <ChevronRight className="w-4 h-4 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
               )}
             </div>
           </button>
@@ -1054,18 +1054,18 @@ const SettingsPage = () => {
         <div className="card bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-700 mb-3">
           <button
             onClick={() => toggleSection('personal')}
-            className="w-full flex items-center justify-between p-4"
+            className="w-full flex items-center justify-between p-3"
           >
             <div className="flex items-center gap-2">
-              <BookOpen className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <BookOpen className="w-4 h-4 text-blue-600 dark:text-blue-400" />
               <h2 className="font-semibold text-gray-800 dark:text-gray-300">{t('settings.personal_plan')}</h2>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-300">{getReadingPlanName()}</span>
               {expandedSection === 'personal' ? (
-                <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
+                <ChevronDown className="w-4 h-4 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
               ) : (
-                <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
+                <ChevronRight className="w-4 h-4 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
               )}
             </div>
           </button>
@@ -1192,10 +1192,10 @@ const SettingsPage = () => {
         <div className="card bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-700 mb-3">
           <button
             onClick={() => toggleSection('notifications')}
-            className="w-full flex items-center justify-between p-4"
+            className="w-full flex items-center justify-between p-3"
           >
             <div className="flex items-center gap-2">
-              <Bell className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <Bell className="w-4 h-4 text-blue-600 dark:text-blue-400" />
               <h2 className="font-semibold text-gray-800 dark:text-gray-300">
                 {t('settings.notifications_title')}
               </h2>
@@ -1205,9 +1205,9 @@ const SettingsPage = () => {
                 {notificationMasterSwitch ? t('common.active') : 'Stumm'}
               </span>
               {expandedSection === 'notifications' ? (
-                <ChevronDown className="w-5 h-5 text-gray-400" />
+                <ChevronDown className="w-4 h-4 text-gray-400" />
               ) : (
-                <ChevronRight className="w-5 h-5 text-gray-400" />
+                <ChevronRight className="w-4 h-4 text-gray-400" />
               )}
             </div>
           </button>
@@ -1241,9 +1241,9 @@ const SettingsPage = () => {
               )}
 
               {/* Master Mute Switch */}
-              <div className="flex items-start justify-between gap-3">
+              <div className="flex items-center justify-between gap-2">
                 <div>
-                  <p className="text-sm font-medium text-gray-800 dark:text-gray-300">
+                  <p className="font-medium text-gray-800 dark:text-gray-300">
                     {t('settings.notifications_master')}
                   </p>
                   <p className="text-xs text-gray-600 dark:text-gray-400">
@@ -1269,8 +1269,8 @@ const SettingsPage = () => {
 
               {/* Daily Text Reminder */}
               <div className={notificationMasterSwitch ? '' : 'opacity-50 pointer-events-none'}>
-                <div className="flex items-start justify-between gap-3 mb-2">
-                  <p className="text-sm font-medium text-gray-800 dark:text-gray-300">
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <p className="font-medium text-gray-800 dark:text-gray-300">
                     {t('settings.notification_daily_text')}
                   </p>
                   <button
@@ -1302,8 +1302,8 @@ const SettingsPage = () => {
 
               {/* Weekly Reading Reminder */}
               <div className={notificationMasterSwitch ? '' : 'opacity-50 pointer-events-none'}>
-                <div className="flex items-start justify-between gap-3 mb-2">
-                  <p className="text-sm font-medium text-gray-800 dark:text-gray-300">
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <p className="font-medium text-gray-800 dark:text-gray-300">
                     {t('settings.notification_weekly_reading')}
                   </p>
                   <button
@@ -1335,8 +1335,8 @@ const SettingsPage = () => {
 
               {/* Personal Reading Reminder */}
               <div className={notificationMasterSwitch ? '' : 'opacity-50 pointer-events-none'}>
-                <div className="flex items-start justify-between gap-3 mb-2">
-                  <p className="text-sm font-medium text-gray-800 dark:text-gray-300">
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <p className="font-medium text-gray-800 dark:text-gray-300">
                     {t('settings.notification_personal_reading')}
                   </p>
                   <button
@@ -1368,9 +1368,9 @@ const SettingsPage = () => {
 
               {/* Streak Preservation Reminder */}
               <div className={notificationMasterSwitch ? '' : 'opacity-50 pointer-events-none'}>
-                <div className="flex items-start justify-between gap-3 mb-2">
+                <div className="flex items-center justify-between gap-2 mb-2">
                   <div>
-                    <p className="text-sm font-medium text-gray-800 dark:text-gray-300">
+                    <p className="font-medium text-gray-800 dark:text-gray-300">
                       {t('settings.notification_streak')}
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -1413,16 +1413,16 @@ const SettingsPage = () => {
         <div className="card bg-white dark:bg-slate-900 border border-red-200 dark:border-red-700 mb-4">
           <button
             onClick={() => toggleSection('reset')}
-            className="w-full flex items-center justify-between p-4"
+            className="w-full flex items-center justify-between p-3"
           >
             <div className="flex items-center gap-2">
-              <RotateCcw className="w-5 h-5 text-red-600 dark:text-red-400" />
+              <RotateCcw className="w-4 h-4 text-red-600 dark:text-red-400" />
               <h2 className="font-semibold text-gray-800 dark:text-gray-300">{t('settings.reset')}</h2>
             </div>
             {expandedSection === 'reset' ? (
-              <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
+              <ChevronDown className="w-4 h-4 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
             ) : (
-              <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
+              <ChevronRight className="w-4 h-4 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
             )}
           </button>
 
@@ -1479,16 +1479,16 @@ const SettingsPage = () => {
         <div className="card bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-700 mb-4">
           <button
             onClick={() => toggleSection('device')}
-            className="w-full flex items-center justify-between p-4"
+            className="w-full flex items-center justify-between p-3"
           >
             <div className="flex items-center gap-2">
-              <Smartphone className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <Smartphone className="w-4 h-4 text-blue-600 dark:text-blue-400" />
               <h2 className="font-semibold text-gray-800 dark:text-gray-300">Device Info</h2>
             </div>
             {expandedSection === 'device' ? (
-              <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
+              <ChevronDown className="w-4 h-4 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
             ) : (
-              <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
+              <ChevronRight className="w-4 h-4 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
             )}
           </button>
 
@@ -1567,11 +1567,11 @@ const SettingsPage = () => {
         <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 mt-6 mb-4">
           <button
             onClick={() => setExpandedVersionInfo(!expandedVersionInfo)}
-            className="w-full flex items-center justify-between p-4"
+            className="w-full flex items-center justify-between p-3"
           >
             <div className="flex items-center gap-2">
               <Info
-                className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+                className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
                 onClick={(e) => {
                   e.stopPropagation()
                   setExpandedVersionInfo(!expandedVersionInfo)

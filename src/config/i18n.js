@@ -274,6 +274,33 @@ export const translations = {
     'thematic.guilt': 'Schuldgefühlen',
     'thematic.last_days': 'die „letzten Tage"',
     'thematic.hope_future': 'die Hoffnung für die Zukunft',
+
+    // Notifications
+    'notification.daily_text_title': '📖 Tagestext wartet auf dich',
+    'notification.daily_text_body': 'Schaffst du es heute? Jede Seite zählt! 🙏',
+    'notification.weekly_reading_title': '📚 Wöchentliches Lesen',
+    'notification.weekly_reading_body': 'Noch Zeit dich vorzubereiten! 💪',
+    'notification.personal_reading_title': '📘 Dein persönliches Bibelleseplan',
+    'notification.personal_reading_body': 'Wie wär\'s mit {book} {chapter}?',
+    'notification.streak_title': '🔥 Du warst so nah dran!',
+    'notification.streak_body': '{days} Tage am Stück - wolltest du heute noch {reading} einschreiben? Kein Druck, aber wir glauben an dich! 😊',
+    'notification.encouragement_title': '{friendName} hat dir Mut zugesprochen 💙',
+    'notification.encouragement_body': '{message}',
+
+    // Notification Settings
+    'settings.notifications_title': 'Benachrichtigungen',
+    'settings.notifications_master': 'Alle Benachrichtigungen',
+    'settings.notifications_master_mute': 'Stumm schalten (Einstellungen bleiben)',
+    'settings.notification_daily_text': 'Tagestext-Erinnerung',
+    'settings.notification_weekly_reading': 'Wöchentliches Lesen Erinnerung',
+    'settings.notification_personal_reading': 'Persönliches Lesen Erinnerung',
+    'settings.notification_streak': 'Streak-Erhaltungs-Erinnerung',
+    'settings.notification_encouragement': 'Ermutigungsnachrichten',
+    'settings.notification_time': 'Uhrzeit',
+    'settings.notification_permission': 'Benachrichtigungs-Berechtigung',
+    'settings.notification_permission_required': 'Benachrichtigungen müssen in Ihrem Browser aktiviert sein',
+    'settings.notification_enable_permission': 'Benachrichtigungen aktivieren',
+    'settings.notification_test': 'Test-Benachrichtigung senden',
   },
 
   en: {
@@ -530,6 +557,33 @@ export const translations = {
     'thematic.guilt': 'Guilt',
     'thematic.last_days': 'The last days',
     'thematic.hope_future': 'Hope for the future',
+
+    // Notifications
+    'notification.daily_text_title': '📖 Your Daily Text awaits',
+    'notification.daily_text_body': 'Can you make it today? Every page counts! 🙏',
+    'notification.weekly_reading_title': '📚 Weekly Reading',
+    'notification.weekly_reading_body': 'Time to prepare yourself! 💪',
+    'notification.personal_reading_title': '📘 Your Personal Bible Plan',
+    'notification.personal_reading_body': 'How about {book} {chapter}?',
+    'notification.streak_title': '🔥 You were so close!',
+    'notification.streak_body': '{days} days in a row - did you want to log {reading} today? No pressure, but we believe in you! 😊',
+    'notification.encouragement_title': '{friendName} sent you encouragement 💙',
+    'notification.encouragement_body': '{message}',
+
+    // Notification Settings
+    'settings.notifications_title': 'Notifications',
+    'settings.notifications_master': 'All Notifications',
+    'settings.notifications_master_mute': 'Mute all (settings remain)',
+    'settings.notification_daily_text': 'Daily Text Reminder',
+    'settings.notification_weekly_reading': 'Weekly Reading Reminder',
+    'settings.notification_personal_reading': 'Personal Reading Reminder',
+    'settings.notification_streak': 'Streak Preservation Reminder',
+    'settings.notification_encouragement': 'Encouragement Messages',
+    'settings.notification_time': 'Time',
+    'settings.notification_permission': 'Notification Permission',
+    'settings.notification_permission_required': 'Notifications must be enabled in your browser',
+    'settings.notification_enable_permission': 'Enable Notifications',
+    'settings.notification_test': 'Send Test Notification',
   },
 
   es: {
@@ -786,6 +840,33 @@ export const translations = {
     'thematic.guilt': 'La culpa',
     'thematic.last_days': 'Los últimos días',
     'thematic.hope_future': 'Una esperanza para el futuro',
+
+    // Notifications
+    'notification.daily_text_title': '📖 Tu Texto Diario te espera',
+    'notification.daily_text_body': '¿Puedes hacerlo hoy? ¡Cada página cuenta! 🙏',
+    'notification.weekly_reading_title': '📚 Lectura Semanal',
+    'notification.weekly_reading_body': '¡Tiempo de prepararte! 💪',
+    'notification.personal_reading_title': '📘 Tu Plan de Lectura Personal',
+    'notification.personal_reading_body': '¿Qué te parece {book} {chapter}?',
+    'notification.streak_title': '🔥 ¡Estabas tan cerca!',
+    'notification.streak_body': '{days} días seguidos - ¿querías registrar {reading} hoy? ¡Sin presión, pero creemos en ti! 😊',
+    'notification.encouragement_title': '{friendName} te envió ánimo 💙',
+    'notification.encouragement_body': '{message}',
+
+    // Notification Settings
+    'settings.notifications_title': 'Notificaciones',
+    'settings.notifications_master': 'Todas las notificaciones',
+    'settings.notifications_master_mute': 'Silenciar todo (configuración permanece)',
+    'settings.notification_daily_text': 'Recordatorio de Texto Diario',
+    'settings.notification_weekly_reading': 'Recordatorio de Lectura Semanal',
+    'settings.notification_personal_reading': 'Recordatorio de Lectura Personal',
+    'settings.notification_streak': 'Recordatorio de Preservación de Racha',
+    'settings.notification_encouragement': 'Mensajes de Ánimo',
+    'settings.notification_time': 'Hora',
+    'settings.notification_permission': 'Permiso de Notificaciones',
+    'settings.notification_permission_required': 'Las notificaciones deben estar habilitadas en tu navegador',
+    'settings.notification_enable_permission': 'Habilitar Notificaciones',
+    'settings.notification_test': 'Enviar Notificación de Prueba',
   },
 
   it: {
@@ -1042,6 +1123,33 @@ export const translations = {
     'thematic.guilt': 'Sensi di colpa',
     'thematic.last_days': 'Ultimi giorni',
     'thematic.hope_future': 'Speranza per il futuro',
+
+    // Notifications
+    'notification.daily_text_title': '📖 Il tuo Testo Giornaliero ti aspetta',
+    'notification.daily_text_body': 'Puoi farcela oggi? Ogni pagina conta! 🙏',
+    'notification.weekly_reading_title': '📚 Lettura Settimanale',
+    'notification.weekly_reading_body': 'Tempo di prepararti! 💪',
+    'notification.personal_reading_title': '📘 Il tuo Piano di Lettura Personale',
+    'notification.personal_reading_body': 'Che ne dici di {book} {chapter}?',
+    'notification.streak_title': '🔥 Eri così vicino!',
+    'notification.streak_body': '{days} giorni di fila - volevi registrare {reading} oggi? Nessuna pressione, ma crediamo in te! 😊',
+    'notification.encouragement_title': '{friendName} ti ha inviato incoraggiamento 💙',
+    'notification.encouragement_body': '{message}',
+
+    // Notification Settings
+    'settings.notifications_title': 'Notifiche',
+    'settings.notifications_master': 'Tutte le notifiche',
+    'settings.notifications_master_mute': 'Muta tutto (le impostazioni rimangono)',
+    'settings.notification_daily_text': 'Promemoria Testo Giornaliero',
+    'settings.notification_weekly_reading': 'Promemoria Lettura Settimanale',
+    'settings.notification_personal_reading': 'Promemoria Lettura Personale',
+    'settings.notification_streak': 'Promemoria Preservazione della Striscia',
+    'settings.notification_encouragement': 'Messaggi di Incoraggiamento',
+    'settings.notification_time': 'Ora',
+    'settings.notification_permission': 'Permesso di Notifica',
+    'settings.notification_permission_required': 'Le notifiche devono essere abilitate nel tuo browser',
+    'settings.notification_enable_permission': 'Abilita Notifiche',
+    'settings.notification_test': 'Invia Notifica di Prova',
   },
 
   fr: {
@@ -1262,6 +1370,33 @@ export const translations = {
     'bibleInOneYear.warning.message': 'Vous êtes actuellement dans le plan "Bible en Un An". Si vous changez de plan, vos progrès seront mis en pause. Vous pourrez continuer plus tard là où vous vous êtes arrêté.',
     'bibleInOneYear.warning.pause': 'Mettre en Pause',
     'bibleInOneYear.warning.cancel': 'Annuler',
+
+    // Notifications
+    'notification.daily_text_title': '📖 Ton Texte Quotidien t\'attend',
+    'notification.daily_text_body': 'Peux-tu le faire aujourd\'hui? Chaque page compte! 🙏',
+    'notification.weekly_reading_title': '📚 Lecture Hebdomadaire',
+    'notification.weekly_reading_body': 'Temps de te préparer! 💪',
+    'notification.personal_reading_title': '📘 Ton Plan de Lecture Personnel',
+    'notification.personal_reading_body': 'Qu\'en dis-tu {book} {chapter}?',
+    'notification.streak_title': '🔥 Tu étais si proche!',
+    'notification.streak_body': '{days} jours d\'affilée - tu voulais enregistrer {reading} aujourd\'hui? Pas de pression, mais nous croyons en toi! 😊',
+    'notification.encouragement_title': '{friendName} t\'a envoyé de l\'encouragement 💙',
+    'notification.encouragement_body': '{message}',
+
+    // Notification Settings
+    'settings.notifications_title': 'Notifications',
+    'settings.notifications_master': 'Toutes les notifications',
+    'settings.notifications_master_mute': 'Tout couper (les paramètres restent)',
+    'settings.notification_daily_text': 'Rappel du Texte Quotidien',
+    'settings.notification_weekly_reading': 'Rappel de Lecture Hebdomadaire',
+    'settings.notification_personal_reading': 'Rappel de Lecture Personnelle',
+    'settings.notification_streak': 'Rappel de Préservation de Série',
+    'settings.notification_encouragement': 'Messages d\'Encouragement',
+    'settings.notification_time': 'Heure',
+    'settings.notification_permission': 'Permission de Notification',
+    'settings.notification_permission_required': 'Les notifications doivent être activées dans ton navigateur',
+    'settings.notification_enable_permission': 'Activer les Notifications',
+    'settings.notification_test': 'Envoyer une Notification de Test',
 
     'thematic.noah': 'Noé et le Déluge',
     'thematic.moses': 'Moïse et la traversée de la mer Rouge',

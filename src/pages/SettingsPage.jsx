@@ -12,6 +12,7 @@ import { getBibleInOneYearState, pausePlan } from '../utils/bibleInOneYearState'
 import { SUPPORTED_LANGUAGES, getCurrentLanguage, setCurrentLanguage } from '../config/languages'
 import { fetchScheduleFromWOL, fetchYeartextFromWOL } from '../utils/scheduleUpdater'
 import { saveScheduleToFirebase, saveYeartextToFirebase } from '../utils/firebaseSchedules'
+import { initializeAdminTemplates } from '../utils/firebaseTemplatesAdmin'
 import { getOrCreateDeviceId, getDeviceName, setDeviceName, getDeviceInfo } from '../utils/deviceId'
 import { t } from '../config/i18n'
 import { APP_VERSION, BUILD_INFO, LINKED_PRODUCTION_VERSION } from '../config/version'
@@ -112,6 +113,10 @@ const SettingsPage = () => {
   const [scheduleYear, setScheduleYear] = useState(new Date().getFullYear() + 1)
   const [scheduleStatus, setScheduleStatus] = useState(null) // 'loading', 'success', 'error'
   const [scheduleMessage, setScheduleMessage] = useState('')
+
+  // Initialize Templates
+  const [initTemplateLoading, setInitTemplateLoading] = useState(false)
+  const [initTemplateMessage, setInitTemplateMessage] = useState('')
 
   // Device Info
   const [deviceId, setDeviceId] = useState(getOrCreateDeviceId())
@@ -482,6 +487,25 @@ const SettingsPage = () => {
     }
   }
 
+  const handleInitializeTemplates = async () => {
+    setInitTemplateLoading(true)
+    setInitTemplateMessage('')
+
+    try {
+      const result = await initializeAdminTemplates()
+
+      if (result.success) {
+        setInitTemplateMessage(`✅ ${result.message}`)
+      } else {
+        setInitTemplateMessage(`❌ ${result.message}`)
+      }
+    } catch (error) {
+      console.error('Template initialization error:', error)
+      setInitTemplateMessage(`❌ Fehler beim Initialisieren: ${error.message}`)
+    } finally {
+      setInitTemplateLoading(false)
+    }
+  }
 
   const handleResetAll = () => {
     if (window.confirm(t('settings.reset_confirm'))) {
@@ -1181,6 +1205,29 @@ const SettingsPage = () => {
               {/* Section 1: Admin Message Templates */}
               <div className="space-y-3">
                 <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-300">Message Templates</h3>
+
+                {/* Initialize Templates Button */}
+                <button
+                  onClick={handleInitializeTemplates}
+                  disabled={initTemplateLoading}
+                  className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-purple-50 dark:bg-purple-900 text-purple-700 dark:text-purple-200 rounded-lg font-medium hover:bg-purple-100 dark:hover:bg-purple-800 transition-colors border border-purple-200 dark:border-purple-700 text-sm disabled:opacity-50"
+                >
+                  <Plus className="w-4 h-4" />
+                  {initTemplateLoading ? 'Initialisiere...' : 'Initialize Templates'}
+                </button>
+
+                {/* Template Init Status Message */}
+                {initTemplateMessage && (
+                  <div className={`p-2 rounded text-xs whitespace-pre-wrap ${
+                    initTemplateMessage.startsWith('✅')
+                      ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800'
+                      : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800'
+                  }`}>
+                    {initTemplateMessage}
+                  </div>
+                )}
+
+                {/* Admin Message Templates Editor */}
                 <AdminMessageTemplates />
               </div>
 

@@ -160,6 +160,52 @@ export const deleteAdminTemplate = async (notificationType, language, index) => 
 }
 
 /**
+ * Initialize Firebase notification templates structure (idempotent)
+ * Creates the structure if it doesn't exist, skips if already present
+ * @returns {Promise<{success: boolean, message: string, created: number}>}
+ */
+export const initializeAdminTemplates = async () => {
+  try {
+    let createdCount = 0
+    const results = []
+
+    // For each notification type
+    for (const notificationType of NOTIFICATION_TYPES) {
+      // For each language
+      for (const language of LANGUAGES) {
+        const templateRef = ref(database, `notification_templates/${notificationType}/${language}/messages`)
+        const snapshot = await get(templateRef)
+
+        // Only create if doesn't exist
+        if (!snapshot.exists()) {
+          await set(templateRef, [])
+          createdCount++
+          results.push(`✓ Created ${notificationType}/${language}`)
+        } else {
+          results.push(`- Skipped ${notificationType}/${language} (already exists)`)
+        }
+      }
+    }
+
+    const message = `Initialized ${createdCount} new template structures\n\n${results.join('\n')}`
+    console.log(`[TemplatesAdmin] ${message}`)
+
+    return {
+      success: true,
+      message,
+      created: createdCount
+    }
+  } catch (error) {
+    console.error('[TemplatesAdmin] Error initializing templates:', error)
+    return {
+      success: false,
+      message: `Error initializing templates: ${error.message}`,
+      created: 0
+    }
+  }
+}
+
+/**
  * Get notification type label
  * @param {string} notificationType - Type of notification
  * @returns {string} Label

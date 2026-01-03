@@ -13,12 +13,12 @@
 
 ```
 master (PRODUCTION) ❌ DO NOT WORK HERE
-  ├── Version: 1.0.0, 1.0.1, 1.1.0, etc.
+  ├── Version: 1.0.0, 1.0.1, 1.1.0, 2.0.1, etc.
   ├── Status: STABLE & TESTED
   ├── Testers Use: YES
   ├── Deployment: Vercel (Live at https://brc-liard.vercel.app)
-  ├── Current Version: **1.1.0** (Admin Access System released)
-  └── Tagged Releases: v1.0.0, v1.0.1, v1.1.0, etc.
+  ├── Current Version: **2.0.1** (Admin Settings Cleanup & iOS Fixes)
+  └── Tagged Releases: v1.0.0, v1.0.1, v1.1.0, v2.0.1, etc.
 
 ```
 
@@ -739,22 +739,46 @@ master (PRODUCTION) ❌ DO NOT WORK HERE
 
 ---
 
-**Last Updated:** 2025-12-28 (Admin Access System Released to Production v1.1.0: 29/32 total)
+**Last Updated:** 2026-01-03 (Admin Settings Cleanup & iOS Fixes Released to Production v2.0.1: 29/32 total)
 **Total Tasks:** 32 (1 critical + 7 testing findings + 9 sync + 3 schedule + 4 UI/UX + 1 docs + 3 UI polish + 1 code cleanup + 1 admin access ✅ PROD + 1 social + 1 favorites)
 **Progress:** 29/32 (91%)
 **Recent Completions:**
+- **Admin Settings Cleanup & iOS Fixes (✅ RELEASED TO PRODUCTION v2.0.1 - 2026-01-03)**
+  - Admin Settings Card Reorganization:
+    - Consolidated all admin functions into single expandable card (ganz unten vor Info Card)
+    - Removed duplicate notification settings (Master Mute, Daily Text were test-only)
+    - Improved "Admin Zugang beenden" button styling (red button with text instead of toggle)
+    - Fixed nested button HTML validation error
+    - Added AdminMessageTemplates component to admin notifications section
+  - Schedule Update Enhancement:
+    - Added year input field (2024-2030) for schedule fetching
+    - Added status message display (success/error/loading states)
+    - Improved button label and feedback messages
+  - Firebase Templates Initialization:
+    - Created `initializeAdminTemplates()` idempotent function
+    - Added "Initialize Templates" button in Admin Settings
+    - Automatically creates `/notification_templates/{type}/{language}/messages` structure
+    - Supports 4 notification types × 5 languages = 20 template sets
+    - Can be run multiple times safely (only creates missing structures)
+  - iOS Datepicker Overflow Fix:
+    - Added overflow-hidden to date picker container
+    - Reduced focus ring from ring-2 to ring-1
+    - Added appearance-none to remove iOS default date input styles
+  - Version bumped: 1.1.0 → 2.0.1
+  - Tagged: v2.0.1, pushed to origin
+  - Live at: https://brc-liard.vercel.app
+  - Related commits: 1e67ad2 (Admin reorganization), 33447d6 (Schedule year input), 1746856 (Templates init)
+
 - **Admin Access System (✅ RELEASED TO PRODUCTION v1.1.0 - 2025-12-28)**
   - Cherry-picked 14 admin + infrastructure commits to production
   - Version bumped: 1.0.0 → 1.1.0
   - Tagged: v1.1.0, pushed to origin
-  - Live at: https://brc-liard.vercel.app
   - AdminContext.jsx with PIN verification (170182)
   - AdminPINModal component for PIN input dialog
   - HomePage calendar button dual-mode (PIN gateway ↔️ Date Picker)
-  - Admin Settings Section in SettingsPage (Exit Admin, Device Info, Reminders, Theme, Schedule Update)
+  - Admin Settings Section in SettingsPage (Exit Admin, Device Info, Reminders, Schedule Update)
   - Feature flags for admin-only items (Date Picker, Schedule Update, Coming Soon Plans)
   - localStorage persistence ("app_adminMode") until exit
-  - Related fixes: Theme/Farbschema moved to admin-only, Coming Soon plans hidden for non-admin
   - **Important:** Reading Plan Store System (Phase 1) NOT released - stays dev-only
 - iOS 2025 App Icon System (Light/Dark/Tinted variants with DALL-E 3)
   - Professional design with navy blue outline and blue bookmark accent

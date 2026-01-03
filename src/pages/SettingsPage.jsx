@@ -35,6 +35,8 @@ const SettingsPage = () => {
   const [expandedSection, setExpandedSection] = useState(null)
   const [expandedReadingPlanDropdown, setExpandedReadingPlanDropdown] = useState(false)
   const [expandedVersionInfo, setExpandedVersionInfo] = useState(false)
+  const [expandedAdminSubsection, setExpandedAdminSubsection] = useState({ notifications: false, plans: false, device: false, reset: false })
+  const [expandedInfoIcons, setExpandedInfoIcons] = useState({ scheduleUpdate: false, planCreator: false, deviceId: false, resetSettings: false, clearCache: false, resetProgress: false })
 
   // Language
   const [language, setLanguage] = useState(getCurrentLanguage())
@@ -738,282 +740,10 @@ const SettingsPage = () => {
                 </button>
               </div>
 
-              {/* Theme Preference - ADMIN ONLY (commented out for regular users) */}
-              {isAdminMode && (
-              <div>
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Farbschema</p>
-                <div className="flex gap-2">
-                  {[
-                    { value: 'light', label: '☀️ Hell' },
-                    { value: 'dark', label: '🌙 Dunkel' },
-                    { value: 'system', label: '💻 System' }
-                  ].map((option) => (
-                    <button
-                      key={option.value}
-                      onClick={() => setThemePreference(option.value)}
-                      className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
-                        theme === option.value
-                          ? 'bg-blue-600 dark:bg-blue-500 text-white'
-                          : 'bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-600'
-                      }`}
-                    >
-                      {option.label}
-                    </button>
-                  ))}
-                </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-300 mt-1">Wähle dein bevorzugtes Farbschema</p>
-              </div>
-              )}
             </div>
           )}
         </div>
 
-        {/* Admin Settings Section (Only visible in Admin Mode) */}
-        {isAdminMode && (
-          <div className="card bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-300 dark:border-indigo-700 mb-3 p-0">
-            <button
-              onClick={() => toggleSection('admin')}
-              className="w-full flex items-start justify-between pt-[10px] pr-[5px] pb-[10px] pl-[10px]"
-            >
-              <div className="flex items-start gap-2.5 flex-1 min-w-0">
-                <Lock className="w-5 h-5 flex-shrink-0 text-indigo-600 dark:text-indigo-400 mt-0.5" />
-                <h2 className="font-semibold text-gray-800 dark:text-gray-300">⚙️ ADMIN SETTINGS</h2>
-              </div>
-              <div className="flex items-center gap-0 flex-shrink-0">
-                {expandedSection === 'admin' ? (
-                  <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-500" />
-                ) : (
-                  <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500" />
-                )}
-              </div>
-            </button>
-
-            {expandedSection === 'admin' && (
-              <div className="mt-0 pt-4 pl-[10px] pr-[10px] pb-[16px] border-t border-indigo-300 dark:border-indigo-700 space-y-4">
-                {/* Exit Admin Access */}
-                <div>
-                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Admin-Modus</p>
-                  <button
-                    onClick={exitAdminAccess}
-                    className="w-full bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100 py-2 px-4 rounded-lg font-medium hover:bg-red-200 dark:hover:bg-red-800 transition-colors border border-red-300 dark:border-red-700"
-                  >
-                    Admin-Zugang beenden
-                  </button>
-                </div>
-
-                {/* Reset App Settings */}
-                <div className="pt-3 border-t border-indigo-300 dark:border-indigo-700">
-                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">App-Einstellungen</p>
-                  <button
-                    onClick={handleResetAll}
-                    className="w-full bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-100 py-2 px-4 rounded-lg font-medium hover:bg-yellow-200 dark:hover:bg-yellow-800 transition-colors border border-yellow-300 dark:border-yellow-700 text-sm"
-                  >
-                    Alle Einstellungen zurücksetzen
-                  </button>
-                </div>
-
-                {/* Device ID Info */}
-                <div className="pt-3 border-t border-indigo-300 dark:border-indigo-700 space-y-2">
-                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Device ID</p>
-                  <div className="flex gap-2">
-                    <code className="flex-1 text-xs bg-indigo-100 dark:bg-indigo-900 p-2 rounded border border-indigo-300 dark:border-indigo-700 dark:text-indigo-100 font-mono overflow-auto">
-                      {deviceId.substring(0, 12)}...
-                    </code>
-                    <button
-                      onClick={handleCopyDeviceId}
-                      className={`px-3 py-2 rounded text-sm font-medium flex items-center gap-1 transition-colors ${
-                        copySuccess
-                          ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 border border-green-300 dark:border-green-700'
-                          : 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-700 hover:bg-indigo-200 dark:hover:bg-indigo-800'
-                      }`}
-                    >
-                      <Copy className="w-4 h-4" />
-                      {copySuccess ? 'Kopiert!' : 'Kopieren'}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Daily Reminders */}
-                <div className="pt-3 border-t border-indigo-300 dark:border-indigo-700 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Tägliche Benachrichtigung</p>
-                      <p className="text-xs text-gray-600 dark:text-gray-400 dark:text-gray-300">Für Tagestext</p>
-                    </div>
-                    <button
-                      onClick={handleDailyReminderToggle}
-                      className={`relative inline-flex h-4 w-11 items-center rounded-full transition-colors ${
-                        dailyReminder ? 'bg-blue-600 dark:bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
-                      }`}
-                    >
-                      <span
-                        className={`inline-block h-5 w-4 transform rounded-full bg-white transition-transform ${
-                          dailyReminder ? 'translate-x-6' : 'translate-x-1'
-                        }`}
-                      />
-                    </button>
-                  </div>
-
-                  {/* Notification Permission Status */}
-                  {dailyReminder && (
-                    <div className="space-y-3">
-                      {/* Permission Status Indicator */}
-                      <div className={`p-3 rounded-lg border flex items-start gap-2 ${
-                        notificationPermission === 'granted'
-                          ? 'bg-green-50 dark:bg-green-900/20 border-green-300 dark:border-green-700'
-                          : notificationPermission === 'denied'
-                          ? 'bg-red-50 dark:bg-red-900/20 border-red-300 dark:border-red-700'
-                          : 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-300 dark:border-yellow-700'
-                      }`}>
-                        {notificationPermission === 'granted' ? (
-                          <Check className="w-4 h-4 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
-                        ) : (
-                          <AlertCircle className="w-4 h-4 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
-                        )}
-                        <p className={`text-xs ${
-                          notificationPermission === 'granted'
-                            ? 'text-green-700 dark:text-green-300'
-                            : notificationPermission === 'denied'
-                            ? 'text-red-700 dark:text-red-300'
-                            : 'text-yellow-700 dark:text-yellow-300'
-                        }`}>
-                          {notificationPermission === 'granted' && '✓ Benachrichtigungen aktiviert'}
-                          {notificationPermission === 'denied' && '✗ Benachrichtigungen abgelehnt - bitte in Browser-Einstellungen aktivieren'}
-                          {notificationPermission === 'default' && '⚠️ Berechtigung erforderlich - klick den Button unten'}
-                          {notificationPermission === 'unsupported' && '⚠️ Benachrichtigungen in diesem Browser nicht unterstützt'}
-                        </p>
-                      </div>
-
-                      {/* Request Permission Button */}
-                      {notificationPermission !== 'granted' && notificationPermission !== 'unsupported' && (
-                        <button
-                          onClick={handleRequestNotificationPermission}
-                          disabled={permissionLoading}
-                          className="w-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 py-2 px-4 rounded-lg font-medium hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors border border-blue-300 dark:border-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          {permissionLoading ? 'Wird bearbeitet...' : 'Benachrichtigungen aktivieren'}
-                        </button>
-                      )}
-
-                      {/* Reminder Time */}
-                      <div className="space-y-2">
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                          Uhrzeit
-                        </label>
-                        <input
-                          type="time"
-                          value={reminderTime}
-                          onChange={(e) => handleReminderTimeChange(e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                      </div>
-
-                      {/* Test Notification Button */}
-                      {notificationPermission === 'granted' && (
-                        <button
-                          onClick={handleTestNotification}
-                          className="w-full bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-100 py-2 px-4 rounded-lg font-medium hover:bg-purple-200 dark:hover:bg-purple-800 transition-colors border border-purple-300 dark:border-purple-700 text-sm"
-                        >
-                          📬 Test-Benachrichtigung senden
-                        </button>
-                      )}
-                    </div>
-                  )}
-                </div>
-
-                {/* Create Reading Plan */}
-                <div className="pt-3 border-t border-indigo-300 dark:border-indigo-700">
-                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">📚 Create Reading Plan</p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 dark:text-gray-300 mb-3">
-                    Create and upload your own custom reading plans to Firebase
-                  </p>
-                  <button
-                    onClick={() => setShowPlanCreator(true)}
-                    className="w-full bg-indigo-600 dark:bg-indigo-700 text-white py-2 px-4 rounded-lg font-medium hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors flex items-center justify-center gap-2"
-                  >
-                    <Plus className="w-4 h-4" />
-                    Create New Plan
-                  </button>
-                  {planUploadMessage && (
-                    <div className="mt-3 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-                      <p className="text-sm text-green-700 dark:text-green-300">{planUploadMessage}</p>
-                    </div>
-                  )}
-                  {planUploadError && (
-                    <div className="mt-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                      <p className="text-sm text-red-700 dark:text-red-300">{planUploadError}</p>
-                    </div>
-                  )}
-                </div>
-
-                {/* Update Schedule */}
-                <div className="pt-3 border-t border-indigo-300 dark:border-indigo-700">
-                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Leseplan aktualisieren</p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 dark:text-gray-300 mb-3">
-                    Lade Leseplan & Jahrestext für ein Jahr von JW.org herunter
-                  </p>
-
-                  <div className="space-y-2 mb-3">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Jahr
-                    </label>
-                    <input
-                      type="number"
-                      value={scheduleYear}
-                      onChange={(e) => setScheduleYear(parseInt(e.target.value))}
-                      min={new Date().getFullYear()}
-                      max={new Date().getFullYear() + 5}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-
-                  <button
-                    onClick={handleFetchSchedule}
-                    disabled={scheduleStatus === 'loading'}
-                    className={`w-full py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 text-sm ${
-                      scheduleStatus === 'loading'
-                        ? 'bg-gray-300 dark:bg-gray-600 text-gray-600 dark:text-gray-300 cursor-not-allowed'
-                        : 'bg-indigo-600 dark:bg-indigo-500 text-white hover:bg-indigo-700 dark:hover:bg-indigo-600'
-                    }`}
-                  >
-                    {scheduleStatus === 'loading' ? (
-                      <>
-                        <RefreshCw className="w-4 h-4 animate-spin" />
-                        Wird heruntergeladen...
-                      </>
-                    ) : (
-                      <>
-                        <Download className="w-4 h-4" />
-                        Leseplan herunterladen
-                      </>
-                    )}
-                  </button>
-
-                  {/* Status Message */}
-                  {scheduleMessage && (
-                    <div
-                      className={`mt-3 p-3 rounded-lg text-sm whitespace-pre-line ${
-                        scheduleStatus === 'success'
-                          ? 'bg-green-50 dark:bg-green-900 text-green-800 dark:text-green-100 border border-green-200 dark:border-green-700'
-                          : scheduleStatus === 'error'
-                          ? 'bg-red-50 dark:bg-red-900 text-red-800 dark:text-red-100 border border-red-200 dark:border-red-700'
-                          : 'bg-blue-50 dark:bg-blue-900 text-blue-800 dark:text-blue-100 border border-blue-200 dark:border-blue-700'
-                      }`}
-                    >
-                      {scheduleMessage}
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Message Templates Management */}
-            <div className="pt-3 border-t border-indigo-300 dark:border-indigo-700">
-              <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Benachrichtigungsvorlagen</p>
-              <AdminMessageTemplates />
-            </div>
-          </div>
-        )}
 
         {/* Weekly Reading Settings */}
         <div className="card bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-700 mb-3 p-0">
@@ -1417,161 +1147,249 @@ const SettingsPage = () => {
           )}
         </div>
 
-        {/* Schedule Update - ADMIN ONLY (moved to Admin Settings Section above) */}
 
-        {/* Reset All - ADMIN ONLY (moved to Admin Settings Section above) */}
+        {/* ADMIN SETTINGS - Consolidated & Organized */}
         {isAdminMode && (
-        <div className="card bg-white dark:bg-slate-900 border border-red-200 dark:border-red-700 mb-4 p-0">
+        <div className="card bg-white dark:bg-slate-900 border border-red-200 dark:border-red-700 mb-3 p-0">
           <button
-            onClick={() => toggleSection('reset')}
+            onClick={() => toggleSection('admin')}
             className="w-full flex items-start justify-between pt-[10px] pr-[5px] pb-[10px] pl-[10px]"
           >
             <div className="flex items-start gap-2.5 flex-1 min-w-0">
-              <RotateCcw className="w-5 h-5 flex-shrink-0 text-red-600 dark:text-red-400 mt-0.5" />
-              <h2 className="font-semibold text-gray-800 dark:text-gray-300">{t('settings.reset')}</h2>
+              <Lock className="w-5 h-5 flex-shrink-0 text-red-600 dark:text-red-400 mt-0.5" />
+              <h2 className="font-semibold text-gray-800 dark:text-gray-300">ADMIN SETTINGS</h2>
             </div>
-            <div className="flex items-center gap-0 flex-shrink-0">
-              {expandedSection === 'reset' ? (
-                <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
-              ) : (
-                <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
-              )}
-            </div>
-          </button>
-
-          {expandedSection === 'reset' && (
-            <div className="mt-0 pt-4 pl-[10px] pr-[10px] pb-[16px] border-t border-red-200 dark:border-red-700 space-y-3">
-              {/* Reset Settings */}
-              <div>
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('settings.reset_settings')}</p>
-                <p className="text-xs text-gray-600 dark:text-gray-400 dark:text-gray-300 mb-2">
-                  {t('settings.reset_settings_note')}
-                </p>
-                <button
-                  onClick={handleResetAll}
-                  className="w-full bg-red-50 dark:bg-red-900 text-red-700 dark:text-red-100 py-2 px-4 rounded-lg font-medium hover:bg-red-100 dark:hover:bg-red-800 transition-colors border border-red-200 dark:border-red-700"
-                >
-                  {t('settings.reset_settings_button')}
-                </button>
-              </div>
-
-              {/* Clear Cache */}
-              <div className="pt-3 border-t border-red-200 dark:border-red-700">
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Cache löschen</p>
-                <p className="text-xs text-gray-600 dark:text-gray-400 dark:text-gray-300 mb-2">
-                  Löscht gecachte Schedules und Yeartexts. Diese werden beim nächsten Laden neu von Firebase geladen.
-                </p>
-                <button
-                  onClick={handleClearCache}
-                  className="w-full bg-orange-50 dark:bg-orange-900 text-orange-700 dark:text-orange-100 py-2 px-4 rounded-lg font-medium hover:bg-orange-100 dark:hover:bg-orange-800 transition-colors border border-orange-200"
-                >
-                  Cache löschen
-                </button>
-              </div>
-
-              {/* Reset Progress */}
-              <div className="pt-3 border-t border-red-200 dark:border-red-700">
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('settings.reset_progress')}</p>
-                <p className="text-xs text-gray-600 dark:text-gray-400 dark:text-gray-300 mb-2">
-                  {t('settings.reset_progress_note')}
-                </p>
-                <button
-                  onClick={handleResetProgress}
-                  className="w-full bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100 py-2 px-4 rounded-lg font-medium hover:bg-red-200 dark:hover:bg-red-800 transition-colors border border-red-300 dark:border-red-600"
-                >
-                  {t('settings.reset_progress_button')}
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-        )}
-
-        {/* Device Info - ADMIN ONLY */}
-        {isAdminMode && (
-        <div className="card bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-700 mb-4 p-0">
-          <button
-            onClick={() => toggleSection('device')}
-            className="w-full flex items-start justify-between pt-[10px] pr-[5px] pb-[10px] pl-[10px]"
-          >
-            <div className="flex items-start gap-2.5 flex-1 min-w-0">
-              <Smartphone className="w-5 h-5 flex-shrink-0 text-blue-600 dark:text-blue-400 mt-0.5" />
-              <h2 className="font-semibold text-gray-800 dark:text-gray-300">Device Info</h2>
-            </div>
-            <div className="flex items-center gap-0 flex-shrink-0">
-              {expandedSection === 'device' ? (
-                <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
-              ) : (
-                <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
-              )}
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  exitAdminAccess()
+                }}
+                className="px-3 py-1 text-xs font-medium rounded bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 text-white transition-colors"
+                title="Exit Admin Mode"
+              >
+                Beenden
+              </button>
             </div>
           </button>
 
-          {expandedSection === 'device' && (
-            <div className="mt-0 pt-4 pl-[10px] pr-[10px] pb-[16px] border-t border-blue-200 dark:border-blue-700 space-y-3">
-              {/* Device ID */}
-              <div className="space-y-2">
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Device ID</p>
-                <div className="flex gap-2">
-                  <code className="flex-1 text-xs bg-gray-100 dark:bg-slate-700 p-2 rounded border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-300 font-mono overflow-auto">
-                    {deviceId.substring(0, 12)}...
-                  </code>
+          {expandedSection === 'admin' && (
+            <div className="mt-0 pt-4 pl-[10px] pr-[10px] pb-[16px] border-t border-red-200 dark:border-red-700 space-y-4">
+
+              {/* Section 1: Notification Settings */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-300 flex items-center justify-between">
+                  Benachrichtigungen
+                </h3>
+
+                {/* Master Mute Switch */}
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-sm text-gray-700 dark:text-gray-300">Master Mute</span>
                   <button
-                    onClick={handleCopyDeviceId}
-                    className={`px-3 py-2 rounded text-sm font-medium flex items-center gap-1 transition-colors ${
-                      copySuccess
-                        ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 border border-green-300 dark:border-green-700'
-                        : 'bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-700 hover:bg-blue-100 dark:hover:bg-blue-800'
+                    onClick={handleMasterSwitchToggle}
+                    className={`relative inline-flex h-4 w-11 items-center rounded-full transition-colors ${
+                      notificationMasterSwitch
+                        ? 'bg-blue-600 dark:bg-blue-500'
+                        : 'bg-gray-300 dark:bg-gray-600'
                     }`}
                   >
-                    <Copy className="w-4 h-4" />
-                    {copySuccess ? 'Kopiert!' : 'Kopieren'}
+                    <span className={`inline-block h-5 w-4 transform rounded-full bg-white transition-transform ${
+                      notificationMasterSwitch ? 'translate-x-6' : 'translate-x-1'
+                    }`} />
                   </button>
                 </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-300">Eindeutige Geräte-ID für Cross-Device-Synchronisation</p>
-              </div>
 
-              {/* Device Name */}
-              <div className="pt-3 border-t border-blue-200 dark:border-blue-700 space-y-2">
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Device Name</p>
-                {!isEditingDeviceName ? (
-                  <div className="flex gap-2">
-                    <p className="flex-1 text-sm bg-gray-50 p-2 rounded border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-300">
-                      {deviceName}
-                    </p>
+                {/* Daily Text Reminder */}
+                <div className={notificationMasterSwitch ? '' : 'opacity-50 pointer-events-none'}>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-sm text-gray-700 dark:text-gray-300">Daily Text</span>
                     <button
-                      onClick={() => setIsEditingDeviceName(true)}
-                      className="px-3 py-2 rounded text-sm font-medium bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-100 border border-blue-200 dark:border-blue-700 hover:bg-blue-100 dark:hover:bg-blue-800 transition-colors"
+                      onClick={handleDailyTextToggle}
+                      disabled={!notificationMasterSwitch}
+                      className={`relative inline-flex h-4 w-11 items-center rounded-full transition-colors ${
+                        dailyTextEnabled
+                          ? 'bg-blue-600 dark:bg-blue-500'
+                          : 'bg-gray-300 dark:bg-gray-600'
+                      }`}
                     >
-                      Bearbeiten
+                      <span className={`inline-block h-5 w-4 transform rounded-full bg-white transition-transform ${
+                        dailyTextEnabled ? 'translate-x-6' : 'translate-x-1'
+                      }`} />
                     </button>
                   </div>
-                ) : (
-                  <div className="space-y-2">
-                    <input
-                      type="text"
-                      value={tempDeviceName}
-                      onChange={(e) => setTempDeviceName(e.target.value)}
-                      className="w-full text-sm px-3 py-2 border border-blue-300 dark:border-blue-600 dark:border-blue-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="z.B. Mein Handy"
-                    />
-                    <div className="flex gap-2">
-                      <button
-                        onClick={handleSaveDeviceName}
-                        className="flex-1 px-3 py-2 rounded text-sm font-medium bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 border border-green-300 dark:border-green-700 hover:bg-green-200 dark:hover:bg-green-800 transition-colors"
-                      >
-                        Speichern
-                      </button>
-                      <button
-                        onClick={handleCancelEditDeviceName}
-                        className="flex-1 px-3 py-2 rounded text-sm font-medium bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
-                      >
-                        Abbrechen
-                      </button>
+                  {dailyTextEnabled && (
+                    <div className="ml-4 mt-2">
+                      <input
+                        type="time"
+                        value={dailyTextTime}
+                        onChange={(e) => handleDailyTextTimeChange(e.target.value)}
+                        className="w-20 px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-300 rounded"
+                      />
                     </div>
+                  )}
+                </div>
+
+                {/* Permission Status */}
+                {notificationPermission !== 'granted' && (
+                  <div className="text-xs text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/20 p-2 rounded border border-yellow-200 dark:border-yellow-700">
+                    {notificationPermission === 'denied'
+                      ? 'Benachrichtigungen deaktiviert'
+                      : 'Benachrichtigungsberechtigung erforderlich'}
+                    {notificationPermission !== 'denied' && (
+                      <button
+                        onClick={handleRequestPermission}
+                        disabled={permissionLoading}
+                        className="ml-2 text-blue-600 dark:text-blue-400 hover:underline"
+                      >
+                        Aktivieren
+                      </button>
+                    )}
                   </div>
                 )}
-                <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-300 mt-1">Hilfreicher Name zur Unterscheidung mehrerer Geräte</p>
+
+                {/* Test Notification Button */}
+                {notificationPermission === 'granted' && (
+                  <button
+                    onClick={handleNewTestNotification}
+                    className="w-full mt-2 px-3 py-2 text-xs bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors border border-gray-300 dark:border-gray-600"
+                  >
+                    Test Benachrichtigung
+                  </button>
+                )}
+              </div>
+
+              {/* Admin Message Templates */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-300">Message Templates</h3>
+                <AdminMessageTemplates />
+              </div>
+
+              {/* Divider */}
+              <div className="border-t border-red-200 dark:border-red-700" />
+
+              {/* Section 2: Reading Plan Things */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-300">Lesepläne</h3>
+
+                {/* Schedule Update Button */}
+                <button
+                  onClick={handleUpdateSchedule}
+                  disabled={loading}
+                  className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-200 rounded-lg font-medium hover:bg-blue-100 dark:hover:bg-blue-800 transition-colors border border-blue-200 dark:border-blue-700 text-sm disabled:opacity-50"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  Schedule Update
+                </button>
+
+                {/* Create Reading Plan Button */}
+                <button
+                  onClick={() => setShowPlanCreator(true)}
+                  className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-green-50 dark:bg-green-900 text-green-700 dark:text-green-200 rounded-lg font-medium hover:bg-green-100 dark:hover:bg-green-800 transition-colors border border-green-200 dark:border-green-700 text-sm"
+                >
+                  <Plus className="w-4 h-4" />
+                  Create Plan
+                </button>
+              </div>
+
+              {/* Divider */}
+              <div className="border-t border-red-200 dark:border-red-700" />
+
+              {/* Section 3: Device Things */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-300">Gerät</h3>
+
+                {/* Device ID */}
+                <div className="space-y-1">
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Device ID</p>
+                  <div className="flex gap-2">
+                    <code className="flex-1 text-xs bg-gray-100 dark:bg-slate-700 p-2 rounded border border-gray-300 dark:border-gray-600 dark:text-gray-300 font-mono overflow-auto">
+                      {deviceId.substring(0, 12)}...
+                    </code>
+                    <button
+                      onClick={handleCopyDeviceId}
+                      className={`px-2 py-1 rounded text-xs font-medium flex items-center gap-1 transition-colors ${
+                        copySuccess
+                          ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300'
+                          : 'bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-800'
+                      }`}
+                    >
+                      <Copy className="w-3 h-3" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Device Name */}
+                <div className="space-y-1">
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Device Name</p>
+                  {!isEditingDeviceName ? (
+                    <div className="flex gap-2">
+                      <p className="flex-1 text-xs bg-gray-50 p-2 rounded border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-300">
+                        {deviceName}
+                      </p>
+                      <button
+                        onClick={() => setIsEditingDeviceName(true)}
+                        className="px-2 py-1 rounded text-xs font-medium bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-100 hover:bg-blue-100 dark:hover:bg-blue-800 transition-colors"
+                      >
+                        Edit
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-1">
+                      <input
+                        type="text"
+                        value={tempDeviceName}
+                        onChange={(e) => setTempDeviceName(e.target.value)}
+                        className="w-full text-xs px-2 py-1 border border-blue-300 dark:border-blue-600 dark:bg-slate-800 dark:text-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                      <div className="flex gap-1">
+                        <button
+                          onClick={handleSaveDeviceName}
+                          className="flex-1 px-2 py-1 rounded text-xs font-medium bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-800 transition-colors"
+                        >
+                          Save
+                        </button>
+                        <button
+                          onClick={handleCancelEditDeviceName}
+                          className="flex-1 px-2 py-1 rounded text-xs font-medium bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Divider */}
+              <div className="border-t border-red-200 dark:border-red-700" />
+
+              {/* Section 4: Reset/Cleanup */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-semibold text-red-600 dark:text-red-400">Zurücksetzen</h3>
+
+                {/* Reset All Settings */}
+                <button
+                  onClick={handleResetAll}
+                  className="w-full bg-red-50 dark:bg-red-900 text-red-700 dark:text-red-100 py-2 px-3 rounded-lg font-medium hover:bg-red-100 dark:hover:bg-red-800 transition-colors border border-red-200 dark:border-red-700 text-sm"
+                >
+                  Reset All
+                </button>
+
+                {/* Clear Cache */}
+                <button
+                  onClick={handleClearCache}
+                  className="w-full bg-orange-50 dark:bg-orange-900 text-orange-700 dark:text-orange-100 py-2 px-3 rounded-lg font-medium hover:bg-orange-100 dark:hover:bg-orange-800 transition-colors border border-orange-200 text-sm"
+                >
+                  Clear Cache
+                </button>
+
+                {/* Reset Progress */}
+                <button
+                  onClick={handleResetProgress}
+                  className="w-full bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100 py-2 px-3 rounded-lg font-medium hover:bg-red-200 dark:hover:bg-red-800 transition-colors border border-red-300 dark:border-red-600 text-sm"
+                >
+                  Reset Progress
+                </button>
               </div>
             </div>
           )}

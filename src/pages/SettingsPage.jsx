@@ -6,6 +6,7 @@ import { useAdmin } from '../context/AdminContext'
 import { useAuth } from '../context/AuthContext'
 import ReadingPlanCreator from '../components/ReadingPlanCreator'
 import BibleInOneYearWarningModal from '../components/BibleInOneYearWarningModal'
+import AdminMessageTemplates from '../components/AdminMessageTemplates'
 import { uploadReadingPlan, getAvailableReadingPlans, installReadingPlan, uninstallReadingPlan, getInstalledPlans } from '../utils/firebaseReadingPlans'
 import { getBibleInOneYearState, pausePlan } from '../utils/bibleInOneYearState'
 import { SUPPORTED_LANGUAGES, getCurrentLanguage, setCurrentLanguage } from '../config/languages'
@@ -649,17 +650,17 @@ const SettingsPage = () => {
         </div>
 
         {/* Language Settings */}
-        <div className="card bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-700 mb-3">
+        <div className="card bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-700 mb-3 p-0">
           <button
             onClick={() => toggleSection('language')}
-            className="w-full flex items-center justify-between p-4"
+            className="w-full flex items-start justify-between pt-[10px] pr-[5px] pb-[10px] pl-[10px]"
           >
-            <div className="flex items-center gap-2">
-              <Globe className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <div className="flex items-start gap-2.5 flex-1 min-w-0">
+              <Globe className="w-5 h-5 flex-shrink-0 text-blue-600 dark:text-blue-400 mt-0.5" />
               <h2 className="font-semibold text-gray-800 dark:text-gray-300">{t('settings.language')}</h2>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600 dark:text-gray-400">{getLanguageName()}</span>
+            <div className="flex items-center gap-0 flex-shrink-0">
+              <span className="text-xs text-gray-600 dark:text-gray-400">{getLanguageName()}</span>
               {expandedSection === 'language' ? (
                 <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-500" />
               ) : (
@@ -669,7 +670,7 @@ const SettingsPage = () => {
           </button>
 
           {expandedSection === 'language' && (
-            <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="mt-0 pt-4 pl-[10px] pr-[10px] pb-[16px] border-t border-gray-200 dark:border-gray-700">
               <div className="grid grid-cols-2 gap-2">
                 {SUPPORTED_LANGUAGES.map((lang) => (
                   <button
@@ -697,24 +698,26 @@ const SettingsPage = () => {
         </div>
 
         {/* Display Settings */}
-        <div className="card bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-700 mb-3">
+        <div className="card bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-700 mb-3 p-0">
           <button
             onClick={() => toggleSection('display')}
-            className="w-full flex items-center justify-between p-4"
+            className="w-full flex items-start justify-between pt-[10px] pr-[5px] pb-[10px] pl-[10px]"
           >
-            <div className="flex items-center gap-2">
-              <Eye className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <div className="flex items-start gap-2.5 flex-1 min-w-0">
+              <Eye className="w-5 h-5 flex-shrink-0 text-blue-600 dark:text-blue-400 mt-0.5" />
               <h2 className="font-semibold text-gray-800 dark:text-gray-300">{t('settings.display')}</h2>
             </div>
-            {expandedSection === 'display' ? (
-              <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-500" />
-            ) : (
-              <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500" />
-            )}
+            <div className="flex items-center gap-0 flex-shrink-0">
+              {expandedSection === 'display' ? (
+                <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-500" />
+              ) : (
+                <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500" />
+              )}
+            </div>
           </button>
 
           {expandedSection === 'display' && (
-            <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 space-y-4">
+            <div className="mt-0 pt-4 pl-[10px] pr-[10px] pb-[16px] border-t border-gray-200 dark:border-gray-700 space-y-4">
               {/* Show Yeartext Toggle */}
               <div className="flex items-center justify-between">
                 <div>
@@ -723,12 +726,12 @@ const SettingsPage = () => {
                 </div>
                 <button
                   onClick={handleShowYeartext}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  className={`relative inline-flex h-4 w-11 items-center rounded-full transition-colors ${
                     showYeartext ? 'bg-blue-600 dark:bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
                   }`}
                 >
                   <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    className={`inline-block h-5 w-4 transform rounded-full bg-white transition-transform ${
                       showYeartext ? 'translate-x-6' : 'translate-x-1'
                     }`}
                   />
@@ -767,24 +770,26 @@ const SettingsPage = () => {
 
         {/* Admin Settings Section (Only visible in Admin Mode) */}
         {isAdminMode && (
-          <div className="card bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-300 dark:border-indigo-700 mb-3">
+          <div className="card bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-300 dark:border-indigo-700 mb-3 p-0">
             <button
               onClick={() => toggleSection('admin')}
-              className="w-full flex items-center justify-between p-4"
+              className="w-full flex items-start justify-between pt-[10px] pr-[5px] pb-[10px] pl-[10px]"
             >
-              <div className="flex items-center gap-2">
-                <Lock className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+              <div className="flex items-start gap-2.5 flex-1 min-w-0">
+                <Lock className="w-5 h-5 flex-shrink-0 text-indigo-600 dark:text-indigo-400 mt-0.5" />
                 <h2 className="font-semibold text-gray-800 dark:text-gray-300">⚙️ ADMIN SETTINGS</h2>
               </div>
-              {expandedSection === 'admin' ? (
-                <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-500" />
-              ) : (
-                <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500" />
-              )}
+              <div className="flex items-center gap-0 flex-shrink-0">
+                {expandedSection === 'admin' ? (
+                  <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-500" />
+                ) : (
+                  <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500" />
+                )}
+              </div>
             </button>
 
             {expandedSection === 'admin' && (
-              <div className="mt-4 pt-4 border-t border-indigo-300 dark:border-indigo-700 space-y-4">
+              <div className="mt-0 pt-4 pl-[10px] pr-[10px] pb-[16px] border-t border-indigo-300 dark:border-indigo-700 space-y-4">
                 {/* Exit Admin Access */}
                 <div>
                   <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Admin-Modus</p>
@@ -837,12 +842,12 @@ const SettingsPage = () => {
                     </div>
                     <button
                       onClick={handleDailyReminderToggle}
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                      className={`relative inline-flex h-4 w-11 items-center rounded-full transition-colors ${
                         dailyReminder ? 'bg-blue-600 dark:bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
                       }`}
                     >
                       <span
-                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        className={`inline-block h-5 w-4 transform rounded-full bg-white transition-transform ${
                           dailyReminder ? 'translate-x-6' : 'translate-x-1'
                         }`}
                       />
@@ -1001,21 +1006,27 @@ const SettingsPage = () => {
                 </div>
               </div>
             )}
+
+            {/* Message Templates Management */}
+            <div className="pt-3 border-t border-indigo-300 dark:border-indigo-700">
+              <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Benachrichtigungsvorlagen</p>
+              <AdminMessageTemplates />
+            </div>
           </div>
         )}
 
         {/* Weekly Reading Settings */}
-        <div className="card bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-700 mb-3">
+        <div className="card bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-700 mb-3 p-0">
           <button
             onClick={() => toggleSection('weekly')}
-            className="w-full flex items-center justify-between p-4"
+            className="w-full flex items-start justify-between pt-[10px] pr-[5px] pb-[10px] pl-[10px]"
           >
-            <div className="flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <div className="flex items-start gap-2.5 flex-1 min-w-0">
+              <Calendar className="w-5 h-5 flex-shrink-0 text-blue-600 dark:text-blue-400 mt-0.5" />
               <h2 className="font-semibold text-gray-800 dark:text-gray-300">{t('settings.weekly_reading')}</h2>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-300">{getMeetingDayName()}</span>
+            <div className="flex items-center gap-0 flex-shrink-0">
+              <span className="text-xs text-gray-600 dark:text-gray-400 dark:text-gray-300">{getMeetingDayName()}</span>
               {expandedSection === 'weekly' ? (
                 <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
               ) : (
@@ -1025,7 +1036,7 @@ const SettingsPage = () => {
           </button>
 
           {expandedSection === 'weekly' && (
-            <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="mt-0 pt-4 pl-[10px] pr-[10px] pb-[16px] border-t border-gray-200 dark:border-gray-700">
               {/* Meeting Day */}
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -1051,17 +1062,17 @@ const SettingsPage = () => {
         </div>
 
         {/* Personal Reading Plan */}
-        <div className="card bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-700 mb-3">
+        <div className="card bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-700 mb-3 p-0">
           <button
             onClick={() => toggleSection('personal')}
-            className="w-full flex items-center justify-between p-4"
+            className="w-full flex items-start justify-between pt-[10px] pr-[5px] pb-[10px] pl-[10px]"
           >
-            <div className="flex items-center gap-2">
-              <BookOpen className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <div className="flex items-start gap-2.5 flex-1 min-w-0">
+              <BookOpen className="w-5 h-5 flex-shrink-0 text-blue-600 dark:text-blue-400 mt-0.5" />
               <h2 className="font-semibold text-gray-800 dark:text-gray-300">{t('settings.personal_plan')}</h2>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-300">{getReadingPlanName()}</span>
+            <div className="flex items-center gap-0 flex-shrink-0">
+              <span className="text-xs text-gray-600 dark:text-gray-400 dark:text-gray-300">{getReadingPlanName()}</span>
               {expandedSection === 'personal' ? (
                 <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
               ) : (
@@ -1071,7 +1082,7 @@ const SettingsPage = () => {
           </button>
 
           {expandedSection === 'personal' && (
-            <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="mt-0 pt-4 pl-[10px] pr-[10px] pb-[16px] border-t border-gray-200 dark:border-gray-700">
               <div className="relative">
                 <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
                   {t('settings.reading_plan')}
@@ -1189,19 +1200,19 @@ const SettingsPage = () => {
         </div>
 
         {/* Notifications - NEW NOTIFICATION SETTINGS UI */}
-        <div className="card bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-700 mb-3">
+        <div className="card bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-700 mb-3 p-0">
           <button
             onClick={() => toggleSection('notifications')}
-            className="w-full flex items-center justify-between p-4"
+            className="w-full flex items-start justify-between pt-[10px] pr-[5px] pb-[10px] pl-[10px]"
           >
-            <div className="flex items-center gap-2">
-              <Bell className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <div className="flex items-start gap-2.5 flex-1 min-w-0">
+              <Bell className="w-5 h-5 flex-shrink-0 text-blue-600 dark:text-blue-400 mt-0.5" />
               <h2 className="font-semibold text-gray-800 dark:text-gray-300">
                 {t('settings.notifications_title')}
               </h2>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600 dark:text-gray-400">
+            <div className="flex items-center gap-0 flex-shrink-0">
+              <span className="text-xs text-gray-600 dark:text-gray-400">
                 {notificationMasterSwitch ? t('common.active') : 'Stumm'}
               </span>
               {expandedSection === 'notifications' ? (
@@ -1213,7 +1224,7 @@ const SettingsPage = () => {
           </button>
 
           {expandedSection === 'notifications' && (
-            <div className="px-4 pb-4 pt-2 space-y-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="mt-0 pt-4 pl-[10px] pr-[10px] pb-[16px] space-y-4 border-t border-gray-200 dark:border-gray-700">
 
               {/* Permission Status Indicator */}
               {notificationPermission !== 'granted' && (
@@ -1252,13 +1263,13 @@ const SettingsPage = () => {
                 </div>
                 <button
                   onClick={handleMasterSwitchToggle}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  className={`relative inline-flex h-4 w-11 items-center rounded-full transition-colors ${
                     notificationMasterSwitch
                       ? 'bg-blue-600 dark:bg-blue-500'
                       : 'bg-gray-300 dark:bg-gray-600'
                   }`}
                 >
-                  <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  <span className={`inline-block h-5 w-4 transform rounded-full bg-white transition-transform ${
                     notificationMasterSwitch ? 'translate-x-6' : 'translate-x-1'
                   }`} />
                 </button>
@@ -1276,13 +1287,13 @@ const SettingsPage = () => {
                   <button
                     onClick={handleDailyTextToggle}
                     disabled={!notificationMasterSwitch}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    className={`relative inline-flex h-4 w-11 items-center rounded-full transition-colors ${
                       dailyTextEnabled
                         ? 'bg-blue-600 dark:bg-blue-500'
                         : 'bg-gray-300 dark:bg-gray-600'
                     }`}
                   >
-                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    <span className={`inline-block h-5 w-4 transform rounded-full bg-white transition-transform ${
                       dailyTextEnabled ? 'translate-x-6' : 'translate-x-1'
                     }`} />
                   </button>
@@ -1309,13 +1320,13 @@ const SettingsPage = () => {
                   <button
                     onClick={handleWeeklyReadingToggle}
                     disabled={!notificationMasterSwitch}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    className={`relative inline-flex h-4 w-11 items-center rounded-full transition-colors ${
                       weeklyReadingEnabled
                         ? 'bg-blue-600 dark:bg-blue-500'
                         : 'bg-gray-300 dark:bg-gray-600'
                     }`}
                   >
-                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    <span className={`inline-block h-5 w-4 transform rounded-full bg-white transition-transform ${
                       weeklyReadingEnabled ? 'translate-x-6' : 'translate-x-1'
                     }`} />
                   </button>
@@ -1342,13 +1353,13 @@ const SettingsPage = () => {
                   <button
                     onClick={handlePersonalReadingToggle}
                     disabled={!notificationMasterSwitch}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    className={`relative inline-flex h-4 w-11 items-center rounded-full transition-colors ${
                       personalReadingEnabled
                         ? 'bg-blue-600 dark:bg-blue-500'
                         : 'bg-gray-300 dark:bg-gray-600'
                     }`}
                   >
-                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    <span className={`inline-block h-5 w-4 transform rounded-full bg-white transition-transform ${
                       personalReadingEnabled ? 'translate-x-6' : 'translate-x-1'
                     }`} />
                   </button>
@@ -1380,13 +1391,13 @@ const SettingsPage = () => {
                   <button
                     onClick={handleStreakToggle}
                     disabled={!notificationMasterSwitch}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    className={`relative inline-flex h-4 w-11 items-center rounded-full transition-colors ${
                       streakEnabled
                         ? 'bg-blue-600 dark:bg-blue-500'
                         : 'bg-gray-300 dark:bg-gray-600'
                     }`}
                   >
-                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    <span className={`inline-block h-5 w-4 transform rounded-full bg-white transition-transform ${
                       streakEnabled ? 'translate-x-6' : 'translate-x-1'
                     }`} />
                   </button>
@@ -1410,24 +1421,26 @@ const SettingsPage = () => {
 
         {/* Reset All - ADMIN ONLY (moved to Admin Settings Section above) */}
         {isAdminMode && (
-        <div className="card bg-white dark:bg-slate-900 border border-red-200 dark:border-red-700 mb-4">
+        <div className="card bg-white dark:bg-slate-900 border border-red-200 dark:border-red-700 mb-4 p-0">
           <button
             onClick={() => toggleSection('reset')}
-            className="w-full flex items-center justify-between p-4"
+            className="w-full flex items-start justify-between pt-[10px] pr-[5px] pb-[10px] pl-[10px]"
           >
-            <div className="flex items-center gap-2">
-              <RotateCcw className="w-5 h-5 text-red-600 dark:text-red-400" />
+            <div className="flex items-start gap-2.5 flex-1 min-w-0">
+              <RotateCcw className="w-5 h-5 flex-shrink-0 text-red-600 dark:text-red-400 mt-0.5" />
               <h2 className="font-semibold text-gray-800 dark:text-gray-300">{t('settings.reset')}</h2>
             </div>
-            {expandedSection === 'reset' ? (
-              <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
-            ) : (
-              <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
-            )}
+            <div className="flex items-center gap-0 flex-shrink-0">
+              {expandedSection === 'reset' ? (
+                <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
+              ) : (
+                <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
+              )}
+            </div>
           </button>
 
           {expandedSection === 'reset' && (
-            <div className="mt-4 pt-4 border-t border-red-200 dark:border-red-700 space-y-3">
+            <div className="mt-0 pt-4 pl-[10px] pr-[10px] pb-[16px] border-t border-red-200 dark:border-red-700 space-y-3">
               {/* Reset Settings */}
               <div>
                 <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('settings.reset_settings')}</p>
@@ -1476,24 +1489,26 @@ const SettingsPage = () => {
 
         {/* Device Info - ADMIN ONLY */}
         {isAdminMode && (
-        <div className="card bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-700 mb-4">
+        <div className="card bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-700 mb-4 p-0">
           <button
             onClick={() => toggleSection('device')}
-            className="w-full flex items-center justify-between p-4"
+            className="w-full flex items-start justify-between pt-[10px] pr-[5px] pb-[10px] pl-[10px]"
           >
-            <div className="flex items-center gap-2">
-              <Smartphone className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <div className="flex items-start gap-2.5 flex-1 min-w-0">
+              <Smartphone className="w-5 h-5 flex-shrink-0 text-blue-600 dark:text-blue-400 mt-0.5" />
               <h2 className="font-semibold text-gray-800 dark:text-gray-300">Device Info</h2>
             </div>
-            {expandedSection === 'device' ? (
-              <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
-            ) : (
-              <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
-            )}
+            <div className="flex items-center gap-0 flex-shrink-0">
+              {expandedSection === 'device' ? (
+                <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
+              ) : (
+                <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
+              )}
+            </div>
           </button>
 
           {expandedSection === 'device' && (
-            <div className="mt-4 pt-4 border-t border-blue-200 dark:border-blue-700 space-y-3">
+            <div className="mt-0 pt-4 pl-[10px] pr-[10px] pb-[16px] border-t border-blue-200 dark:border-blue-700 space-y-3">
               {/* Device ID */}
               <div className="space-y-2">
                 <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Device ID</p>
@@ -1564,14 +1579,14 @@ const SettingsPage = () => {
         )}
 
         {/* Version & Build Info Card - Expandable */}
-        <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 mt-6 mb-4">
+        <div className="card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 mb-3 p-0">
           <button
             onClick={() => setExpandedVersionInfo(!expandedVersionInfo)}
-            className="w-full flex items-center justify-between p-4"
+            className="w-full flex items-start justify-between pt-[10px] pr-[5px] pb-[10px] pl-[10px]"
           >
-            <div className="flex items-center gap-2">
+            <div className="flex items-start gap-2.5 flex-1 min-w-0">
               <Info
-                className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+                className="w-5 h-5 flex-shrink-0 text-blue-600 dark:text-blue-400 flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity mt-0.5"
                 onClick={(e) => {
                   e.stopPropagation()
                   setExpandedVersionInfo(!expandedVersionInfo)
@@ -1579,15 +1594,15 @@ const SettingsPage = () => {
               />
               <h2 className="font-semibold text-gray-800 dark:text-gray-300">BRC</h2>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600 dark:text-gray-400">
+            <div className="flex items-center gap-0 flex-shrink-0">
+              <span className="text-xs text-gray-600 dark:text-gray-400">
                 v{APP_VERSION}
               </span>
             </div>
           </button>
 
           {expandedVersionInfo && (
-            <div className="mt-0 pt-4 px-4 pb-4 border-t border-slate-200 dark:border-slate-700 space-y-3">
+            <div className="mt-0 pt-4 pl-[10px] pr-[10px] pb-[16px] border-t border-slate-200 dark:border-slate-700 space-y-3">
               {/* Build Code - With Copy Button */}
               <div>
                 <p className="text-xs text-gray-600 dark:text-gray-400 font-medium mb-1">Build</p>

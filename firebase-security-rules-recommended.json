@@ -1,11 +1,5 @@
 {
   "rules": {
-    "devices": {
-      "$deviceId": {
-        ".read": true,
-        ".write": true
-      }
-    },
     "admins": {
       ".read": "auth != null",
       ".write": "root.child('admins').child(auth.uid).exists()"
@@ -18,11 +12,23 @@
       ".read": true,
       ".write": "root.child('admins').child(auth.uid).exists()"
     },
+    "readingPlans": {
+      ".read": true,
+      "available": {
+        "$planId": {
+          ".write": "root.child('admins').child(auth.uid).exists()"
+        }
+      }
+    },
     "users": {
       "$uid": {
         ".read": "$uid === auth.uid",
         ".write": "$uid === auth.uid",
         "progress": {
+          ".read": "$uid === auth.uid",
+          ".write": "$uid === auth.uid"
+        },
+        "installedPlans": {
           ".read": "$uid === auth.uid",
           ".write": "$uid === auth.uid"
         }

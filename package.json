@@ -6,6 +6,7 @@
   "description": "Progressive Web App for tracking Bible reading progress",
   "scripts": {
     "dev": "vite",
+    "dev:restart": "pkill -9 -f 'node.*vite' 2>/dev/null || true && sleep 1 && npm run dev",
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint .",

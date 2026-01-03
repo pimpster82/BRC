@@ -1191,6 +1191,19 @@ const SettingsPage = () => {
               <div className="space-y-3">
                 <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-300">Lesepläne</h3>
 
+                {/* Schedule Update Year Input */}
+                <div className="space-y-2">
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-400">Jahr für Leseplan</label>
+                  <input
+                    type="number"
+                    min="2024"
+                    max={new Date().getFullYear() + 5}
+                    value={scheduleYear}
+                    onChange={(e) => setScheduleYear(parseInt(e.target.value) || new Date().getFullYear() + 1)}
+                    className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
                 {/* Schedule Update Button */}
                 <button
                   onClick={handleFetchSchedule}
@@ -1198,8 +1211,21 @@ const SettingsPage = () => {
                   className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-200 rounded-lg font-medium hover:bg-blue-100 dark:hover:bg-blue-800 transition-colors border border-blue-200 dark:border-blue-700 text-sm disabled:opacity-50"
                 >
                   <RefreshCw className="w-4 h-4" />
-                  Schedule Update
+                  Schedule Update laden
                 </button>
+
+                {/* Status Message */}
+                {scheduleMessage && (
+                  <div className={`mt-2 p-2 rounded text-xs whitespace-pre-wrap ${
+                    scheduleStatus === 'success'
+                      ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800'
+                      : scheduleStatus === 'error'
+                      ? 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800'
+                      : 'bg-gray-50 dark:bg-slate-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700'
+                  }`}>
+                    {scheduleMessage}
+                  </div>
+                )}
 
                 {/* Create Reading Plan Button */}
                 <button

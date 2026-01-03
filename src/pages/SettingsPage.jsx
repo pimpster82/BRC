@@ -1151,27 +1151,29 @@ const SettingsPage = () => {
         {/* ADMIN SETTINGS - Consolidated & Organized */}
         {isAdminMode && (
         <div className="card bg-white dark:bg-slate-900 border border-red-200 dark:border-red-700 mb-3 p-0">
-          <button
-            onClick={() => toggleSection('admin')}
-            className="w-full flex items-start justify-between pt-[10px] pr-[5px] pb-[10px] pl-[10px]"
-          >
-            <div className="flex items-start gap-2.5 flex-1 min-w-0">
+          <div className="w-full flex items-start justify-between pt-[10px] pr-[5px] pb-[10px] pl-[10px]">
+            <button
+              onClick={() => toggleSection('admin')}
+              className="flex items-start gap-2.5 flex-1 min-w-0 hover:opacity-80 transition-opacity"
+            >
               <Lock className="w-5 h-5 flex-shrink-0 text-red-600 dark:text-red-400 mt-0.5" />
-              <h2 className="font-semibold text-gray-800 dark:text-gray-300">ADMIN SETTINGS</h2>
-            </div>
+              <h2 className="font-semibold text-gray-800 dark:text-gray-300">Admin Settings</h2>
+            </button>
             <div className="flex items-center gap-2 flex-shrink-0">
               <button
-                onClick={(e) => {
-                  e.stopPropagation()
-                  exitAdminAccess()
-                }}
+                onClick={exitAdminAccess}
                 className="px-3 py-1 text-xs font-medium rounded bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 text-white transition-colors"
                 title="Exit Admin Mode"
               >
                 Beenden
               </button>
+              {expandedSection === 'admin' ? (
+                <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-500" />
+              ) : (
+                <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500" />
+              )}
             </div>
-          </button>
+          </div>
 
           {expandedSection === 'admin' && (
             <div className="mt-0 pt-4 pl-[10px] pr-[10px] pb-[16px] border-t border-red-200 dark:border-red-700 space-y-4">
@@ -1273,8 +1275,8 @@ const SettingsPage = () => {
 
                 {/* Schedule Update Button */}
                 <button
-                  onClick={handleUpdateSchedule}
-                  disabled={loading}
+                  onClick={handleFetchSchedule}
+                  disabled={scheduleStatus === 'loading'}
                   className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-200 rounded-lg font-medium hover:bg-blue-100 dark:hover:bg-blue-800 transition-colors border border-blue-200 dark:border-blue-700 text-sm disabled:opacity-50"
                 >
                   <RefreshCw className="w-4 h-4" />

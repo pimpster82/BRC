@@ -26,7 +26,7 @@ export default function LoadingSpinner({
   const sizes = {
     full: {
       container: 'min-h-screen',
-      ring: 'w-40 h-40',
+      ring: 'w-32 h-32',
       icon: 'w-32 h-32',
       iconImg: 'w-24 h-24',
       text: 'text-lg',
@@ -34,7 +34,7 @@ export default function LoadingSpinner({
     },
     inline: {
       container: 'py-12',
-      ring: 'w-32 h-32',
+      ring: 'w-24 h-24',
       icon: 'w-24 h-24',
       iconImg: 'w-16 h-16',
       text: 'text-base',
@@ -42,7 +42,7 @@ export default function LoadingSpinner({
     },
     small: {
       container: 'py-6',
-      ring: 'w-20 h-20',
+      ring: 'w-16 h-16',
       icon: 'w-16 h-16',
       iconImg: 'w-10 h-10',
       text: 'text-sm',
@@ -65,7 +65,7 @@ export default function LoadingSpinner({
           <div className="relative">
             {/* Outer pulse ring */}
             <div
-              className={`absolute ${config.ring} bg-indigo-400 rounded-full opacity-20 animate-pulse dark:bg-blue-400`}
+              className={`absolute ${config.ring} bg-indigo-400 rounded-full opacity-20 animate-pulse dark:bg-blue-400 -z-10`}
               style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
             ></div>
 

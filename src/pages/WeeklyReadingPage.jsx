@@ -376,10 +376,10 @@ const WeeklyReadingPage = () => {
   const progressPercent = verseProgress.percentage
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 dark:from-slate-800 to-indigo-50 dark:to-slate-700 dark:from-slate-900 dark:to-slate-800 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 dark:from-slate-800 to-indigo-50 dark:to-slate-700 dark:from-slate-900 dark:to-slate-800 pt-12 px-4 pb-4">
       <div className="max-w-md mx-auto">
         {/* Header */}
-        <div className="mb-4 pt-4">
+        <div className="mb-4">
           <button
             onClick={() => navigate('/')}
             className="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 mb-4"

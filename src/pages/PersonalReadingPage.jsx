@@ -496,7 +496,7 @@ export default function PersonalReadingPage() {
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950 pb-20">
       {/* Header */}
-      <div className="sticky top-0 pt-12 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-gray-700 z-40">
+      <div className="sticky top-0 safe-top bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-gray-700 z-40">
         <div className="flex items-center gap-4 px-4 pb-4">
           <button
             onClick={() => navigate('/')}

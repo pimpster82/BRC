@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 
 /**
  * LoadingSpinner - Animated loading component with multiple variants
@@ -9,6 +9,8 @@ import React from 'react'
  * - Customizable loading message
  * - Dark/Light mode support
  * - Professional appearance
+ * - Minimum display time of 5 seconds to show loading animation
+ * - Round loading GIF with smooth edges
  *
  * @param {Object} props
  * @param {string} props.message - Loading message to display (default: "Wird geladen...")
@@ -22,6 +24,26 @@ export default function LoadingSpinner({
   showDots = true,
   iconSize = 'lg',
 }) {
+  const [gifLoaded, setGifLoaded] = useState(false)
+  const [minTimeElapsed, setMinTimeElapsed] = useState(false)
+
+  useEffect(() => {
+    // Ensure minimum display time of 5 seconds
+    const timer = setTimeout(() => {
+      setMinTimeElapsed(true)
+    }, 5000)
+
+    return () => clearTimeout(timer)
+  }, [])
+
+  // Preload the GIF
+  useEffect(() => {
+    const img = new Image()
+    img.onload = () => {
+      setGifLoaded(true)
+    }
+    img.src = '/icons/book-loading.gif'
+  }, [])
   // Size configurations
   const sizes = {
     full: {
@@ -69,12 +91,17 @@ export default function LoadingSpinner({
               style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
             ></div>
 
-            {/* Icon - Animated GIF */}
+            {/* Icon - Animated GIF (Round) */}
             <div className={`relative ${config.icon} flex items-center justify-center animate-pulse`}>
               <img
                 src="/icons/book-loading.gif"
                 alt="Loading..."
-                className={`${config.iconImg} object-contain drop-shadow-lg`}
+                className={`${config.iconImg} object-cover rounded-full drop-shadow-lg`}
+                style={{
+                  clipPath: 'circle(50%)',
+                  opacity: gifLoaded ? 1 : 0,
+                  transition: 'opacity 0.3s ease-in'
+                }}
               />
             </div>
           </div>

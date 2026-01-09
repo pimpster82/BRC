@@ -6,7 +6,7 @@ import { AdminProvider } from './context/AdminContext'
 import { ThemeProvider } from './context/ThemeContext'
 import { LoadingProvider } from './context/LoadingContext'
 import { ProgressProvider } from './context/ProgressContext'
-import LoadingSpinner from './components/LoadingSpinner'
+import MinimumDelaySpinner from './components/MinimumDelaySpinner'
 import InstallPromptBanner from './components/InstallPromptBanner'
 import HomePage from './pages/HomePage'
 import WeeklyReadingPage from './pages/WeeklyReadingPage'
@@ -21,15 +21,16 @@ import { startNotificationService, stopNotificationService } from './utils/notif
 /**
  * ProtectedRoute - Only allows authenticated users
  * Redirects to login if user is not authenticated
+ * Shows loading spinner for minimum 5 seconds to display animation
  */
 const ProtectedRoute = ({ element }) => {
   const { currentUser, loading } = useAuth()
 
-  if (loading) {
-    return <LoadingSpinner variant="full" message="Authentifizierung wird überprüft..." />
-  }
-
-  return currentUser ? element : <Navigate to="/login" replace />
+  return (
+    <MinimumDelaySpinner loading={loading} message="Authentifizierung wird überprüft...">
+      {currentUser ? element : <Navigate to="/login" replace />}
+    </MinimumDelaySpinner>
+  )
 }
 
 /**

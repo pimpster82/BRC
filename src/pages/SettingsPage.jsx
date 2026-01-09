@@ -46,6 +46,9 @@ const SettingsPage = () => {
   const [showYeartext, setShowYeartext] = useState(
     localStorage.getItem('settings_showYeartext') !== 'false' // Default: true
   )
+  const [appIcon, setAppIcon] = useState(
+    localStorage.getItem('settings_appIcon') || 'light' // Default: light
+  )
 
   // Weekly Reading Settings
   const [meetingDay, setMeetingDay] = useState(
@@ -180,6 +183,34 @@ const SettingsPage = () => {
     const newValue = !showYeartext
     setShowYeartext(newValue)
     localStorage.setItem('settings_showYeartext', newValue.toString())
+  }
+
+  const handleAppIconChange = (iconType) => {
+    setAppIcon(iconType)
+    localStorage.setItem('settings_appIcon', iconType)
+    // Update manifest dynamically (for new installations)
+    updateManifestIcon(iconType)
+  }
+
+  // Update manifest.json icon dynamically
+  const updateManifestIcon = (iconType) => {
+    const manifestLink = document.querySelector('link[rel="manifest"]')
+    if (manifestLink) {
+      // Force browser to re-fetch manifest with new icon
+      const manifestUrl = `/manifest.json?icon=${iconType}&v=${Date.now()}`
+      manifestLink.href = manifestUrl
+    }
+
+    // Update apple-touch-icon for iOS
+    const appleIcon = document.querySelector('link[rel="apple-touch-icon"]')
+    if (appleIcon) {
+      const iconMap = {
+        light: '/icons/icon-silver-light-1024.png',
+        dark: '/icons/icon-silver-dark-1024.png',
+        tinted: '/icons/icon-silver-tinted-1024.png'
+      }
+      appleIcon.href = iconMap[iconType] || iconMap.light
+    }
   }
 
   const handleMeetingDayChange = (day) => {
@@ -762,6 +793,63 @@ const SettingsPage = () => {
                     }`}
                   />
                 </button>
+              </div>
+
+              {/* App Icon Selection */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {t('settings.app_icon')}
+                </label>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                  {t('settings.app_icon_note')}
+                </p>
+
+                {/* Icon Options */}
+                <div className="space-y-2">
+                  {[
+                    { value: 'light', label: t('settings.icon_light'), preview: '/icons/icon-silver-light-192.png' },
+                    { value: 'dark', label: t('settings.icon_dark'), preview: '/icons/icon-silver-dark-192.png' },
+                    { value: 'tinted', label: t('settings.icon_tinted'), preview: '/icons/icon-silver-tinted-192.png' }
+                  ].map((option) => (
+                    <button
+                      key={option.value}
+                      onClick={() => handleAppIconChange(option.value)}
+                      className={`w-full flex items-center gap-3 p-3 rounded-lg border-2 transition-all ${
+                        appIcon === option.value
+                          ? 'border-blue-600 dark:border-blue-500 bg-blue-50 dark:bg-blue-900/30'
+                          : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                      }`}
+                    >
+                      <img
+                        src={option.preview}
+                        alt={option.label}
+                        className="w-12 h-12 rounded-lg object-cover"
+                      />
+                      <span className={`font-medium ${
+                        appIcon === option.value
+                          ? 'text-blue-900 dark:text-blue-200'
+                          : 'text-gray-700 dark:text-gray-300'
+                      }`}>
+                        {option.label}
+                      </span>
+                      {appIcon === option.value && (
+                        <svg className="w-5 h-5 ml-auto text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                      )}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Warning: Reinstall Required */}
+                <div className="bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 rounded-lg p-3 mt-3">
+                  <p className="text-xs text-amber-800 dark:text-amber-200 font-medium mb-1">
+                    {t('settings.icon_reinstall_required')}
+                  </p>
+                  <p className="text-xs text-amber-700 dark:text-amber-300">
+                    {t('settings.icon_reinstall_steps')}
+                  </p>
+                </div>
               </div>
 
             </div>

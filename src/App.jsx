@@ -7,6 +7,7 @@ import { ThemeProvider } from './context/ThemeContext'
 import { LoadingProvider } from './context/LoadingContext'
 import { ProgressProvider } from './context/ProgressContext'
 import LoadingSpinner from './components/LoadingSpinner'
+import InstallPromptBanner from './components/InstallPromptBanner'
 import HomePage from './pages/HomePage'
 import WeeklyReadingPage from './pages/WeeklyReadingPage'
 import ParserTestBench from './pages/ParserTestBench'
@@ -76,18 +77,23 @@ const AppContent = () => {
   }, [currentUser])
 
   return (
-    <Routes>
-      {/* Public Routes */}
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
+    <>
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
 
-      {/* Protected Routes */}
-      <Route path="/" element={<ProtectedRoute element={<HomePage />} />} />
-      <Route path="/weekly" element={<ProtectedRoute element={<WeeklyReadingPage />} />} />
-      <Route path="/personal-reading" element={<ProtectedRoute element={<PersonalReadingPage />} />} />
-      <Route path="/test-parser" element={<ProtectedRoute element={<ParserTestBench />} />} />
-      <Route path="/settings" element={<ProtectedRoute element={<SettingsPage />} />} />
-    </Routes>
+        {/* Protected Routes */}
+        <Route path="/" element={<ProtectedRoute element={<HomePage />} />} />
+        <Route path="/weekly" element={<ProtectedRoute element={<WeeklyReadingPage />} />} />
+        <Route path="/personal-reading" element={<ProtectedRoute element={<PersonalReadingPage />} />} />
+        <Route path="/test-parser" element={<ProtectedRoute element={<ParserTestBench />} />} />
+        <Route path="/settings" element={<ProtectedRoute element={<SettingsPage />} />} />
+      </Routes>
+
+      {/* Install Prompt Banner - shows after 2nd visit */}
+      {currentUser && <InstallPromptBanner />}
+    </>
   )
 }
 

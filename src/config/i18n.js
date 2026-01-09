@@ -83,6 +83,7 @@ export const translations = {
     'settings.icon_light': 'Hell (Standard)',
     'settings.icon_dark': 'Dunkel',
     'settings.icon_tinted': 'Getönt',
+    'settings.icon_cartoon': 'Comic-Stil',
     'settings.icon_reinstall_required': '⚠️ Änderung wird erst nach Neuinstallation sichtbar',
     'settings.icon_reinstall_steps': 'App vom Home-Bildschirm löschen → Neu hinzufügen → Erneut anmelden',
 
@@ -452,6 +453,7 @@ export const translations = {
     'settings.icon_light': 'Light (Default)',
     'settings.icon_dark': 'Dark',
     'settings.icon_tinted': 'Tinted',
+    'settings.icon_cartoon': 'Cartoon Style',
     'settings.icon_reinstall_required': '⚠️ Change will be visible after reinstalling',
     'settings.icon_reinstall_steps': 'Delete app from home screen → Add again → Login again',
 
@@ -806,6 +808,7 @@ export const translations = {
     'settings.icon_light': 'Claro (Predeterminado)',
     'settings.icon_dark': 'Oscuro',
     'settings.icon_tinted': 'Tintado',
+    'settings.icon_cartoon': 'Estilo Cómic',
     'settings.icon_reinstall_required': '⚠️ El cambio será visible después de reinstalar',
     'settings.icon_reinstall_steps': 'Eliminar app de pantalla de inicio → Añadir de nuevo → Iniciar sesión de nuevo',
 
@@ -1160,6 +1163,7 @@ export const translations = {
     'settings.icon_light': 'Chiaro (Predefinito)',
     'settings.icon_dark': 'Scuro',
     'settings.icon_tinted': 'Tinto',
+    'settings.icon_cartoon': 'Stile Fumetto',
     'settings.icon_reinstall_required': '⚠️ La modifica sarà visibile dopo la reinstallazione',
     'settings.icon_reinstall_steps': 'Elimina app dalla schermata home → Aggiungi di nuovo → Accedi di nuovo',
 
@@ -1517,6 +1521,7 @@ export const translations = {
     'settings.icon_light': 'Clair (Par défaut)',
     'settings.icon_dark': 'Sombre',
     'settings.icon_tinted': 'Teinté',
+    'settings.icon_cartoon': 'Style BD',
     'settings.icon_reinstall_required': '⚠️ Le changement sera visible après réinstallation',
     'settings.icon_reinstall_steps': 'Supprimer l\'app de l\'écran d\'accueil → Ajouter à nouveau → Se connecter à nouveau',
 

@@ -207,7 +207,8 @@ const SettingsPage = () => {
       const iconMap = {
         light: '/icons/icon-silver-light-1024.png',
         dark: '/icons/icon-silver-dark-1024.png',
-        tinted: '/icons/icon-silver-tinted-1024.png'
+        tinted: '/icons/icon-silver-tinted-1024.png',
+        cartoon: '/icons/icon-cartoon-light-1024.png'
       }
       appleIcon.href = iconMap[iconType] || iconMap.light
     }
@@ -809,7 +810,8 @@ const SettingsPage = () => {
                   {[
                     { value: 'light', label: t('settings.icon_light'), preview: '/icons/icon-silver-light-192.png' },
                     { value: 'dark', label: t('settings.icon_dark'), preview: '/icons/icon-silver-dark-192.png' },
-                    { value: 'tinted', label: t('settings.icon_tinted'), preview: '/icons/icon-silver-tinted-192.png' }
+                    { value: 'tinted', label: t('settings.icon_tinted'), preview: '/icons/icon-silver-tinted-192.png' },
+                    { value: 'cartoon', label: t('settings.icon_cartoon'), preview: '/icons/icon-cartoon-light-192.png' }
                   ].map((option) => (
                     <button
                       key={option.value}

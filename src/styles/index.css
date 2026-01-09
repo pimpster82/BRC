@@ -31,6 +31,15 @@ body {
   .text-muted {
     @apply text-gray-500 dark:text-gray-500;
   }
+
+  /* Safe Area Insets - for notch/dynamic island clearance */
+  .safe-top {
+    padding-top: max(3rem, env(safe-area-inset-top));
+  }
+
+  .safe-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
 }
 
 #root {

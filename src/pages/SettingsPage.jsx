@@ -655,7 +655,7 @@ const SettingsPage = () => {
   const readingPlans = allReadingPlans.filter(plan => plan.available || isAdminMode)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 dark:from-slate-800 to-indigo-50 dark:to-slate-700 dark:from-slate-900 dark:to-slate-800 pt-12 px-4 pb-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 dark:from-slate-800 to-indigo-50 dark:to-slate-700 dark:from-slate-900 dark:to-slate-800 safe-top px-4 pb-4">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="mb-6">

@@ -42,6 +42,7 @@ export const initializeBibleInOneYear = (attemptNumber = 1) => {
     pauseDate: null,
     completedReadings: [], // Array of reading IDs (1-365)
     lastReadingId: 0,
+    lastReadingDate: null, // Date when last reading was marked (for notifications)
     daysActive: 0,
     totalChaptersRead: 0
   }
@@ -77,6 +78,7 @@ export const markReadingComplete = (state, readingId) => {
     ...state,
     completedReadings: [...state.completedReadings, readingId].sort((a, b) => a - b),
     lastReadingId: Math.max(state.lastReadingId, readingId),
+    lastReadingDate: new Date().toISOString().split('T')[0], // Track when this reading was marked
     daysActive: state.daysActive + 1
   }
 
@@ -96,6 +98,11 @@ export const unmarkReading = (state, readingId) => {
   const newState = {
     ...state,
     completedReadings: state.completedReadings.filter(id => id !== readingId)
+  }
+
+  // If no readings marked anymore, clear lastReadingDate
+  if (newState.completedReadings.length === 0) {
+    newState.lastReadingDate = null
   }
 
   saveBibleInOneYearState(newState)
@@ -301,11 +308,19 @@ export const calculateStats = (state) => {
     }
   }
 
+  // Calculate actual days active (startDate to pauseDate or today)
+  let actualDaysActive = 0
+  if (state.startDate) {
+    const start = new Date(state.startDate)
+    const end = state.pauseDate ? new Date(state.pauseDate) : new Date()
+    actualDaysActive = Math.floor((end - start) / (1000 * 60 * 60 * 24)) + 1 // +1 to include start day
+  }
+
   return {
     progress,
     readingsCompleted: state.completedReadings.length,
     totalReadings: 365,
-    daysActive: state.daysActive,
+    daysActive: actualDaysActive,
     startDate: state.startDate,
     pauseDate: state.pauseDate,
     isActive: state.active,

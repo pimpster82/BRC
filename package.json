@@ -6,6 +6,7 @@
   "description": "Progressive Web App for tracking Bible reading progress",
   "scripts": {
     "dev": "vite",
+    "dev:restart": "pkill -9 -f 'node.*vite' 2>/dev/null || true && sleep 1 && npm run dev",
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint .",
@@ -31,6 +32,9 @@
     "postcss": "^8.4.32",
     "sharp": "^0.34.5",
     "tailwindcss": "^4.1.18",
-    "vite": "^5.0.8"
+    "vite": "^5.0.8",
+    "vite-plugin-pwa": "^1.2.0",
+    "workbox-precaching": "^7.4.0",
+    "workbox-routing": "^7.4.0"
   }
 }

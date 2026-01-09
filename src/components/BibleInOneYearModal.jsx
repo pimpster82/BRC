@@ -31,9 +31,12 @@ export default function BibleInOneYearModal({ stats, onResume, onRestart, onCanc
       <div className="bg-white dark:bg-slate-900 rounded-lg shadow-xl max-w-md w-full">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
-            {t('bibleInOneYear.modal.title')}
-          </h2>
+          <div className="flex items-center gap-3">
+            <BookOpen className="text-blue-600 dark:text-blue-400" size={24} />
+            <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+              {t('bibleInOneYear.modal.title')}
+            </h2>
+          </div>
           <button
             onClick={onCancel}
             className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
@@ -44,15 +47,8 @@ export default function BibleInOneYearModal({ stats, onResume, onRestart, onCanc
 
         {/* Content */}
         <div className="p-6 space-y-4">
-          {/* Attempt Info */}
+          {/* Plan Info */}
           <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-            <div className="flex items-center gap-2 mb-3">
-              <BookOpen className="text-blue-600 dark:text-blue-400" size={20} />
-              <span className="font-semibold text-blue-900 dark:text-blue-200">
-                {t('bibleInOneYear.modal.attemptNumber', { number: stats.attempt })}
-              </span>
-            </div>
-
             <div className="space-y-2 text-sm">
               {/* Start Date */}
               <div className="flex items-center justify-between">

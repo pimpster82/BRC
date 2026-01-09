@@ -1,18 +1,18 @@
-# App Icons - iOS 2025 Compliant
+# App Icons - iOS 2025 Compliant (Silver Design)
 
 ## Current Icon Files (✅ ACTIVE)
 
 ### Master Icons (1024×1024) - iOS 2025 Variants
 
-**3 Required Variants:**
-- `icon-light-1024.png` - Light mode (white pages, navy outline)
-- `icon-dark-1024.png` - Dark mode (white pages, dark background, navy outline)
-- `icon-tinted-1024.png` - Monochrome/Grayscale (fully opaque, for system tinting)
+**3 Required Variants (Silver Design):**
+- `icon-silver-light-1024.png` - Light mode (open Bible with colorful bookmarks, transparent bg)
+- `icon-silver-dark-1024.png` - Dark mode (same Bible, slate-900 background)
+- `icon-silver-tinted-1024.png` - Monochrome/Grayscale (fully opaque, for system tinting)
 
 ### Web Icons (512×512 & 192×192)
-- `icon-light-512.png` / `icon-light-192.png`
-- `icon-dark-512.png` / `icon-dark-192.png`
-- `icon-tinted-512.png` / `icon-tinted-192.png`
+- `icon-silver-light-512.png` / `icon-silver-light-192.png`
+- `icon-silver-dark-512.png` / `icon-silver-dark-192.png`
+- `icon-silver-tinted-512.png` / `icon-silver-tinted-192.png`
 
 ### iOS Home Screen Icons
 - `icon-ios-120x120.png` - iPhone Spotlight
@@ -27,9 +27,10 @@
 
 ## Total: 17 Files (487 KB)
 
-### Design
-- **Style:** Professional lineart, open Bible with verse lines
-- **Colors:** Navy blue (#1a3a52) outline, blue accent (#2563eb) bookmark
+### Design (Silver Variant)
+- **Style:** Open Bible with colorful reading highlights (yellow, blue, pink, green lines)
+- **Components:** Silver/gray hard cover, white pages with colored bookmarks, "BRC" ribbon bookmark
+- **Colors:** Silver/gray frame, white pages, multicolor highlights (yellow, cyan, magenta, lime)
 - **Format:** PNG (all) + SVG (vector)
 - **Color Spaces:** sRGB (light/dark), Gray Gamma 2.2 (tinted)
 
@@ -69,6 +70,17 @@ See `readytoremove.md` in project root for full cleanup list.
 
 ---
 
-**Last Updated:** 2025-12-27
+## Alternative Icon Designs (Archived)
+
+Previous versions and test variants are stored in `public/icons/alternatives/`:
+- `icon-light-*.png` / `icon-dark-*.png` / `icon-tinted-*.png` (old navy design)
+- `icon-light-cartoon.png` (test variant)
+- `book-loading-*.gif` (loading animations)
+
+These are kept for reference/testing. Only the **silver variants** are deployed.
+
+---
+
+**Last Updated:** 2026-01-01
 **iOS Compliance:** iOS 18+ (with iOS 25 support)
 **Web Compliance:** PWA, all modern browsers

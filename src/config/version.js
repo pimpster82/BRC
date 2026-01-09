@@ -8,7 +8,7 @@
  * - PATCH: Bug fixes
  */
 
-export const APP_VERSION = 'dev0.2.0'
+export const APP_VERSION = '2.0.1'
 
 /**
  * Production Version Tracking
@@ -16,7 +16,7 @@ export const APP_VERSION = 'dev0.2.0'
  * Updated when features merge from dev to production
  * Used for rollback tracking and dependency management
  */
-export const LINKED_PRODUCTION_VERSION = '1.1.1'  // Current prod version live at https://brc-liard.vercel.app
+export const LINKED_PRODUCTION_VERSION = '2.0.1'  // Current prod version live at https://brc-liard.vercel.app
 
 /**
  * Build Information
@@ -88,6 +88,15 @@ export const BUILD_INFO = `v${APP_VERSION} (${BUILD_CODE}) → prod ${LINKED_PRO
  * - Ready for new experimental features
  *
  * PRODUCTION RELEASE NOTES:
+ *
+ * 2.0.1 (Admin Settings Cleanup & iOS Fixes)
+ * - Reorganized Admin Settings UI: consolidated into single expandable card
+ * - Removed obsolete duplicate notification settings (Master Mute, Daily Text)
+ * - Improved "Admin Zugang beenden" button styling (red button with text)
+ * - Fixed nested button HTML validation error
+ * - Fixed iOS datepicker overflow issue with overflow-hidden and reduced focus ring
+ * - Added AdminMessageTemplates to admin notifications section
+ * - Cleaner, more organized admin interface
  *
  * 1.0.0 (Stable Release - Production Ready) [BASELINE]
  * - Comprehensive dark mode support across all UI elements

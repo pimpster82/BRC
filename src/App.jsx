@@ -17,6 +17,7 @@ import RegisterPage from './pages/RegisterPage'
 import PersonalReadingPage from './pages/PersonalReadingPage'
 import { processPendingSyncQueue } from './utils/firebaseUserProgress'
 import { startNotificationService, stopNotificationService } from './utils/notificationService'
+import { useUpdateChecker } from './hooks/useUpdateChecker'
 
 /**
  * ProtectedRoute - Only allows authenticated users
@@ -39,6 +40,9 @@ const ProtectedRoute = ({ element }) => {
  */
 const AppContent = () => {
   const { currentUser } = useAuth()
+
+  // Automatic update checking (background)
+  const { updateInfo } = useUpdateChecker()
 
   useEffect(() => {
     // PHASE 3: Add online/offline event listeners

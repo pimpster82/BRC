@@ -17,6 +17,7 @@ import { getOrCreateDeviceId, getDeviceName, setDeviceName, getDeviceInfo } from
 import { t } from '../config/i18n'
 import { APP_VERSION, BUILD_INFO, LINKED_PRODUCTION_VERSION } from '../config/version'
 import { useTheme } from '../context/ThemeContext'
+import { getCurrentChannel, setUpdateChannel, checkForUpdates, triggerUpdate } from '../utils/updateManager'
 import bibleBooks from '../../data/bible-books-en.json'
 import { requestNotificationPermission, getNotificationPermission, testNotification } from '../utils/reminderService'
 import { showLocalNotification } from '../utils/notificationScheduler'
@@ -136,6 +137,13 @@ const SettingsPage = () => {
   const [selectedPlanInfo, setSelectedPlanInfo] = useState(null) // Plan to show in modal
   const [showUninstallModal, setShowUninstallModal] = useState(false) // Show uninstall confirmation
   const [planToUninstall, setPlanToUninstall] = useState(null) // Plan to uninstall
+
+  // Update Channel Management
+  const [updateChannel, setUpdateChannelState] = useState(getCurrentChannel().id)
+  const [updateAvailable, setUpdateAvailable] = useState(false)
+  const [latestVersion, setLatestVersion] = useState(null)
+  const [checkingUpdate, setCheckingUpdate] = useState(false)
+  const [updateError, setUpdateError] = useState('')
 
   // Load available and installed plans
   useEffect(() => {
@@ -636,6 +644,51 @@ const SettingsPage = () => {
       console.error('Plan upload error:', error)
     } finally {
       hideLoading()
+    }
+  }
+
+  // Update Channel Handlers
+  const handleChannelToggle = () => {
+    const newChannel = updateChannel === 'production' ? 'beta' : 'production'
+
+    if (window.confirm(t('settings.channel_switch_confirm') || 'Channel wechseln? Die App wird neu geladen.')) {
+      setUpdateChannel(newChannel)
+      setUpdateChannelState(newChannel)
+      setUpdateAvailable(false)
+      setLatestVersion(null)
+      setUpdateError('')
+    }
+  }
+
+  const handleCheckForUpdates = async () => {
+    setCheckingUpdate(true)
+    setUpdateError('')
+
+    try {
+      const result = await checkForUpdates()
+
+      if (result.error) {
+        setUpdateError(result.error)
+      } else {
+        setUpdateAvailable(result.hasUpdate)
+        setLatestVersion(result.latestVersion)
+      }
+    } catch (error) {
+      setUpdateError(error.message)
+    } finally {
+      setCheckingUpdate(false)
+    }
+  }
+
+  const handleInstallUpdate = async () => {
+    if (window.confirm('Update jetzt installieren? Die App wird neu geladen und alle offenen Änderungen gehen verloren.')) {
+      showLoading('Update wird installiert...')
+      try {
+        await triggerUpdate()
+      } catch (error) {
+        hideLoading()
+        alert('Fehler beim Update: ' + error.message)
+      }
     }
   }
 
@@ -1446,7 +1499,115 @@ const SettingsPage = () => {
               {/* Divider */}
               <div className="border-t border-red-200 dark:border-red-700" />
 
-              {/* Section 4: Reset/Cleanup */}
+              {/* Section 4: Update Channel */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-300">Update-Kanal</h3>
+
+                {/* Beta Channel Toggle */}
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex-1">
+                    <p className="font-medium text-gray-800 dark:text-gray-300 text-sm">
+                      Beta-Channel aktivieren
+                    </p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400">
+                      Neue Features vor Production-Release testen
+                    </p>
+                  </div>
+                  <button
+                    onClick={handleChannelToggle}
+                    className={`relative inline-flex h-4 w-11 items-center rounded-full transition-colors ${
+                      updateChannel === 'beta'
+                        ? 'bg-purple-600 dark:bg-purple-500'
+                        : 'bg-gray-300 dark:bg-gray-600'
+                    }`}
+                  >
+                    <span className={`inline-block h-5 w-4 transform rounded-full bg-white transition-transform ${
+                      updateChannel === 'beta' ? 'translate-x-6' : 'translate-x-1'
+                    }`} />
+                  </button>
+                </div>
+
+                {/* Beta Warning */}
+                {updateChannel === 'beta' && (
+                  <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3">
+                    <p className="text-xs text-yellow-800 dark:text-yellow-200 font-medium flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3" />
+                      Beta-Versionen können instabil sein
+                    </p>
+                  </div>
+                )}
+
+                {/* Version Info */}
+                <div className="bg-gray-50 dark:bg-slate-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs text-gray-600 dark:text-gray-400">Aktuelle Version</span>
+                    <span className="text-xs font-mono text-gray-900 dark:text-gray-200">{APP_VERSION}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-gray-600 dark:text-gray-400">Channel</span>
+                    <span className={`text-xs font-medium ${
+                      updateChannel === 'beta'
+                        ? 'text-purple-700 dark:text-purple-300'
+                        : 'text-blue-700 dark:text-blue-300'
+                    }`}>
+                      {updateChannel === 'beta' ? 'Beta' : 'Production'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Check for Updates Button */}
+                <button
+                  onClick={handleCheckForUpdates}
+                  disabled={checkingUpdate}
+                  className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-200 rounded-lg font-medium hover:bg-blue-100 dark:hover:bg-blue-800 transition-colors border border-blue-200 dark:border-blue-700 text-sm disabled:opacity-50"
+                >
+                  <RefreshCw className={`w-4 h-4 ${checkingUpdate ? 'animate-spin' : ''}`} />
+                  {checkingUpdate ? 'Prüfe...' : 'Auf Updates prüfen'}
+                </button>
+
+                {/* Update Available Notification */}
+                {updateAvailable && latestVersion && (
+                  <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-3">
+                    <div className="flex items-start gap-2 mb-2">
+                      <Check className="w-4 h-4 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
+                      <div className="flex-1">
+                        <p className="text-xs font-medium text-green-800 dark:text-green-200">
+                          Update verfügbar: {latestVersion}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={handleInstallUpdate}
+                      className="w-full mt-2 px-3 py-2 bg-green-600 dark:bg-green-500 text-white rounded-lg font-medium hover:bg-green-700 dark:hover:bg-green-600 transition-colors text-sm"
+                    >
+                      Jetzt aktualisieren
+                    </button>
+                  </div>
+                )}
+
+                {/* No Updates Message */}
+                {!updateAvailable && !checkingUpdate && latestVersion && (
+                  <div className="bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3">
+                    <p className="text-xs text-gray-600 dark:text-gray-400">
+                      ✓ Keine Updates verfügbar
+                    </p>
+                  </div>
+                )}
+
+                {/* Error Message */}
+                {updateError && (
+                  <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
+                    <p className="text-xs text-red-700 dark:text-red-300">
+                      ✗ Fehler: {updateError}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Divider */}
+              <div className="border-t border-red-200 dark:border-red-700" />
+
+              {/* Section 5: Reset/Cleanup */}
               <div className="space-y-3">
                 <h3 className="text-sm font-semibold text-red-600 dark:text-red-400">Zurücksetzen</h3>
 

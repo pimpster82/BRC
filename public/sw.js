@@ -146,4 +146,30 @@ self.addEventListener('sync', (event) => {
   }
 })
 
+// Handle messages from clients (for update management)
+self.addEventListener('message', (event) => {
+  console.log('[SW] Message received:', event.data)
+
+  // Skip waiting and activate new service worker immediately
+  if (event.data.type === 'SKIP_WAITING') {
+    console.log('[SW] Skipping waiting, activating now')
+    self.skipWaiting()
+  }
+
+  // Clear all caches (for channel switching or forced updates)
+  if (event.data.type === 'CLEAR_CACHE') {
+    console.log('[SW] Clearing all caches')
+    event.waitUntil(
+      caches.keys().then((keys) => {
+        return Promise.all(keys.map((key) => {
+          console.log('[SW] Deleting cache:', key)
+          return caches.delete(key)
+        }))
+      }).then(() => {
+        console.log('[SW] All caches cleared')
+      })
+    )
+  }
+})
+
 console.log('[SW] Service Worker loaded')

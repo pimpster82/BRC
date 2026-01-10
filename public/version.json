@@ -1,0 +1,10 @@
+{
+  "version": "2.0.1",
+  "channel": "production",
+  "buildDate": "2026-01-10T12:00:00Z",
+  "gitTag": "v2.0.1",
+  "gitCommit": "0aa6726",
+  "deploymentUrl": "https://brc-liard.vercel.app",
+  "releaseNotes": "Admin Settings Cleanup & iOS Fixes",
+  "minCompatibleVersion": "2.0.0"
+}

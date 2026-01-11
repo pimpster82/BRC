@@ -1,10 +1,10 @@
 {
-  "version": "B0.3.0",
+  "version": "B2.1.0",
   "channel": "beta",
-  "buildDate": "2026-01-11T14:00:00Z",
-  "gitTag": "B0.3.0",
+  "buildDate": "2026-01-11T14:30:00Z",
+  "gitTag": "B2.1.0",
   "gitCommit": "latest",
   "deploymentUrl": "https://brc-beta.vercel.app",
-  "releaseNotes": "Beta: Update system implementation and new features",
-  "minCompatibleVersion": "B0.2.0"
+  "releaseNotes": "Beta: Update system test - new features ahead of production",
+  "minCompatibleVersion": "B2.0.0"
 }

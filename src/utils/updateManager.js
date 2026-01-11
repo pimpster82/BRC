@@ -191,9 +191,8 @@ export const compareVersions = (v1, v2) => {
 /**
  * Trigger app update
  * Steps:
- * 1. Unregister all service workers
- * 2. Clear all caches
- * 3. Reload app from new channel URL
+ * 1. Clear all caches (keep service worker active)
+ * 2. Navigate to deployment URL to get fresh version
  *
  * IMPORTANT: This preserves user data (localStorage reading progress)
  * Only code and assets are refreshed
@@ -204,17 +203,9 @@ export const triggerUpdate = async () => {
   console.log('[Update] Starting update process...')
 
   try {
-    // Step 1: Unregister all service workers
-    if ('serviceWorker' in navigator) {
-      const registrations = await navigator.serviceWorker.getRegistrations()
+    const channel = getCurrentChannel()
 
-      for (const registration of registrations) {
-        await registration.unregister()
-        console.log('[Update] Service worker unregistered')
-      }
-    }
-
-    // Step 2: Clear all caches
+    // Step 1: Clear all caches (but keep service worker)
     if ('caches' in window) {
       const cacheKeys = await caches.keys()
 
@@ -228,10 +219,15 @@ export const triggerUpdate = async () => {
 
     console.log('[Update] All caches cleared')
 
-    // Step 3: Reload app (hard reload to bypass cache)
-    // This will load from the active channel's deployment URL
-    console.log('[Update] Reloading app...')
-    window.location.reload(true)
+    // Step 2: Navigate to deployment URL
+    // Use window.location.href instead of reload() to ensure fresh fetch
+    console.log(`[Update] Navigating to: ${channel.deploymentUrl}`)
+
+    // Small delay to ensure cache clear completes
+    await new Promise(resolve => setTimeout(resolve, 100))
+
+    // Navigate to base URL (same domain, just forces fresh load)
+    window.location.href = window.location.origin + window.location.pathname + '?updated=' + Date.now()
   } catch (error) {
     console.error('[Update] Error during update:', error)
     throw error

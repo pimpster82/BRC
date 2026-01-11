@@ -52,7 +52,7 @@ export const RELEASE_CHANNELS = {
     versionPattern: /^B\d+\.\d+\.\d+$/,    // Regex to validate version format
     updateCheckInterval: 1800000,          // 30 minutes in milliseconds
     autoUpdate: false,                     // Ask user before updating
-    enabled: true
+    enabled: false                         // DISABLED until beta deployment is set up
   }
 }
 

@@ -190,9 +190,7 @@ export const compareVersions = (v1, v2) => {
 
 /**
  * Trigger app update
- * Steps:
- * 1. Clear all caches (keep service worker active)
- * 2. Navigate to deployment URL to get fresh version
+ * Simple hard reload with cache bypass
  *
  * IMPORTANT: This preserves user data (localStorage reading progress)
  * Only code and assets are refreshed
@@ -203,31 +201,13 @@ export const triggerUpdate = async () => {
   console.log('[Update] Starting update process...')
 
   try {
-    const channel = getCurrentChannel()
+    // Simple approach: Just do a hard reload with cache bypass
+    // The browser will fetch fresh files from the server
+    // Service worker will automatically update on next page load
+    console.log('[Update] Reloading app with cache bypass...')
 
-    // Step 1: Clear all caches (but keep service worker)
-    if ('caches' in window) {
-      const cacheKeys = await caches.keys()
-
-      await Promise.all(
-        cacheKeys.map(async key => {
-          await caches.delete(key)
-          console.log(`[Update] Cache deleted: ${key}`)
-        })
-      )
-    }
-
-    console.log('[Update] All caches cleared')
-
-    // Step 2: Navigate to deployment URL
-    // Use window.location.href instead of reload() to ensure fresh fetch
-    console.log(`[Update] Navigating to: ${channel.deploymentUrl}`)
-
-    // Small delay to ensure cache clear completes
-    await new Promise(resolve => setTimeout(resolve, 100))
-
-    // Navigate to base URL (same domain, just forces fresh load)
-    window.location.href = window.location.origin + window.location.pathname + '?updated=' + Date.now()
+    // Use location.replace with timestamp to force fresh load
+    window.location.replace(window.location.href.split('?')[0] + '?v=' + Date.now())
   } catch (error) {
     console.error('[Update] Error during update:', error)
     throw error

@@ -1,10 +1,10 @@
 {
-  "version": "v2.0.2",
+  "version": "2.0.2",
   "channel": "production",
-  "buildDate": "2026-01-11T14:30:00Z",
+  "buildDate": "2026-01-11T15:00:00Z",
   "gitTag": "v2.0.2",
   "gitCommit": "latest",
   "deploymentUrl": "https://brc-liard.vercel.app",
-  "releaseNotes": "Beta: Update system test - new features ahead of production",
-  "minCompatibleVersion": "v2.0.0"
+  "releaseNotes": "Update system testing - simplified update mechanism",
+  "minCompatibleVersion": "2.0.0"
 }

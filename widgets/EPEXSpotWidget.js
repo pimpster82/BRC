@@ -50,6 +50,7 @@ async function fetchPrices() {
     const bzn = CONFIG.country === "at" ? "AT" : "DE-LU"
     const req = new Request(`https://api.energy-charts.info/price?bzn=${bzn}`)
     req.timeoutInterval = 15
+    req.headers = { "Accept": "application/json" }
     const json = await req.loadJSON()
 
     if (Array.isArray(json.unix_seconds) && json.unix_seconds.length > 0) {
@@ -70,13 +71,14 @@ async function fetchPrices() {
     console.error("energy-charts Fehler:", e.message)
   }
 
-  // 2. Fallback: aWATTar
+  // 2. Fallback: aWATTar (https://api.awattar.de · v1/marketdata · GET · JSON)
   try {
     const base = CONFIG.country === "at"
       ? "https://api.awattar.at/v1/marketdata"
       : "https://api.awattar.de/v1/marketdata"
     const req = new Request(`${base}?start=${now}&end=${now + 26 * 3_600_000}`)
     req.timeoutInterval = 15
+    req.headers = { "Accept": "application/json" }
     const json = await req.loadJSON()
     if (Array.isArray(json.data) && json.data.length > 0) return json.data
   } catch (e) {

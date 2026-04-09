@@ -44,11 +44,28 @@ const C = {
 // ═══════════════════════════════════════════════════════════
 async function fetchPrices() {
   const now = Date.now()
+  const h26 = 26 * 3600000   // 26 Stunden in ms (keine Numeric Separators für Kompatibilität)
 
-  // 1. Versuch: Fraunhofer energy-charts.info (sehr zuverlässig, kein Key)
+  // 1. Primär: aWATTar – bestätigtes Format: {object, data[], url}
+  //    data[i]: { start_timestamp (ms), end_timestamp (ms), marketprice (EUR/MWh), unit }
+  try {
+    const base = CONFIG.country === "at"
+      ? "https://api.awattar.at/v1/marketdata"
+      : "https://api.awattar.de/v1/marketdata"
+    const req = new Request(base + "?start=" + now + "&end=" + (now + h26))
+    req.timeoutInterval = 15
+    req.headers = { "Accept": "application/json" }
+    const json = await req.loadJSON()
+    if (Array.isArray(json.data) && json.data.length > 0) return json.data
+  } catch (e) {
+    console.error("aWATTar Fehler:", e.message)
+  }
+
+  // 2. Fallback: energy-charts.info (Fraunhofer ISE)
+  //    Format: { unix_seconds[], price[] } – Preise in EUR/MWh
   try {
     const bzn = CONFIG.country === "at" ? "AT" : "DE-LU"
-    const req = new Request(`https://api.energy-charts.info/price?bzn=${bzn}`)
+    const req = new Request("https://api.energy-charts.info/price?bzn=" + bzn)
     req.timeoutInterval = 15
     req.headers = { "Accept": "application/json" }
     const json = await req.loadJSON()
@@ -56,12 +73,12 @@ async function fetchPrices() {
     if (Array.isArray(json.unix_seconds) && json.unix_seconds.length > 0) {
       const entries = []
       for (let i = 0; i < json.unix_seconds.length; i++) {
-        if (json.price[i] === null) continue   // fehlende Werte überspringen
+        if (json.price[i] === null) continue
         const start = json.unix_seconds[i] * 1000
         const end   = i + 1 < json.unix_seconds.length
           ? json.unix_seconds[i + 1] * 1000
-          : start + 3_600_000
-        if (end > now - 3_600_000) {           // ab ca. 1h vor jetzt
+          : start + 3600000
+        if (end > now - 3600000) {
           entries.push({ start_timestamp: start, end_timestamp: end, marketprice: json.price[i] })
         }
       }
@@ -69,20 +86,6 @@ async function fetchPrices() {
     }
   } catch (e) {
     console.error("energy-charts Fehler:", e.message)
-  }
-
-  // 2. Fallback: aWATTar (https://api.awattar.de · v1/marketdata · GET · JSON)
-  try {
-    const base = CONFIG.country === "at"
-      ? "https://api.awattar.at/v1/marketdata"
-      : "https://api.awattar.de/v1/marketdata"
-    const req = new Request(`${base}?start=${now}&end=${now + 26 * 3_600_000}`)
-    req.timeoutInterval = 15
-    req.headers = { "Accept": "application/json" }
-    const json = await req.loadJSON()
-    if (Array.isArray(json.data) && json.data.length > 0) return json.data
-  } catch (e) {
-    console.error("aWATTar Fehler:", e.message)
   }
 
   return null

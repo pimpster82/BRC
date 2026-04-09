@@ -2,423 +2,389 @@
 // ║          EPEX Spot Preis-Widget für Scriptable           ║
 // ║  Zeigt aktuelle Börsen-Strompreise (DE/AT) – stündlich   ║
 // ╚══════════════════════════════════════════════════════════╝
+// v1.1 – Fixes: Dark Mode Farben (Color.dynamic), API-Fallback
 //
 // INSTALLATION:
 //   1. App "Scriptable" aus dem App Store installieren (kostenlos)
-//   2. Dieses Script in Scriptable einfügen (+ → Script einfügen)
-//   3. Widget auf dem Homescreen hinzufügen:
-//      Homescreen lange drücken → + → Scriptable → Größe wählen
-//   4. Widget konfigurieren: Dieses Script auswählen
+//   2. Dieses Script in Scriptable einfügen (+ → Neues Script)
+//   3. Homescreen lange drücken → + → Scriptable → Größe wählen
+//   4. Widget antippen → dieses Script auswählen
 //
-// DATENQUELLE: aWATTar API (kostenlos, kein API-Key nötig)
-//   Deutschland: https://api.awattar.de/v1/marketdata
-//   Österreich:  https://api.awattar.at/v1/marketdata
-//
-// WICHTIG: Preise sind EPEX Spot Börsenpreise (netto, ohne MwSt/Netzentgelte)
+// QUELLEN: energy-charts.info (Fraunhofer ISE) + aWATTar als Fallback
+// PREISE: EPEX Spot Day-Ahead, netto (ohne MwSt / Netzentgelte)
 
 // ═══════════════════════════════════════════════════════════
 // KONFIGURATION – hier anpassen
 // ═══════════════════════════════════════════════════════════
 const CONFIG = {
-  // Land: "de" für Deutschland, "at" für Österreich
-  country: "de",
-
-  // Preisschwellen für Farbkodierung (in ct/kWh, Börsenwert netto)
-  thresholdGreen:  5,   // ≤ dieser Wert → grün (günstig)
-  thresholdYellow: 15,  // ≤ dieser Wert → gelb (mittel), darüber → rot (teuer)
-
-  // Anzahl der nächsten Stunden im Medium-Widget (max. 8)
-  hoursToShow: 6,
-
-  // Hintergrundfarbe des Widgets
-  bgColorDark:   new Color("#0f0f1a"),
-  bgColorLight:  new Color("#f0f4ff"),
-
-  // Widget im Dark Mode? (auto = je nach Systemeinstellung)
-  // Werte: true = immer dunkel, false = immer hell, "auto" = Systemeinstellung
-  forceDarkMode: "auto",
+  country:        "de",  // "de" = Deutschland, "at" = Österreich
+  thresholdGreen:  5,    // ≤ ct/kWh → grün  (günstig)
+  thresholdYellow: 15,   // ≤ ct/kWh → gelb  (mittel), darüber → rot (teuer)
+  hoursToShow:     6,    // Anzahl Folgestunden im Medium-Widget (max. 8)
 }
 
 // ═══════════════════════════════════════════════════════════
-// FARBEN & DESIGN
+// FARBEN – Color.dynamic() schaltet automatisch Hell/Dunkel
 // ═══════════════════════════════════════════════════════════
-const isDark = CONFIG.forceDarkMode === "auto"
-  ? Device.isUsingDarkAppearance()
-  : CONFIG.forceDarkMode
-
-const COLORS = {
-  bg:       isDark ? CONFIG.bgColorDark  : CONFIG.bgColorLight,
-  text:     isDark ? new Color("#ffffff") : new Color("#1a1a2e"),
-  dim:      isDark ? new Color("#777799") : new Color("#888888"),
-  accent:   new Color("#e94560"),
-  green:    new Color("#00c851"),
-  yellow:   new Color("#ffbb33"),
-  red:      new Color("#ff4444"),
-  barBg:    isDark ? new Color("#222244") : new Color("#dde4f0"),
-  negative: new Color("#4fc3f7"),   // Negativpreise → blau
+const C = {
+  bg:      Color.dynamic(new Color("#f0f4ff"), new Color("#0f0f1a")),
+  text:    Color.dynamic(new Color("#1a1a2e"), new Color("#ffffff")),
+  dim:     Color.dynamic(new Color("#555577"), new Color("#777799")),
+  divider: Color.dynamic(new Color("#ccccdd"), new Color("#222244")),
+  accent:  new Color("#e94560"),
+  green:   new Color("#00c851"),
+  yellow:  new Color("#ffbb33"),
+  red:     new Color("#ff4444"),
+  blue:    new Color("#4fc3f7"),   // Negativpreise
 }
 
 // ═══════════════════════════════════════════════════════════
-// API & DATEN
+// API – Primär: energy-charts.info (Fraunhofer ISE)
+//        Fallback: aWATTar
 // ═══════════════════════════════════════════════════════════
 async function fetchPrices() {
-  const base = CONFIG.country === "at"
-    ? "https://api.awattar.at/v1/marketdata"
-    : "https://api.awattar.de/v1/marketdata"
+  const now = Date.now()
 
-  // Daten für jetzt bis +26 Stunden laden
-  const now  = Date.now()
-  const end  = now + 26 * 3600 * 1000
-  const url  = `${base}?start=${now}&end=${end}`
-
+  // 1. Versuch: Fraunhofer energy-charts.info (sehr zuverlässig, kein Key)
   try {
-    const req = new Request(url)
+    const bzn = CONFIG.country === "at" ? "AT" : "DE-LU"
+    const req = new Request(`https://api.energy-charts.info/price?bzn=${bzn}`)
     req.timeoutInterval = 15
     const json = await req.loadJSON()
-    return json.data || []
+
+    if (Array.isArray(json.unix_seconds) && json.unix_seconds.length > 0) {
+      const entries = []
+      for (let i = 0; i < json.unix_seconds.length; i++) {
+        if (json.price[i] === null) continue   // fehlende Werte überspringen
+        const start = json.unix_seconds[i] * 1000
+        const end   = i + 1 < json.unix_seconds.length
+          ? json.unix_seconds[i + 1] * 1000
+          : start + 3_600_000
+        if (end > now - 3_600_000) {           // ab ca. 1h vor jetzt
+          entries.push({ start_timestamp: start, end_timestamp: end, marketprice: json.price[i] })
+        }
+      }
+      if (entries.length > 0) return entries
+    }
   } catch (e) {
-    console.error("Fehler beim Laden der Preise:", e)
-    return null
-  }
-}
-
-function eurMwhToCtKwh(eurMwh) {
-  // EUR/MWh → ct/kWh: dividieren durch 10
-  return eurMwh / 10
-}
-
-function priceColor(ctKwh) {
-  if (ctKwh < 0)                       return COLORS.negative
-  if (ctKwh <= CONFIG.thresholdGreen)  return COLORS.green
-  if (ctKwh <= CONFIG.thresholdYellow) return COLORS.yellow
-  return COLORS.red
-}
-
-function priceLabel(ctKwh) {
-  const sign = ctKwh < 0 ? "−" : ""
-  return `${sign}${Math.abs(ctKwh).toFixed(1)}`
-}
-
-function hourStr(ts) {
-  const d = new Date(ts)
-  return `${d.getHours().toString().padStart(2, "0")}:00`
-}
-
-function trendArrow(current, next) {
-  if (next > current + 0.5) return { symbol: "↑", color: COLORS.red }
-  if (next < current - 0.5) return { symbol: "↓", color: COLORS.green }
-  return { symbol: "→", color: COLORS.dim }
-}
-
-// Gibt aktuellen Eintrag + nächste n Einträge zurück
-function getRelevantEntries(data, count) {
-  const now = Date.now()
-  const result = []
-
-  for (const entry of data) {
-    if (entry.start_timestamp <= now && entry.end_timestamp > now) {
-      result.push({ ...entry, isCurrent: true })
-    } else if (entry.start_timestamp > now && result.length > 0) {
-      result.push({ ...entry, isCurrent: false })
-      if (result.length >= count + 1) break
-    }
+    console.error("energy-charts Fehler:", e.message)
   }
 
-  // Fallback: wenn noch kein "current" gefunden (z.B. Daten beginnen in Zukunft)
-  if (result.length === 0) {
-    for (const entry of data.slice(0, count + 1)) {
-      result.push({ ...entry, isCurrent: result.length === 0 })
-    }
+  // 2. Fallback: aWATTar
+  try {
+    const base = CONFIG.country === "at"
+      ? "https://api.awattar.at/v1/marketdata"
+      : "https://api.awattar.de/v1/marketdata"
+    const req = new Request(`${base}?start=${now}&end=${now + 26 * 3_600_000}`)
+    req.timeoutInterval = 15
+    const json = await req.loadJSON()
+    if (Array.isArray(json.data) && json.data.length > 0) return json.data
+  } catch (e) {
+    console.error("aWATTar Fehler:", e.message)
   }
 
-  return result
-}
-
-// ═══════════════════════════════════════════════════════════
-// WIDGET BAUEN
-// ═══════════════════════════════════════════════════════════
-async function buildWidget(family) {
-  const widget = new ListWidget()
-  widget.backgroundColor = COLORS.bg
-  widget.setPadding(12, 14, 10, 14)
-  widget.url = "https://www.awattar.de/tariffs/hourly"
-
-  const data = await fetchPrices()
-
-  // ── Fehlerfall ──────────────────────────────────────────
-  if (!data || data.length === 0) {
-    addHeader(widget)
-    widget.addSpacer(10)
-    const err = widget.addText("Keine Daten verfügbar.\nBitte Internetverbindung\nprüfen.")
-    err.textColor = COLORS.dim
-    err.font = Font.systemFont(12)
-    return widget
-  }
-
-  const maxHours = family === "small" ? 2 : family === "large" ? 11 : CONFIG.hoursToShow
-  const entries  = getRelevantEntries(data, maxHours)
-  const current  = entries[0]
-  const curPrice = eurMwhToCtKwh(current.marketprice)
-
-  // ── SMALL Widget ─────────────────────────────────────────
-  if (family === "small") {
-    addHeader(widget)
-    widget.addSpacer(4)
-
-    // Großer aktueller Preis
-    const priceRow = widget.addStack()
-    priceRow.layoutHorizontally()
-    priceRow.centerAlignContent()
-
-    const bigText = priceRow.addText(priceLabel(curPrice))
-    bigText.textColor = priceColor(curPrice)
-    bigText.font = Font.boldSystemFont(38)
-
-    const unitCol = priceRow.addStack()
-    unitCol.layoutVertically()
-    unitCol.addSpacer(14)
-    const unit = unitCol.addText(" ct\n/kWh")
-    unit.textColor = COLORS.dim
-    unit.font = Font.systemFont(9)
-
-    widget.addSpacer(2)
-
-    const nowLabel = widget.addText(`Jetzt · ${hourStr(current.start_timestamp)} Uhr`)
-    nowLabel.textColor = COLORS.dim
-    nowLabel.font = Font.systemFont(10)
-
-    widget.addSpacer(8)
-
-    // Nächste 2 Stunden
-    for (let i = 1; i < Math.min(entries.length, 3); i++) {
-      const e = entries[i]
-      const p = eurMwhToCtKwh(e.marketprice)
-      const row = widget.addStack()
-      row.layoutHorizontally()
-
-      const t = row.addText(hourStr(e.start_timestamp) + " Uhr")
-      t.textColor = COLORS.dim
-      t.font = Font.systemFont(11)
-
-      row.addSpacer()
-
-      const pTxt = row.addText(`${priceLabel(p)} ct`)
-      pTxt.textColor = priceColor(p)
-      pTxt.font = Font.boldSystemFont(11)
-
-      widget.addSpacer(3)
-    }
-
-    addFooter(widget)
-  }
-
-  // ── MEDIUM Widget ─────────────────────────────────────────
-  else if (family === "medium") {
-    addHeader(widget)
-    widget.addSpacer(6)
-
-    const mainRow = widget.addStack()
-    mainRow.layoutHorizontally()
-
-    // Linke Spalte: Aktueller Preis
-    const left = mainRow.addStack()
-    left.layoutVertically()
-    left.size = new Size(120, 0)
-
-    const big = left.addText(priceLabel(curPrice))
-    big.textColor = priceColor(curPrice)
-    big.font = Font.boldSystemFont(40)
-
-    const ctLbl = left.addText("ct/kWh")
-    ctLbl.textColor = COLORS.dim
-    ctLbl.font = Font.systemFont(11)
-
-    left.addSpacer(4)
-
-    const nowLbl = left.addText(`${hourStr(current.start_timestamp)} Uhr`)
-    nowLbl.textColor = COLORS.dim
-    nowLbl.font = Font.systemFont(10)
-
-    // Trend zur nächsten Stunde
-    if (entries.length > 1) {
-      const nextP = eurMwhToCtKwh(entries[1].marketprice)
-      const arrow = trendArrow(curPrice, nextP)
-      left.addSpacer(2)
-      const tr = left.addText(`nächste ${arrow.symbol} ${priceLabel(nextP)} ct`)
-      tr.textColor = arrow.color
-      tr.font = Font.systemFont(10)
-    }
-
-    mainRow.addSpacer(8)
-
-    // Rechte Spalte: Nächste Stunden
-    const right = mainRow.addStack()
-    right.layoutVertically()
-
-    const hdr = right.addText("Nächste Stunden")
-    hdr.textColor = COLORS.dim
-    hdr.font = Font.systemFont(9)
-    right.addSpacer(4)
-
-    for (let i = 1; i < Math.min(entries.length, CONFIG.hoursToShow + 1); i++) {
-      const e = entries[i]
-      const p = eurMwhToCtKwh(e.marketprice)
-
-      const row = right.addStack()
-      row.layoutHorizontally()
-
-      const dot = row.addText("● ")
-      dot.textColor = priceColor(p)
-      dot.font = Font.systemFont(10)
-
-      const time = row.addText(hourStr(e.start_timestamp))
-      time.textColor = COLORS.dim
-      time.font = Font.systemFont(10)
-
-      row.addSpacer()
-
-      const pTxt = row.addText(`${priceLabel(p)} ct`)
-      pTxt.textColor = priceColor(p)
-      pTxt.font = Font.boldSystemFont(10)
-
-      right.addSpacer(3)
-    }
-
-    addFooter(widget)
-  }
-
-  // ── LARGE Widget ──────────────────────────────────────────
-  else {
-    addHeader(widget)
-    widget.addSpacer(4)
-
-    // Aktueller Preis groß
-    const topRow = widget.addStack()
-    topRow.layoutHorizontally()
-    topRow.centerAlignContent()
-
-    const bigTxt = topRow.addText(priceLabel(curPrice))
-    bigTxt.textColor = priceColor(curPrice)
-    bigTxt.font = Font.boldSystemFont(44)
-
-    const uStack = topRow.addStack()
-    uStack.layoutVertically()
-    uStack.addSpacer(18)
-    const uTxt = uStack.addText(" ct/kWh")
-    uTxt.textColor = COLORS.dim
-    uTxt.font = Font.systemFont(12)
-
-    widget.addSpacer(2)
-
-    const nowRow = widget.addStack()
-    nowRow.layoutHorizontally()
-    const nLbl = nowRow.addText(`Jetzt: ${hourStr(current.start_timestamp)}–${hourStr(current.end_timestamp)} Uhr`)
-    nLbl.textColor = COLORS.dim
-    nLbl.font = Font.systemFont(10)
-
-    if (entries.length > 1) {
-      const nextP = eurMwhToCtKwh(entries[1].marketprice)
-      const arrow = trendArrow(curPrice, nextP)
-      nowRow.addSpacer()
-      const tr = nowRow.addText(`${arrow.symbol} ${priceLabel(nextP)} ct`)
-      tr.textColor = arrow.color
-      tr.font = Font.systemFont(10)
-    }
-
-    widget.addSpacer(8)
-
-    // Trennlinie
-    const div = widget.addText("─────────────────────────────")
-    div.textColor = isDark ? new Color("#222244") : new Color("#ccccdd")
-    div.font = Font.systemFont(8)
-
-    widget.addSpacer(6)
-
-    // Preisliste mit Mini-Balken
-    const allPrices = entries.slice(1).map(e => Math.abs(eurMwhToCtKwh(e.marketprice)))
-    const maxP = Math.max(...allPrices, 1)
-
-    for (let i = 1; i < Math.min(entries.length, 12); i++) {
-      const e = entries[i]
-      const p = eurMwhToCtKwh(e.marketprice)
-
-      const row = widget.addStack()
-      row.layoutHorizontally()
-      row.centerAlignContent()
-
-      // Dot
-      const dot = row.addText("●")
-      dot.textColor = priceColor(p)
-      dot.font = Font.systemFont(9)
-      row.addSpacer(4)
-
-      // Uhrzeit
-      const tTxt = row.addText(hourStr(e.start_timestamp))
-      tTxt.textColor = COLORS.dim
-      tTxt.font = Font.monospacedSystemFont(10)
-      row.addSpacer(6)
-
-      // Mini-Balken
-      const barWidth = Math.max(1, Math.round((Math.abs(p) / maxP) * 12))
-      const bar = row.addText("▮".repeat(barWidth))
-      bar.textColor = priceColor(p)
-      bar.font = Font.systemFont(8)
-
-      row.addSpacer()
-
-      // Preis
-      const pTxt = row.addText(`${priceLabel(p)} ct`)
-      pTxt.textColor = priceColor(p)
-      pTxt.font = Font.boldMonospacedSystemFont(10)
-
-      widget.addSpacer(4)
-    }
-
-    addFooter(widget)
-  }
-
-  // Jede Stunde neu laden
-  const nextHour = new Date()
-  nextHour.setMinutes(2, 0, 0)
-  nextHour.setHours(nextHour.getHours() + 1)
-  widget.refreshAfterDate = nextHour
-
-  return widget
+  return null
 }
 
 // ═══════════════════════════════════════════════════════════
 // HILFSFUNKTIONEN
 // ═══════════════════════════════════════════════════════════
-function addHeader(widget) {
-  const row = widget.addStack()
-  row.layoutHorizontally()
-  row.centerAlignContent()
+function toCtKwh(eurMwh) { return eurMwh / 10 }
 
-  const icon = row.addText("⚡")
-  icon.font = Font.systemFont(12)
-
-  row.addSpacer(4)
-
-  const title = row.addText("EPEX Spot")
-  title.textColor = COLORS.accent
-  title.font = Font.boldSystemFont(13)
-
-  row.addSpacer()
-
-  const ctry = row.addText(CONFIG.country.toUpperCase() + " · Börsenpreis")
-  ctry.textColor = COLORS.dim
-  ctry.font = Font.systemFont(9)
+function priceColor(ct) {
+  if (ct < 0)                       return C.blue
+  if (ct <= CONFIG.thresholdGreen)  return C.green
+  if (ct <= CONFIG.thresholdYellow) return C.yellow
+  return C.red
 }
 
-function addFooter(widget) {
-  widget.addSpacer()
+function fmt(ct) {
+  if (ct == null) return "–"
+  return (ct < 0 ? "−" : "") + Math.abs(ct).toFixed(1)
+}
+
+function hStr(ts) {
+  return new Date(ts).getHours().toString().padStart(2, "0") + ":00"
+}
+
+function trendArrow(cur, nxt) {
+  if (nxt > cur + 0.5) return { s: "↑", c: C.red }
+  if (nxt < cur - 0.5) return { s: "↓", c: C.green }
+  return { s: "→", c: C.dim }
+}
+
+// Liefert aktuellen Slot + nächste n Einträge
+function getEntries(data, count) {
+  const now = Date.now()
+  const out = []
+  for (const e of data) {
+    if (e.start_timestamp <= now && e.end_timestamp > now) {
+      out.push({ ...e, isCurrent: true })
+    } else if (e.start_timestamp > now && out.length > 0) {
+      out.push({ ...e, isCurrent: false })
+      if (out.length >= count + 1) break
+    }
+  }
+  // Fallback: kein "jetzt" gefunden → erste Einträge verwenden
+  if (out.length === 0) {
+    for (const e of data.slice(0, count + 1)) {
+      out.push({ ...e, isCurrent: out.length === 0 })
+    }
+  }
+  return out
+}
+
+function addHeader(w) {
+  const row = w.addStack()
+  row.layoutHorizontally()
+  row.centerAlignContent()
+  const icon = row.addText("⚡ ")
+  icon.font = Font.systemFont(12)
+  const title = row.addText("EPEX Spot")
+  title.textColor = C.accent
+  title.font = Font.boldSystemFont(13)
+  row.addSpacer()
+  const sub = row.addText(CONFIG.country.toUpperCase() + " · Börsenpreis")
+  sub.textColor = C.dim
+  sub.font = Font.systemFont(9)
+}
+
+function addFooter(w) {
+  w.addSpacer()
   const now = new Date()
   const hh  = now.getHours().toString().padStart(2, "0")
   const mm  = now.getMinutes().toString().padStart(2, "0")
-  const footer = widget.addText(`Stand: ${hh}:${mm} · Quelle: aWATTar / EPEX SPOT`)
-  footer.textColor = COLORS.dim
-  footer.font = Font.systemFont(8)
-  footer.rightAlignText()
+  const f   = w.addText(`Stand: ${hh}:${mm} · energy-charts.info / aWATTar`)
+  f.textColor = C.dim
+  f.font = Font.systemFont(8)
+  f.rightAlignText()
+}
+
+// ═══════════════════════════════════════════════════════════
+// WIDGET AUFBAUEN
+// ═══════════════════════════════════════════════════════════
+async function buildWidget(family) {
+  const w = new ListWidget()
+  w.backgroundColor = C.bg          // Color.dynamic → kein Device.isUsingDarkAppearance() nötig
+  w.setPadding(12, 14, 10, 14)
+  w.url = "https://api.energy-charts.info"
+
+  const data = await fetchPrices()
+
+  // ── Fehlerfall ──────────────────────────────────────────
+  if (!data || data.length === 0) {
+    addHeader(w)
+    w.addSpacer(10)
+    const err = w.addText(
+      "⚠️ Keine Preisdaten\nverfügbar.\n\n" +
+      "Bitte prüfen:\n" +
+      "· Internetverbindung\n" +
+      "· Einstellungen → Scriptable\n" +
+      "  → Netzwerkzugriff erlaubt?"
+    )
+    err.textColor = C.dim
+    err.font = Font.systemFont(11)
+    return w
+  }
+
+  const maxH    = family === "small" ? 2 : family === "large" ? 11 : CONFIG.hoursToShow
+  const entries = getEntries(data, maxH)
+  const cur     = entries[0]
+  const curCt   = toCtKwh(cur.marketprice)
+
+  // ── SMALL ───────────────────────────────────────────────
+  if (family === "small") {
+    addHeader(w)
+    w.addSpacer(4)
+
+    const prRow = w.addStack()
+    prRow.layoutHorizontally()
+    prRow.centerAlignContent()
+
+    const big = prRow.addText(fmt(curCt))
+    big.textColor = priceColor(curCt)
+    big.font = Font.boldSystemFont(38)
+
+    const uc = prRow.addStack()
+    uc.layoutVertically()
+    uc.addSpacer(14)
+    const u = uc.addText(" ct\n/kWh")
+    u.textColor = C.dim
+    u.font = Font.systemFont(9)
+
+    w.addSpacer(2)
+    const nl = w.addText(`Jetzt · ${hStr(cur.start_timestamp)} Uhr`)
+    nl.textColor = C.dim
+    nl.font = Font.systemFont(10)
+    w.addSpacer(8)
+
+    for (let i = 1; i < Math.min(entries.length, 3); i++) {
+      const e = entries[i]
+      const p = toCtKwh(e.marketprice)
+      const row = w.addStack()
+      row.layoutHorizontally()
+      const t = row.addText(hStr(e.start_timestamp) + " Uhr")
+      t.textColor = C.dim
+      t.font = Font.systemFont(11)
+      row.addSpacer()
+      const pt = row.addText(`${fmt(p)} ct`)
+      pt.textColor = priceColor(p)
+      pt.font = Font.boldSystemFont(11)
+      w.addSpacer(3)
+    }
+    addFooter(w)
+  }
+
+  // ── MEDIUM ──────────────────────────────────────────────
+  else if (family === "medium") {
+    addHeader(w)
+    w.addSpacer(6)
+
+    const mainRow = w.addStack()
+    mainRow.layoutHorizontally()
+
+    // Linke Spalte – aktueller Preis
+    const left = mainRow.addStack()
+    left.layoutVertically()
+    left.size = new Size(120, 0)
+
+    const big = left.addText(fmt(curCt))
+    big.textColor = priceColor(curCt)
+    big.font = Font.boldSystemFont(40)
+
+    const cl = left.addText("ct/kWh")
+    cl.textColor = C.dim
+    cl.font = Font.systemFont(11)
+    left.addSpacer(4)
+
+    const nl = left.addText(`${hStr(cur.start_timestamp)} Uhr`)
+    nl.textColor = C.dim
+    nl.font = Font.systemFont(10)
+
+    if (entries.length > 1) {
+      const nxt = toCtKwh(entries[1].marketprice)
+      const arr = trendArrow(curCt, nxt)
+      left.addSpacer(2)
+      const tr = left.addText(`nächste ${arr.s} ${fmt(nxt)} ct`)
+      tr.textColor = arr.c
+      tr.font = Font.systemFont(10)
+    }
+
+    mainRow.addSpacer(8)
+
+    // Rechte Spalte – nächste Stunden
+    const right = mainRow.addStack()
+    right.layoutVertically()
+
+    const hdr = right.addText("Nächste Stunden")
+    hdr.textColor = C.dim
+    hdr.font = Font.systemFont(9)
+    right.addSpacer(4)
+
+    for (let i = 1; i < Math.min(entries.length, CONFIG.hoursToShow + 1); i++) {
+      const e = entries[i]
+      const p = toCtKwh(e.marketprice)
+      const row = right.addStack()
+      row.layoutHorizontally()
+      const dot = row.addText("● ")
+      dot.textColor = priceColor(p)
+      dot.font = Font.systemFont(10)
+      const time = row.addText(hStr(e.start_timestamp))
+      time.textColor = C.dim
+      time.font = Font.systemFont(10)
+      row.addSpacer()
+      const pt = row.addText(`${fmt(p)} ct`)
+      pt.textColor = priceColor(p)
+      pt.font = Font.boldSystemFont(10)
+      right.addSpacer(3)
+    }
+    addFooter(w)
+  }
+
+  // ── LARGE ───────────────────────────────────────────────
+  else {
+    addHeader(w)
+    w.addSpacer(4)
+
+    const topRow = w.addStack()
+    topRow.layoutHorizontally()
+    topRow.centerAlignContent()
+
+    const bigTxt = topRow.addText(fmt(curCt))
+    bigTxt.textColor = priceColor(curCt)
+    bigTxt.font = Font.boldSystemFont(44)
+
+    const us = topRow.addStack()
+    us.layoutVertically()
+    us.addSpacer(18)
+    const ut = us.addText(" ct/kWh")
+    ut.textColor = C.dim
+    ut.font = Font.systemFont(12)
+
+    w.addSpacer(2)
+
+    const nowRow = w.addStack()
+    nowRow.layoutHorizontally()
+    const nl2 = nowRow.addText(`Jetzt: ${hStr(cur.start_timestamp)}–${hStr(cur.end_timestamp)} Uhr`)
+    nl2.textColor = C.dim
+    nl2.font = Font.systemFont(10)
+
+    if (entries.length > 1) {
+      const nxt = toCtKwh(entries[1].marketprice)
+      const arr = trendArrow(curCt, nxt)
+      nowRow.addSpacer()
+      const tr = nowRow.addText(`${arr.s} ${fmt(nxt)} ct`)
+      tr.textColor = arr.c
+      tr.font = Font.systemFont(10)
+    }
+
+    w.addSpacer(8)
+    const div = w.addText("─────────────────────────────")
+    div.textColor = C.divider
+    div.font = Font.systemFont(8)
+    w.addSpacer(6)
+
+    const allP = entries.slice(1).map(e => Math.abs(toCtKwh(e.marketprice)))
+    const maxP = Math.max(...allP, 1)
+
+    for (let i = 1; i < Math.min(entries.length, 12); i++) {
+      const e  = entries[i]
+      const p  = toCtKwh(e.marketprice)
+      const row = w.addStack()
+      row.layoutHorizontally()
+      row.centerAlignContent()
+
+      const dot = row.addText("●")
+      dot.textColor = priceColor(p)
+      dot.font = Font.systemFont(9)
+      row.addSpacer(4)
+
+      const tt = row.addText(hStr(e.start_timestamp))
+      tt.textColor = C.dim
+      tt.font = Font.monospacedSystemFont(10)
+      row.addSpacer(6)
+
+      const bw  = Math.max(1, Math.round((Math.abs(p) / maxP) * 12))
+      const bar = row.addText("▮".repeat(bw))
+      bar.textColor = priceColor(p)
+      bar.font = Font.systemFont(8)
+      row.addSpacer()
+
+      const pt = row.addText(`${fmt(p)} ct`)
+      pt.textColor = priceColor(p)
+      pt.font = Font.boldMonospacedSystemFont(10)
+      w.addSpacer(4)
+    }
+    addFooter(w)
+  }
+
+  // Zur nächsten vollen Stunde + 2 Min neu laden
+  const nextH = new Date()
+  nextH.setMinutes(2, 0, 0)
+  nextH.setHours(nextH.getHours() + 1)
+  w.refreshAfterDate = nextH
+
+  return w
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -430,11 +396,10 @@ const widget = await buildWidget(family)
 if (config.runsInWidget) {
   Script.setWidget(widget)
 } else {
-  // Vorschau wenn direkt in Scriptable ausgeführt
   switch (family) {
-    case "small":  await widget.presentSmall();  break
-    case "large":  await widget.presentLarge();  break
-    default:       await widget.presentMedium(); break
+    case "small": await widget.presentSmall(); break
+    case "large": await widget.presentLarge(); break
+    default:      await widget.presentMedium(); break
   }
 }
 

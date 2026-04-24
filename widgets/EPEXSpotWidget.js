@@ -51,34 +51,42 @@ const C = {
 // API – Primär: energy-charts.info (Fraunhofer ISE)
 //        Fallback: aWATTar
 // ═══════════════════════════════════════════════════════════
+// loadJSON() wirft SyntaxError wenn Server HTML zurückgibt ("Unexpected token '<'")
+// Daher: loadString() + manuelle Prüfung + JSON.parse()
+async function fetchJSON(url) {
+  const req = new Request(url)
+  req.timeoutInterval = 15
+  req.headers = {
+    "Accept": "application/json",
+    "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15"
+  }
+  const text = await req.loadString()
+  const t = text ? text.trim() : ""
+  if (t[0] !== "{" && t[0] !== "[") {
+    throw new Error("Keine JSON-Antwort (erhalten: " + t.substring(0, 40) + ")")
+  }
+  return JSON.parse(text)
+}
+
 async function fetchPrices() {
   const now = Date.now()
-  const h26 = 26 * 3600000   // 26 Stunden in ms (keine Numeric Separators für Kompatibilität)
+  const h26 = 26 * 3600000
 
-  // 1. Primär: aWATTar – bestätigtes Format: {object, data[], url}
-  //    data[i]: { start_timestamp (ms), end_timestamp (ms), marketprice (EUR/MWh), unit }
+  // 1. Primär: aWATTar – Format: { data: [{start_timestamp, end_timestamp, marketprice, unit}] }
   try {
     const base = CONFIG.country === "at"
       ? "https://api.awattar.at/v1/marketdata"
       : "https://api.awattar.de/v1/marketdata"
-    const req = new Request(base + "?start=" + now + "&end=" + (now + h26))
-    req.timeoutInterval = 15
-    req.headers = { "Accept": "application/json" }
-    const json = await req.loadJSON()
+    const json = await fetchJSON(base + "?start=" + now + "&end=" + (now + h26))
     if (Array.isArray(json.data) && json.data.length > 0) return json.data
   } catch (e) {
     console.error("aWATTar Fehler:", e.message)
   }
 
-  // 2. Fallback: energy-charts.info (Fraunhofer ISE)
-  //    Format: { unix_seconds[], price[] } – Preise in EUR/MWh
+  // 2. Fallback: energy-charts.info – Format: { unix_seconds[], price[] }
   try {
     const bzn = CONFIG.country === "at" ? "AT" : "DE-LU"
-    const req = new Request("https://api.energy-charts.info/price?bzn=" + bzn)
-    req.timeoutInterval = 15
-    req.headers = { "Accept": "application/json" }
-    const json = await req.loadJSON()
-
+    const json = await fetchJSON("https://api.energy-charts.info/price?bzn=" + bzn)
     if (Array.isArray(json.unix_seconds) && json.unix_seconds.length > 0) {
       const entries = []
       for (let i = 0; i < json.unix_seconds.length; i++) {
